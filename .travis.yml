@@ -1,9 +1,10 @@
 language: java
-install: true
+install:
+ - uname -a
 script: mvn clean verify
 after_success:
  - ./generate-maven-settings.sh
-# - mvn deploy -s ./target/maven-settings.xml
+ - mvn deploy -s ./target/maven-settings.xml
 env:
   global:
     secure: GmN3IcF6NWVXrA9U/cT5/SNp1Ke45/Hav0WrSXI7If9a/Jb3kUwESGSkqtChBmM9D5UqR208Ybk3KuHsPW8WXWww/12TUH94PxEQAd8EivJ+ZSgpHm0sMCrxFkttbg2BvbilUq/05rHco7wwLxMpNzLK3k36Th4zRLSpZKlmVZE=
