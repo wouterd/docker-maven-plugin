@@ -4,7 +4,7 @@ docker-maven-plugin
 A maven plugin to manage docker containers and images for integration tests.
 
 # Architecture principles
-* The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple builds can run on the same server in parallel.
+* The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names and/or ids.
 * Multiple "docker providers" need to be supported and pluggable
 
 # Musts for 1.0
