@@ -21,12 +21,11 @@ public final class DockerPortFromEnvironmentSupplier extends DockerEnvironmentSu
     @Override
     public Optional<Integer> get() {
         Optional<URI> dockerUriFromEnvironment = getDockerUriFromEnvironment();
-        if (dockerUriFromEnvironment.isPresent()) {
-            URI dockerUrl = dockerUriFromEnvironment.get();
-            boolean isTcpSocket = RemoteDockerProvider.TCP_PROTOCOL.equalsIgnoreCase(dockerUrl.getScheme());
-            return isTcpSocket ? Optional.fromNullable(dockerUrl.getPort()) : Optional.<Integer>absent();
-        } else {
+        if (!dockerUriFromEnvironment.isPresent()) {
             return Optional.absent();
         }
+        URI dockerUrl = dockerUriFromEnvironment.get();
+        boolean isTcpSocket = RemoteDockerProvider.TCP_PROTOCOL.equalsIgnoreCase(dockerUrl.getScheme());
+        return isTcpSocket ? Optional.fromNullable(dockerUrl.getPort()) : Optional.<Integer>absent();
     }
 }
