@@ -161,6 +161,8 @@
             <configuration>
               <source>1.7</source>
               <target>1.7</target>
+              <fork>true</fork>
+              <compilerVersion>1.7</compilerVersion>
             </configuration>
           </plugin>
         </plugins>
