@@ -19,12 +19,17 @@
         <groupId>@project.groupId@</groupId>
         <artifactId>@project.artifactId@</artifactId>
         <version>@project.version@</version>
+        <configuration>
+          <containers>
+            <container>
+              <image>wouterd/tomcat</image>
+            </container>
+          </containers>
+        </configuration>
         <executions>
           <execution>
-            <id>touch</id>
-            <phase>validate</phase>
             <goals>
-              <goal>touch</goal>
+              <goal>start-containers</goal>
             </goals>
           </execution>
         </executions>

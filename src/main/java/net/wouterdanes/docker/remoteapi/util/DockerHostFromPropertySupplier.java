@@ -1,4 +1,4 @@
-package net.wouterdanes.docker.provider.util;
+package net.wouterdanes.docker.remoteapi.util;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;

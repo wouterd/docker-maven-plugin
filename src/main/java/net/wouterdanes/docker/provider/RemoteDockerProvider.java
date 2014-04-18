@@ -1,13 +1,16 @@
 package net.wouterdanes.docker.provider;
 
 import net.wouterdanes.docker.maven.ContainerStartConfiguration;
-import net.wouterdanes.docker.provider.util.DockerHostFromEnvironmentSupplier;
-import net.wouterdanes.docker.provider.util.DockerHostFromPropertySupplier;
-import net.wouterdanes.docker.provider.util.DockerPortFromEnvironmentSupplier;
-import net.wouterdanes.docker.provider.util.DockerPortFromPropertySupplier;
+import net.wouterdanes.docker.remoteapi.ContainerCreateRequest;
+import net.wouterdanes.docker.remoteapi.ContainerStartRequest;
+import net.wouterdanes.docker.remoteapi.ContainersService;
+import net.wouterdanes.docker.remoteapi.util.DockerHostFromEnvironmentSupplier;
+import net.wouterdanes.docker.remoteapi.util.DockerHostFromPropertySupplier;
+import net.wouterdanes.docker.remoteapi.util.DockerPortFromEnvironmentSupplier;
+import net.wouterdanes.docker.remoteapi.util.DockerPortFromPropertySupplier;
 
 /**
- * This class is responsible for providing a docker interface with a remote (not running on localhost) docker host It
+ * This class is responsible for providing a docker interface with a remote (not running on localhost) docker host. It
  * can be configured by setting an environment variable {@value #DOCKER_HOST_SYSTEM_ENV }, like in the client. Or you
  * can specify the host and port on the command line like such:
  * <pre>-D{@value #DOCKER_HOST_PROPERTY}=[host] -D{@value #DOCKER_PORT_PROPERTY}=[port]</pre>
@@ -27,6 +30,8 @@ public class RemoteDockerProvider implements DockerProvider {
     private final String host;
     private final int port;
 
+    private final ContainersService containersService;
+
     public RemoteDockerProvider() {
         this(getDockerHostFromEnvironment(), getDockerPortFromEnvironment());
     }
@@ -34,11 +39,24 @@ public class RemoteDockerProvider implements DockerProvider {
     public RemoteDockerProvider(final String host, final int port) {
         this.host = host;
         this.port = port;
+
+        String dockerApiRoot = String.format("http://%s:%s", host, port);
+        containersService = new ContainersService(dockerApiRoot);
     }
 
     @Override
     public String startContainer(final ContainerStartConfiguration configuration) {
-        return null;
+        ContainerCreateRequest createRequest = new ContainerCreateRequest()
+                .fromImage(configuration.getImage());
+
+        String containerId = containersService.createContainer(createRequest);
+
+        ContainerStartRequest containerStartRequest = new ContainerStartRequest()
+                .withAllPortsPublished();
+
+        containersService.startContainer(containerId, containerStartRequest);
+
+        return containerId;
     }
 
     @Override
@@ -60,4 +78,5 @@ public class RemoteDockerProvider implements DockerProvider {
                 .or(DockerHostFromEnvironmentSupplier.INSTANCE.get())
                 .or(DEFAULT_DOCKER_HOST);
     }
+
 }
