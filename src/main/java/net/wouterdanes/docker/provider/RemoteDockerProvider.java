@@ -28,15 +28,12 @@ public class RemoteDockerProvider implements DockerProvider {
     private final int port;
 
     public RemoteDockerProvider() {
+        this(getDockerHostFromEnvironment(), getDockerPortFromEnvironment());
+    }
 
-        host = DockerHostFromPropertySupplier.INSTANCE.get()
-                .or(DockerHostFromEnvironmentSupplier.INSTANCE.get())
-                .or(DEFAULT_DOCKER_HOST);
-
-        port = DockerPortFromPropertySupplier.INSTANCE.get()
-                .or(DockerPortFromEnvironmentSupplier.INSTANCE.get())
-                .or(DEFAULT_DOCKER_PORT);
-
+    public RemoteDockerProvider(final String host, final int port) {
+        this.host = host;
+        this.port = port;
     }
 
     @Override
@@ -50,5 +47,17 @@ public class RemoteDockerProvider implements DockerProvider {
                 "host='" + host + '\'' +
                 ", port=" + port +
                 '}';
+    }
+
+    private static Integer getDockerPortFromEnvironment() {
+        return DockerPortFromPropertySupplier.INSTANCE.get()
+                .or(DockerPortFromEnvironmentSupplier.INSTANCE.get())
+                .or(DEFAULT_DOCKER_PORT);
+    }
+
+    private static String getDockerHostFromEnvironment() {
+        return DockerHostFromPropertySupplier.INSTANCE.get()
+                .or(DockerHostFromEnvironmentSupplier.INSTANCE.get())
+                .or(DEFAULT_DOCKER_HOST);
     }
 }
