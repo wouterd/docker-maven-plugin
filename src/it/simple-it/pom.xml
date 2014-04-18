@@ -31,6 +31,13 @@
             <goals>
               <goal>start-containers</goal>
             </goals>
+            <configuration>
+              <containers>
+                <container>
+                  <image>wouterd/tomcat</image>
+                </container>
+              </containers>
+            </configuration>
           </execution>
         </executions>
       </plugin>
