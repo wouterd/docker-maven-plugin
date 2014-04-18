@@ -1,4 +1,4 @@
-package net.wouterdanes.docker.provider.util;
+package net.wouterdanes.docker.remoteapi.util;
 
 import java.net.URI;
 
@@ -8,24 +8,24 @@ import com.google.common.base.Supplier;
 import net.wouterdanes.docker.provider.RemoteDockerProvider;
 
 /**
- * Supplies the docker port from the environment variable
+ * Supplies the docker host from the environment variable
  * '{@value net.wouterdanes.docker.provider.RemoteDockerProvider#DOCKER_HOST_SYSTEM_ENV}'
  */
-public final class DockerPortFromEnvironmentSupplier extends DockerEnvironmentSupplier
-        implements Supplier<Optional<Integer>> {
+public final class DockerHostFromEnvironmentSupplier extends DockerEnvironmentSupplier
+        implements Supplier<Optional<String>> {
 
-    public static DockerPortFromEnvironmentSupplier INSTANCE = new DockerPortFromEnvironmentSupplier();
+    public static DockerHostFromEnvironmentSupplier INSTANCE = new DockerHostFromEnvironmentSupplier();
 
-    private DockerPortFromEnvironmentSupplier() {    }
+    private DockerHostFromEnvironmentSupplier() {    }
 
     @Override
-    public Optional<Integer> get() {
+    public Optional<String> get() {
         Optional<URI> dockerUriFromEnvironment = getDockerUriFromEnvironment();
         if (!dockerUriFromEnvironment.isPresent()) {
             return Optional.absent();
         }
         URI dockerUrl = dockerUriFromEnvironment.get();
         boolean isTcpSocket = RemoteDockerProvider.TCP_PROTOCOL.equalsIgnoreCase(dockerUrl.getScheme());
-        return isTcpSocket ? Optional.fromNullable(dockerUrl.getPort()) : Optional.<Integer>absent();
+        return isTcpSocket ? Optional.fromNullable(dockerUrl.getHost()) : Optional.<String>absent();
     }
 }

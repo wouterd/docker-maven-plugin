@@ -47,7 +47,7 @@ public class RemoteDockerProviderTest {
         RemoteDockerProvider provider = new RemoteDockerProvider();
 
         String expectedValue = String.format("RemoteDockerProvider{host='%s', port=%s}", expectedHost, expectedPort);
-        org.junit.Assert.assertEquals(expectedValue, provider.toString());
+        Assert.assertEquals(expectedValue, provider.toString());
 
     }
 }

@@ -19,6 +19,20 @@
         <groupId>@project.groupId@</groupId>
         <artifactId>@project.artifactId@</artifactId>
         <version>@project.version@</version>
+        <executions>
+          <execution>
+            <configuration>
+              <containers>
+                <container>
+                  <image>wouterd/tomcat</image>
+                </container>
+              </containers>
+            </configuration>
+            <goals>
+              <goal>start-containers</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

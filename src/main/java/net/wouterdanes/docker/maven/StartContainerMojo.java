@@ -2,7 +2,7 @@ package net.wouterdanes.docker.maven;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
+import javax.inject.Inject;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,26 +26,20 @@ public class StartContainerMojo extends AbstractMojo {
     @Parameter(defaultValue = "remote", property = "docker.provider", required = true)
     private String providerName;
 
-    private Optional<DockerProvider> dockerProvider;
-
-    public StartContainerMojo(final DockerProvider dockerProvider) {
-        this.dockerProvider = Optional.of(dockerProvider);
+    @Inject
+    public StartContainerMojo(final List<ContainerStartConfiguration> containers, final String providerName) {
+        this.containers = containers;
+        this.providerName = providerName;
     }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-
-        DockerProvider provider = dockerProvider.or(new DockerProviderSupplier(providerName));
+        DockerProvider provider = new DockerProviderSupplier(providerName).get();
 
         for (ContainerStartConfiguration configuration : containers) {
             String containerId = provider.startContainer(configuration);
             getLog().info(String.format("Started container with id '%s'", containerId));
         }
-
-    }
-
-    public void setContainers(List<ContainerStartConfiguration> containers) {
-        this.containers = containers;
     }
 
 }
