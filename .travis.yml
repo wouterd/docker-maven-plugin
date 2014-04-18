@@ -1,9 +1,9 @@
 language: java
 install: true
-script: mvn clean verify
+script: mvn clean test
 after_success:
 - ./generate-maven-settings.sh
-- mvn deploy -s ./target/maven-settings.xml
+- mvn deploy -s ./target/maven-settings.xml -DskipTests
 env:
   global:
   - secure: Lft4JvZkRsoKrSIhLKTie45uycZZ5ixmugR5hVlX9qjpugLswIUCrWmiV2KvjNf4dwKTWoVOvphMpxzZbIU6+QK91MTH81Gt5kLYFifQDPLL49gal1ahIfUKJIJUFOC2wJjVY7ZC2lQrNVLU78IQGdidshZNIRS43ugyBPfxXjM=
