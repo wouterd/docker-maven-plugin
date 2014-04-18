@@ -1,7 +1,5 @@
 language: java
-jdk:
-- oraclejdk7
-install: false
+install: true
 script: mvn clean verify
 after_success:
 - ./generate-maven-settings.sh
