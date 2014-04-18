@@ -1,6 +1,8 @@
 docker-maven-plugin
 ===================
 
+[![Build Status](https://travis-ci.org/wouterd/docker-maven-plugin.svg?branch=master)](https://travis-ci.org/wouterd/docker-maven-plugin)
+
 A maven plugin to manage docker containers and images for integration tests.
 
 # Architecture principles
