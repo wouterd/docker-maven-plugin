@@ -10,6 +10,7 @@ A maven plugin to manage docker containers and images for integration tests.
 * Multiple "docker providers" need to be supported and pluggable
 
 # Musts for 1.0
+
 - [ ] Start a container in the pre-integration-test phase based on an image:
 - [X] Known on the docker host by a name
 - [ ] Available in a repository
