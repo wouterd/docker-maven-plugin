@@ -20,4 +20,15 @@ public interface DockerProvider {
      */
     String startContainer(ContainerStartConfiguration configuration);
 
+    /**
+     * Stops a docker container
+     * @param containerId the Id of the container to stop
+     */
+    void stopContainer(String containerId);
+
+    /**
+     * Delete a docker container
+     * @param containerId the Id of the container to delete
+     */
+    void deleteContainer(String containerId);
 }
