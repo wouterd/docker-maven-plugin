@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -26,16 +25,16 @@ import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 public class ContainersService {
 
     private final ObjectMapper objectMapper;
-    private final String dockerApiRoot;
+    private final WebTarget serviceEndPoint;
 
     public ContainersService(String dockerApiRoot) {
-        this.dockerApiRoot = dockerApiRoot;
         objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+        serviceEndPoint = ClientBuilder.newClient().target(dockerApiRoot).path("/containers");
     }
 
     public String createContainer(ContainerCreateRequest request) {
-        WebTarget createEndPoint = getServiceEndPoint().path("/create");
+        WebTarget createEndPoint = serviceEndPoint.path("/create");
 
         String createResponseStr;
         try {
@@ -57,7 +56,7 @@ public class ContainersService {
     }
 
     public void startContainer(String id, ContainerStartRequest configuration) {
-        Response response = getServiceEndPoint()
+        Response response = serviceEndPoint
                 .path(id)
                 .path("/start")
                 .request()
@@ -70,7 +69,7 @@ public class ContainersService {
     }
 
     public void killContainer(String id) {
-        Response response = getServiceEndPoint()
+        Response response = serviceEndPoint
                 .path(id)
                 .path("/kill")
                 .request()
@@ -83,7 +82,7 @@ public class ContainersService {
     }
 
     public void deleteContainer(String id) {
-        Response response = getServiceEndPoint()
+        Response response = serviceEndPoint
                 .path(id)
                 .request()
                 .delete();
@@ -101,11 +100,6 @@ public class ContainersService {
             case 500:
                 throw new DockerException(statusInfo.getReasonPhrase());
         }
-    }
-
-    private WebTarget getServiceEndPoint() {
-        Client client = ClientBuilder.newClient();
-        return client.target(dockerApiRoot).path("/containers");
     }
 
     private String toJson(Object obj) {
