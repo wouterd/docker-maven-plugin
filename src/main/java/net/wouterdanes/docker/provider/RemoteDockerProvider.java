@@ -60,6 +60,16 @@ public class RemoteDockerProvider implements DockerProvider {
     }
 
     @Override
+    public void stopContainer(final String containerId) {
+        containersService.killContainer(containerId);
+    }
+
+    @Override
+    public void deleteContainer(final String containerId) {
+        containersService.deleteContainer(containerId);
+    }
+
+    @Override
     public String toString() {
         return "RemoteDockerProvider{" +
                 "host='" + host + '\'' +

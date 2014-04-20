@@ -54,6 +54,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
+    <docker.host/>
+    <docker.port/>
   </properties>
 
   <dependencies>
@@ -147,6 +149,7 @@
               <goals>
                 <goal>verify</goal>
               </goals>
+              <streamLogs>true</streamLogs>
             </configuration>
             <executions>
               <execution>
@@ -155,6 +158,12 @@
                   <goal>install</goal>
                   <goal>run</goal>
                 </goals>
+                <configuration>
+                  <properties>
+                    <docker.host>${docker.host}</docker.host>
+                    <docker.port>${docker.port}</docker.port>
+                  </properties>
+                </configuration>
               </execution>
             </executions>
           </plugin>

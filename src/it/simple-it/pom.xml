@@ -21,15 +21,28 @@
         <version>@project.version@</version>
         <executions>
           <execution>
+            <id>start</id>
             <configuration>
               <containers>
                 <container>
-                  <image>wouterd/tomcat</image>
+                  <image>ubuntu</image>
+                </container>
+                <container>
+                  <image>busybox</image>
+                </container>
+                <container>
+                  <image>debian</image>
                 </container>
               </containers>
             </configuration>
             <goals>
               <goal>start-containers</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop</id>
+            <goals>
+              <goal>stop-containers</goal>
             </goals>
           </execution>
         </executions>
