@@ -1,15 +1,14 @@
 package net.wouterdanes.docker.remoteapi;
 
-import net.wouterdanes.docker.remoteapi.exception.ContainerNotFoundException;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import net.wouterdanes.docker.remoteapi.exception.ContainerNotFoundException;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 
 /**
  * This class is responsible for talking to the Docker Remote API "containers" endpoint.<br/> See <a
@@ -23,11 +22,10 @@ public class ContainersService extends BaseService {
     }
 
     public String createContainer(ContainerCreateRequest request) {
-        WebTarget createEndPoint = getServiceEndPoint().path("/create");
-
         String createResponseStr;
         try {
-            createResponseStr = createEndPoint
+            createResponseStr = getServiceEndPoint()
+                    .path("/create")
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .post(Entity.entity(toJson(request), MediaType.APPLICATION_JSON_TYPE), String.class);
         } catch (WebApplicationException e) {
@@ -91,4 +89,13 @@ public class ContainersService extends BaseService {
         }
     }
 
+    public ContainerInspectionResult inspectContainer(final String containerId) {
+        String json = getServiceEndPoint()
+                .path(containerId)
+                .path("json")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get(String.class);
+
+        return toObject(json, ContainerInspectionResult.class);
+    }
 }

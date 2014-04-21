@@ -5,6 +5,60 @@ docker-maven-plugin
 
 A maven plugin to manage docker containers and images for integration tests.
 
+# Usage
+
+      <plugin>
+        <groupId>net.wouterdanes.docker</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>start</id>
+            <goals>
+              <goal>start-containers</goal>
+            </goals>
+            <configuration>
+              <containers>
+                <container>
+                  <id>Debian</id>
+                  <image>debian:wheezy</image>
+                </container>
+                <container>
+                  <id>BusyBox</id>
+                  <image>busybox</image>
+                </container>
+                <container>
+                  <id>DB</id>
+                  <image>tutum/mysql</image>
+                </container>
+              </containers>
+            </configuration>
+          </execution>
+          <execution>
+            <id>stop</id>
+            <goals>
+              <goal>stop-containers</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+The above pom.xml element includes the plugin and starts some containers in the pre-integration-test phase and stops
+those in the post-integration-test phase. Under `<configuration>` add some containers. By giving them an `id`, you can
+reference them later and the ID is also used in the port mapping properties. The `<image>` tag specifies the docker image
+to start.
+
+By default, all exposed ports are published on the host. The following two properties are set per exposed port:
+- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.DB.ports.tcp/3306.host')
+- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.DB.ports.tcp/3306.port')
+
+You can pass those project properties over to your integration test and use them to connect to your application.
+
+# Boot2docker-cli
+Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-only network and a "public network". The VM
+also exposes port 4243 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
+interface. Else, the published ports won't be mapped to the right IP.
+
 # Architecture principles
 * The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names and/or ids.
 * Multiple "docker providers" need to be supported and pluggable
@@ -17,11 +71,11 @@ A maven plugin to manage docker containers and images for integration tests.
 - [x] Shut down containers in the post-integration-test phase that were started in the pre-integration-test phase
 - [ ] Supply information to the project during the integration-test phase about:
   - [ ] Images that were built
-  - [ ] Containers that were started
+  - [x] Containers that were started
 - [ ] Build a docker image from a bunch of source files in package and pre-integration-test phases
   - [ ] Allow built containers to be started in the pre-integration phase
 - [ ] Docker provider for "local docker" via tcp
-- [ ] Docker provider for "remote docker" via tcp (boot2docker/vm/server)
+- [x] Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
 # Further possible functionality
 * Commit containers instead of cleaning them up when the integration tests have failed
