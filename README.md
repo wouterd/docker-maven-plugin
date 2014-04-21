@@ -21,7 +21,7 @@ A maven plugin to manage docker containers and images for integration tests.
 - [ ] Build a docker image from a bunch of source files in package and pre-integration-test phases
   - [ ] Allow built containers to be started in the pre-integration phase
 - [ ] Docker provider for "local docker" via tcp
-- [ ] Docker provider for "remote docker" via tcp (boot2docker/vm/server)
+- [X] Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
 # Further possible functionality
 * Commit containers instead of cleaning them up when the integration tests have failed
