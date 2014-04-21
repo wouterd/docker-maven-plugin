@@ -1,5 +1,7 @@
 language: java
-install: true
+install:
+  - uname -a
+  - sudo apt-get install lxc-docker
 script: mvn clean verify
 after_success: ./deploy-to-sonatype.sh
 env:
