@@ -25,13 +25,10 @@
             <configuration>
               <containers>
                 <container>
-                  <image>wouterd/tomcat</image>
+                  <image>debian:wheezy</image>
                 </container>
                 <container>
-                  <image>wouterd/tomcat</image>
-                </container>
-                <container>
-                  <image>wouterd/tomcat</image>
+                  <image>busybox</image>
                 </container>
               </containers>
             </configuration>
