@@ -11,9 +11,9 @@ A maven plugin to manage docker containers and images for integration tests.
 
 # Musts for 1.0
 
-- [ ] Start a container in the pre-integration-test phase based on an image:
+- [x] Start a container in the pre-integration-test phase based on an image:
   - [x] Known on the docker host by a name
-  - [ ] Available in a repository
+  - [x] Available in a repository
 - [x] Shut down containers in the post-integration-test phase that were started in the pre-integration-test phase
 - [ ] Supply information to the project during the integration-test phase about:
   - [ ] Images that were built
