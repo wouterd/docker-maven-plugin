@@ -1,40 +1,29 @@
 package net.wouterdanes.docker.remoteapi;
 
-import java.io.IOException;
+import net.wouterdanes.docker.remoteapi.exception.ContainerNotFoundException;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-import net.wouterdanes.docker.remoteapi.exception.ContainerNotFoundException;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 
 /**
  * This class is responsible for talking to the Docker Remote API "containers" endpoint.<br/> See <a
  * href="http://docs.docker.io/reference/api/docker_remote_api_v1.10/#21-containers">
  * http://docs.docker.io/reference/api/docker_remote_api_v1.10/#21-containers</a>
  */
-public class ContainersService {
-
-    private final ObjectMapper objectMapper;
-    private final WebTarget serviceEndPoint;
+public class ContainersService extends BaseService {
 
     public ContainersService(String dockerApiRoot) {
-        objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
-        serviceEndPoint = ClientBuilder.newClient().target(dockerApiRoot).path("/containers");
+        super(dockerApiRoot, "/containers");
     }
 
     public String createContainer(ContainerCreateRequest request) {
-        WebTarget createEndPoint = serviceEndPoint.path("/create");
+        WebTarget createEndPoint = getServiceEndPoint().path("/create");
 
         String createResponseStr;
         try {
@@ -56,7 +45,7 @@ public class ContainersService {
     }
 
     public void startContainer(String id, ContainerStartRequest configuration) {
-        Response response = serviceEndPoint
+        Response response = getServiceEndPoint()
                 .path(id)
                 .path("/start")
                 .request()
@@ -69,7 +58,7 @@ public class ContainersService {
     }
 
     public void killContainer(String id) {
-        Response response = serviceEndPoint
+        Response response = getServiceEndPoint()
                 .path(id)
                 .path("/kill")
                 .request()
@@ -82,7 +71,7 @@ public class ContainersService {
     }
 
     public void deleteContainer(String id) {
-        Response response = serviceEndPoint
+        Response response = getServiceEndPoint()
                 .path(id)
                 .request()
                 .delete();
@@ -102,19 +91,4 @@ public class ContainersService {
         }
     }
 
-    private String toJson(Object obj) {
-        try {
-            return objectMapper.writeValueAsString(obj);
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to Jsonify", e);
-        }
-    }
-
-    private <T> T toObject(String json, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(json, clazz);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot convert Json", e);
-        }
-    }
 }

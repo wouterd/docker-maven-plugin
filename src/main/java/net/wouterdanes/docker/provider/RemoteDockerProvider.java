@@ -4,6 +4,8 @@ import net.wouterdanes.docker.maven.ContainerStartConfiguration;
 import net.wouterdanes.docker.remoteapi.ContainerCreateRequest;
 import net.wouterdanes.docker.remoteapi.ContainerStartRequest;
 import net.wouterdanes.docker.remoteapi.ContainersService;
+import net.wouterdanes.docker.remoteapi.ImagesService;
+import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromEnvironmentSupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromPropertySupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerPortFromEnvironmentSupplier;
@@ -31,6 +33,7 @@ public class RemoteDockerProvider implements DockerProvider {
     private final int port;
 
     private final ContainersService containersService;
+    private final ImagesService imagesService;
 
     public RemoteDockerProvider() {
         this(getDockerHostFromEnvironment(), getDockerPortFromEnvironment());
@@ -42,15 +45,22 @@ public class RemoteDockerProvider implements DockerProvider {
 
         String dockerApiRoot = String.format("http://%s:%s", host, port);
         containersService = new ContainersService(dockerApiRoot);
+        imagesService = new ImagesService(dockerApiRoot);
     }
 
     @Override
     public String startContainer(final ContainerStartConfiguration configuration) {
+        String imageId = configuration.getImage();
         ContainerCreateRequest createRequest = new ContainerCreateRequest()
-                .fromImage(configuration.getImage());
+                .fromImage(imageId);
 
-        String containerId = containersService.createContainer(createRequest);
-
+        String containerId;
+        try {
+            containerId = containersService.createContainer(createRequest);
+        } catch (ImageNotFoundException e) {
+            imagesService.pullImage(imageId);
+            containerId = containersService.createContainer(createRequest);
+        }
         ContainerStartRequest containerStartRequest = new ContainerStartRequest()
                 .withAllPortsPublished();
 
