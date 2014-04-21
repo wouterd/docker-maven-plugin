@@ -1,7 +1,14 @@
 package net.wouterdanes.docker.provider;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import net.wouterdanes.docker.maven.ContainerStartConfiguration;
+import net.wouterdanes.docker.maven.ExposedPort;
 import net.wouterdanes.docker.remoteapi.ContainerCreateRequest;
+import net.wouterdanes.docker.remoteapi.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.ContainerStartRequest;
 import net.wouterdanes.docker.remoteapi.ContainersService;
 import net.wouterdanes.docker.remoteapi.ImagesService;
@@ -77,6 +84,23 @@ public class RemoteDockerProvider implements DockerProvider {
     @Override
     public void deleteContainer(final String containerId) {
         containersService.deleteContainer(containerId);
+    }
+
+    @Override
+    public List<ExposedPort> getExposedPorts(final String containerId) {
+        ContainerInspectionResult containerInspectionResult = containersService.inspectContainer(containerId);
+        if (containerInspectionResult.getNetworkSettings().getPorts().isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<String, List<ContainerInspectionResult.NetworkSettings.PortMappingInfo>> ports =
+                containerInspectionResult.getNetworkSettings().getPorts();
+        List<ExposedPort> exposedPorts = new ArrayList<>();
+        for (Map.Entry<String, List<ContainerInspectionResult.NetworkSettings.PortMappingInfo>> port : ports.entrySet()) {
+            String exposedPort = port.getKey();
+            int hostPort = port.getValue().get(0).getHostPort();
+            exposedPorts.add(new ExposedPort(exposedPort, hostPort, host));
+        }
+        return exposedPorts;
     }
 
     @Override

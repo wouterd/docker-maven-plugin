@@ -9,6 +9,7 @@ package net.wouterdanes.docker.maven;
 public class ContainerStartConfiguration {
 
     private String image;
+    private String id;
 
     /**
      * Set the image name or id to use and returns the object so you can chain from/with statements.
@@ -21,7 +22,16 @@ public class ContainerStartConfiguration {
         return this;
     }
 
+    public ContainerStartConfiguration withId(String id) {
+        this.id = id;
+        return this;
+    }
+
     public String getImage() {
         return image;
+    }
+
+    public String getId() {
+        return id != null ? id : image;
     }
 }

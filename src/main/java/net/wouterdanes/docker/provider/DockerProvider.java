@@ -1,6 +1,9 @@
 package net.wouterdanes.docker.provider;
 
+import java.util.List;
+
 import net.wouterdanes.docker.maven.ContainerStartConfiguration;
+import net.wouterdanes.docker.maven.ExposedPort;
 
 /**
  * This interface represents an implementation that provides Docker functionality. Examples are:
@@ -31,4 +34,11 @@ public interface DockerProvider {
      * @param containerId the Id of the container to delete
      */
     void deleteContainer(String containerId);
+
+    /**
+     * Returns a list of ports exposed by the container, including information on how to reach them
+     * @param containerId the Id of the container
+     * @return {@link List} of {@link net.wouterdanes.docker.maven.ExposedPort}s
+     */
+    List<ExposedPort> getExposedPorts(String containerId);
 }

@@ -25,10 +25,16 @@
             <configuration>
               <containers>
                 <container>
+                  <id>Debian</id>
                   <image>debian:wheezy</image>
                 </container>
                 <container>
+                  <id>BusyBox</id>
                   <image>busybox</image>
+                </container>
+                <container>
+                  <id>DB</id>
+                  <image>tutum/mysql</image>
                 </container>
               </containers>
             </configuration>
