@@ -59,6 +59,11 @@ Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-onl
 also exposes port 4243 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
 interface. Else, the published ports won't be mapped to the right IP.
 
+# Docker version
+The docker remote API implementation is based on the 1.10 docker api version. The plugin should work with docker 1.10 and
+up. It could also work with lower versions of docker, but it won't, because I specifically target the 1.10 API to prevent
+strange errors from occurring.
+
 # Architecture principles
 * The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names and/or ids.
 * Multiple "docker providers" need to be supported and pluggable
@@ -82,3 +87,5 @@ interface. Else, the published ports won't be mapped to the right IP.
 * Create some kind of "wait for stuff to initialize" step: for example, Tomcat starting up.
 * Add support for linux sockets for "local docker" provider
 * Add support for Tutum.co
+* Create a feature complete docker remote api for Java
+* Support multiple (all) versions of the Docker Remote API
