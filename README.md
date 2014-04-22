@@ -83,6 +83,7 @@ strange errors from occurring.
 - [x] Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
 # Further possible functionality
+* Linking containers
 * Commit containers instead of cleaning them up when the integration tests have failed
 * Create some kind of "wait for stuff to initialize" step: for example, Tomcat starting up.
 * Add support for linux sockets for "local docker" provider
