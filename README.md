@@ -6,11 +6,6 @@ docker-maven-plugin
 A maven plugin to manage docker containers and images for integration tests.
 
 # Usage
-The plugin will connect to a docker instance over HTTP, linux socket support will be added after 1.0. It will look up the host/port of docker in the following way:
-- It will grab host and port from docker.host and docker.port set by -Ddocker.host and -Ddocker.port on the command line
-- Else it will try to parse the DOCKER_HOST system environment variable
-- Finally it will default to 127.0.0.1:4243
-
 
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
@@ -58,6 +53,11 @@ By default, all exposed ports are published on the host. The following two prope
 - docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.DB.ports.tcp/3306.port')
 
 You can pass those project properties over to your integration test and use them to connect to your application.
+
+The plugin will connect to a docker instance over HTTP, linux socket support will be added after 1.0. It will look up the host/port of docker in the following way:
+- It will grab host and port from docker.host and docker.port set by -Ddocker.host and -Ddocker.port on the command line
+- Else it will try to parse the DOCKER_HOST system environment variable
+- Finally it will default to 127.0.0.1:4243
 
 # Boot2docker-cli
 Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-only network and a "public network". The VM
