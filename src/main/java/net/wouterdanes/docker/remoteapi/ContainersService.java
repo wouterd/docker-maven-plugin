@@ -9,6 +9,10 @@ import javax.ws.rs.core.Response;
 import net.wouterdanes.docker.remoteapi.exception.ContainerNotFoundException;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
+import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
+import net.wouterdanes.docker.remoteapi.model.ContainerCreateResponse;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
+import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
 
 /**
  * This class is responsible for talking to the Docker Remote API "containers" endpoint.<br/> See <a

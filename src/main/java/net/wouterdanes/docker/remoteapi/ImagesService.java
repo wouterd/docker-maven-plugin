@@ -2,6 +2,8 @@ package net.wouterdanes.docker.remoteapi;
 
 import javax.ws.rs.core.MediaType;
 
+import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
+
 /**
  * This class is responsible for talking to the Docker Remote API "images" endpoint.<br/> See <a
  * href="http://docs.docker.io/reference/api/docker_remote_api_v1.10/#22-images">

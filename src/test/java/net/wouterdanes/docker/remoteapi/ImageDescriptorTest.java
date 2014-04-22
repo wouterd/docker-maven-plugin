@@ -2,6 +2,7 @@ package net.wouterdanes.docker.remoteapi;
 
 import org.junit.Test;
 
+import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
 import static junit.framework.Assert.assertEquals;
 
 public class ImageDescriptorTest {

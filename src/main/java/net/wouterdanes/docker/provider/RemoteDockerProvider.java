@@ -7,12 +7,12 @@ import java.util.Map;
 
 import net.wouterdanes.docker.maven.ContainerStartConfiguration;
 import net.wouterdanes.docker.maven.ExposedPort;
-import net.wouterdanes.docker.remoteapi.ContainerCreateRequest;
-import net.wouterdanes.docker.remoteapi.ContainerInspectionResult;
-import net.wouterdanes.docker.remoteapi.ContainerStartRequest;
 import net.wouterdanes.docker.remoteapi.ContainersService;
 import net.wouterdanes.docker.remoteapi.ImagesService;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
+import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
+import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromEnvironmentSupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromPropertySupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerPortFromEnvironmentSupplier;

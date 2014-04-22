@@ -1,4 +1,4 @@
-package net.wouterdanes.docker.remoteapi;
+package net.wouterdanes.docker.remoteapi.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
