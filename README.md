@@ -82,7 +82,7 @@ strange errors from occurring.
 - [ ] Supply information to the project during the integration-test phase about:
   - [ ] Images that were built
   - [x] Containers that were started
-- [ ] Build a docker image from a bunch of source files in package and pre-integration-test phases
+- [x] Build a docker image from a bunch of source files in package and pre-integration-test phases
   - [ ] Allow built containers to be started in the pre-integration phase
 - [ ] Docker provider for "local docker" via tcp
 - [x] Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)

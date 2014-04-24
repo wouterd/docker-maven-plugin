@@ -55,6 +55,22 @@
         <version>@project.version@</version>
         <executions>
           <execution>
+            <id>build</id>
+            <goals>
+              <goal>build-images</goal>
+            </goals>
+            <configuration>
+              <images>
+                <image>
+                  <id>nginx</id>
+                  <files>
+                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
+                  </files>
+                </image>
+              </images>
+            </configuration>
+          </execution>
+          <execution>
             <id>start</id>
             <configuration>
               <containers>

@@ -59,6 +59,7 @@
   </properties>
 
   <dependencies>
+    <!-- Maven dependencies -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
@@ -81,11 +82,13 @@
       <artifactId>plexus-utils</artifactId>
       <version>3.0.8</version>
     </dependency>
+    <!-- For Optional and Functional Programming -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>16.0.1</version>
     </dependency>
+    <!-- For Doing REST calls and translating to/from Json -->
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
@@ -95,6 +98,12 @@
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.13</version>
+    </dependency>
+    <!-- Needed to build tar.gz archives for the docker build engine -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.8</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.wouterdanes.docker.maven.ContainerStartConfiguration;
 import net.wouterdanes.docker.maven.ExposedPort;
+import net.wouterdanes.docker.maven.ImageBuildConfiguration;
 
 /**
  * This interface represents an implementation that provides Docker functionality. Examples are:
@@ -41,4 +42,11 @@ public interface DockerProvider {
      * @return {@link List} of {@link net.wouterdanes.docker.maven.ExposedPort}s
      */
     List<ExposedPort> getExposedPorts(String containerId);
+
+    /**
+     * Builds a new Docker Image based on the passed configuration and returns the id of the newly created image.
+     * @param image the image configuration to use
+     * @return the id of the new Docker Image
+     */
+    String buildImage(ImageBuildConfiguration image);
 }
