@@ -101,5 +101,15 @@ public class StartContainerMojoTest {
         public List<ExposedPort> getExposedPorts(final String containerId) {
             return proxy.getExposedPorts(containerId);
         }
+
+        @Override
+        public String buildImage(final ImageBuildConfiguration image) {
+            return proxy.buildImage(image);
+        }
+
+        @Override
+        public void removeImage(final String imageId) {
+            proxy.removeImage(imageId);
+        }
     }
 }

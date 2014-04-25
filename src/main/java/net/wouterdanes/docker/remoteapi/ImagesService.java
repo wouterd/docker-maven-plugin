@@ -1,7 +1,9 @@
 package net.wouterdanes.docker.remoteapi;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
 
 /**
@@ -28,5 +30,16 @@ public class ImagesService extends BaseService {
                 .request()
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .post(null, String.class);
+    }
+
+    public void deleteImage(final String imageId) {
+        try {
+            getServiceEndPoint()
+                    .path(imageId)
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .delete(String.class);
+        } catch (WebApplicationException e) {
+            throw new DockerException("Cannot remove image", e);
+        }
     }
 }

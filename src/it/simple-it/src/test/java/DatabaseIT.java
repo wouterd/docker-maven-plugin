@@ -15,7 +15,7 @@ public class DatabaseIT {
         try {
             DriverManager.getConnection(mySqlConnectionUrl, "root", "");
         } catch (SQLException e) {
-            Assert.assertTrue(e.getMessage().contains("Access denied for user 'root'@"));
+            Assert.assertTrue(e.getMessage(), e.getMessage().contains("Access denied for user 'root'@"));
         }
     }
 }

@@ -1,14 +1,29 @@
 package net.wouterdanes.docker.provider;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+
 import net.wouterdanes.docker.maven.ContainerStartConfiguration;
 import net.wouterdanes.docker.maven.ExposedPort;
+import net.wouterdanes.docker.maven.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.ContainersService;
 import net.wouterdanes.docker.remoteapi.ImagesService;
+import net.wouterdanes.docker.remoteapi.MiscService;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
@@ -41,6 +56,7 @@ public class RemoteDockerProvider implements DockerProvider {
 
     private final ContainersService containersService;
     private final ImagesService imagesService;
+    private final MiscService miscService;
 
     public RemoteDockerProvider() {
         this(getDockerHostFromEnvironment(), getDockerPortFromEnvironment());
@@ -53,6 +69,7 @@ public class RemoteDockerProvider implements DockerProvider {
         String dockerApiRoot = String.format("http://%s:%s", host, port);
         containersService = new ContainersService(dockerApiRoot);
         imagesService = new ImagesService(dockerApiRoot);
+        miscService = new MiscService(dockerApiRoot);
     }
 
     @Override
@@ -101,6 +118,34 @@ public class RemoteDockerProvider implements DockerProvider {
             exposedPorts.add(new ExposedPort(exposedPort, hostPort, host));
         }
         return exposedPorts;
+    }
+
+    @Override
+    public String buildImage(final ImageBuildConfiguration image) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (
+            CompressorOutputStream gzipStream = new CompressorStreamFactory().createCompressorOutputStream("gz", baos);
+            ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", gzipStream)
+        ) {
+            for (File file : image.getFiles()) {
+                ArchiveEntry entry = tar.createArchiveEntry(file, file.getName());
+                tar.putArchiveEntry(entry);
+                byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+                tar.write(contents);
+                tar.closeArchiveEntry();
+            }
+            tar.flush();
+            gzipStream.flush();
+        } catch (CompressorException | ArchiveException | IOException e) {
+            throw new IllegalStateException("Unable to create output archive", e);
+        }
+        byte[] bytes = baos.toByteArray();
+        return miscService.buildImage(bytes);
+    }
+
+    @Override
+    public void removeImage(final String imageId) {
+        imagesService.deleteImage(imageId);
     }
 
     @Override
