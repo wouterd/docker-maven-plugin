@@ -79,8 +79,8 @@ strange errors from occurring.
   - [x] Known on the docker host by a name
   - [x] Available in a repository
 - [x] Shut down containers in the post-integration-test phase that were started in the pre-integration-test phase
-- [ ] Supply information to the project during the integration-test phase about:
-  - [ ] Images that were built
+- [x] Supply information to the project during the integration-test phase about:
+  - [x] Images that were built
   - [x] Containers that were started
 - [x] Build a docker image from a bunch of source files in package and pre-integration-test phases
   - [ ] Allow built containers to be started in the pre-integration phase

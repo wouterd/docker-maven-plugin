@@ -49,4 +49,10 @@ public interface DockerProvider {
      * @return the id of the new Docker Image
      */
     String buildImage(ImageBuildConfiguration image);
+
+    /**
+     * Removes an image from docker
+     * @param imageId the Id of the images to remove
+     */
+    void removeImage(String imageId);
 }

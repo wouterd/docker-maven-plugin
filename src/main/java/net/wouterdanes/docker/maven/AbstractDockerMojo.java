@@ -1,7 +1,6 @@
 package net.wouterdanes.docker.maven;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -16,6 +15,9 @@ import net.wouterdanes.docker.provider.DockerProvider;
  */
 public abstract class AbstractDockerMojo extends AbstractMojo {
 
+    private static final String STARTED_CONTAINERS_KEY = "startedContainers";
+    private static final String BUILT_IMAGES_KEY = "builtImages";
+
     @Parameter(defaultValue = "remote", property = "docker.provider", required = true)
     private String providerName;
 
@@ -28,28 +30,36 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         doExecute();
     }
 
-    protected abstract void doExecute() throws MojoExecutionException, MojoFailureException ;
+    protected abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 
-    @SuppressWarnings("unchecked")
     protected void registerStartedContainer(String id) {
-        Object obj = getPluginContext().get("startedContainers");
-        List<String> startedContainers;
-        if (obj == null) {
-            startedContainers = new ArrayList<>();
-            getPluginContext().put("startedContainers", startedContainers);
-        } else {
-            startedContainers = (List<String>) obj;
-        }
+        List<String> startedContainers = obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
         startedContainers.add(id);
     }
 
-    @SuppressWarnings("unchecked")
     protected List<String> getStartedContainers() {
-        Object obj = getPluginContext().get("startedContainers");
+        return obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
+    }
+
+    protected void registerBuiltImage(String startId, String imageId) {
+        List<BuiltImageInfo> builtImages = obtainListFromPluginContext(BUILT_IMAGES_KEY);
+        builtImages.add(new BuiltImageInfo(startId, imageId));
+    }
+
+    protected List<BuiltImageInfo> getBuiltImages() {
+        return obtainListFromPluginContext(BUILT_IMAGES_KEY);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> List<T> obtainListFromPluginContext(String name) {
+        Object obj = getPluginContext().get(name);
         if (obj == null) {
-            return Collections.emptyList();
+            ArrayList<T> list = new ArrayList<>();
+            getPluginContext().put(name, list);
+            return list;
+        } else {
+            return (List<T>) obj;
         }
-        return (List<String>) obj;
     }
 
     protected DockerProvider getDockerProvider() {

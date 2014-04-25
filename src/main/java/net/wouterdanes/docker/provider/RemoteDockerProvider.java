@@ -144,6 +144,11 @@ public class RemoteDockerProvider implements DockerProvider {
     }
 
     @Override
+    public void removeImage(final String imageId) {
+        imagesService.deleteImage(imageId);
+    }
+
+    @Override
     public String toString() {
         return "RemoteDockerProvider{" +
                 "host='" + host + '\'' +

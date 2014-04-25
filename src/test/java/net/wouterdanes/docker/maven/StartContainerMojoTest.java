@@ -106,5 +106,10 @@ public class StartContainerMojoTest {
         public String buildImage(final ImageBuildConfiguration image) {
             return proxy.buildImage(image);
         }
+
+        @Override
+        public void removeImage(final String imageId) {
+            proxy.removeImage(imageId);
+        }
     }
 }
