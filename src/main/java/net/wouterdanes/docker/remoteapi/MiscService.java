@@ -17,8 +17,14 @@ public class MiscService extends BaseService {
     private static final Pattern BUILD_IMAGE_ID_EXTRACTION_PATTERN =
             Pattern.compile(".*Successfully built ([0-9a-f]+).*", Pattern.DOTALL);
 
+    private static final Pattern BUILD_IMAGE_INTERMEDIATE_IDS_EXTRACTION_PATTERN =
+            Pattern.compile(".*?Running in ([0-9a-f]+).*?", Pattern.DOTALL);
+
+    private final ContainersService containersService;
+
     public MiscService(final String dockerApiRoot) {
         super(dockerApiRoot, "/");
+        containersService = new ContainersService(dockerApiRoot);
     }
 
     /**
@@ -42,11 +48,16 @@ public class MiscService extends BaseService {
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.entity(tarArchive, "application/tar"), String.class);
 
+        Matcher intermediates = BUILD_IMAGE_INTERMEDIATE_IDS_EXTRACTION_PATTERN.matcher(jsonStream);
+        while (intermediates.find()) {
+            String intermediateId = intermediates.group(1);
+            containersService.deleteContainer(intermediateId);
+        }
+
         Matcher matcher = BUILD_IMAGE_ID_EXTRACTION_PATTERN.matcher(jsonStream);
         if (!matcher.matches()) {
             throw new DockerException("Can't obtain ID from build output stream.", jsonStream);
         }
-
         return matcher.group(1);
     }
 
