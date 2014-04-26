@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -39,6 +41,7 @@ public class StartContainerMojo extends AbstractDockerMojo {
     public void doExecute() throws MojoExecutionException, MojoFailureException {
         DockerProvider provider = getDockerProvider();
         for (ContainerStartConfiguration configuration : containers) {
+            replaceImageWithBuiltImageIdIfInternalId(configuration);
             try {
                 getLog().info(String.format("Starting container '%s'..", configuration.getId()));
                 String containerId = provider.startContainer(configuration);
@@ -56,6 +59,13 @@ public class StartContainerMojo extends AbstractDockerMojo {
             }
         }
         getLog().debug("Properties after exposing ports: " + project.getProperties());
+    }
+
+    private void replaceImageWithBuiltImageIdIfInternalId(final ContainerStartConfiguration configuration) {
+        Optional<BuiltImageInfo> builtImage = getBuiltImageForStartId(configuration.getImage());
+        if (builtImage.isPresent()) {
+            configuration.fromImage(builtImage.get().getImageId());
+        }
     }
 
     public void setProject(final MavenProject project) {

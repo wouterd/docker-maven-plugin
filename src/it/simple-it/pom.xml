@@ -83,8 +83,8 @@
                   <image>busybox</image>
                 </container>
                 <container>
-                  <id>DB</id>
-                  <image>tutum/mysql</image>
+                  <id>cache</id>
+                  <image>nginx</image>
                 </container>
               </containers>
             </configuration>
