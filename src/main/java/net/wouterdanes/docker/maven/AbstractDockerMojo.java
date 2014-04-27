@@ -1,7 +1,12 @@
 package net.wouterdanes.docker.maven;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.base.Optional;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -42,12 +47,22 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected void registerBuiltImage(String startId, String imageId) {
-        List<BuiltImageInfo> builtImages = obtainListFromPluginContext(BUILT_IMAGES_KEY);
-        builtImages.add(new BuiltImageInfo(startId, imageId));
+        Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
+        builtImages.put(startId, new BuiltImageInfo(startId, imageId));
     }
 
-    protected List<BuiltImageInfo> getBuiltImages() {
-        return obtainListFromPluginContext(BUILT_IMAGES_KEY);
+    protected Collection<BuiltImageInfo> getBuiltImages() {
+        Map<String, BuiltImageInfo> builtImagesMap = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
+        return builtImagesMap.values();
+    }
+
+    protected DockerProvider getDockerProvider() {
+        return new DockerProviderSupplier(providerName).get();
+    }
+
+    protected Optional<BuiltImageInfo> getBuiltImageForStartId(final String imageId) {
+        Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
+        return Optional.fromNullable(builtImages.get(imageId));
     }
 
     @SuppressWarnings("unchecked")
@@ -62,7 +77,15 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         }
     }
 
-    protected DockerProvider getDockerProvider() {
-        return new DockerProviderSupplier(providerName).get();
+    @SuppressWarnings("unchecked")
+    private <T> Map<String, T> obtainMapFromPluginContext(String name) {
+        Object obj = getPluginContext().get(name);
+        if (obj == null) {
+            Map<String, T> map = new HashMap<>();
+            getPluginContext().put(name, map);
+            return map;
+        } else {
+            return (Map<String, T>) obj;
+        }
     }
 }

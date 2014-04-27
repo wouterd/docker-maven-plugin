@@ -83,7 +83,7 @@ strange errors from occurring.
   - [x] Images that were built
   - [x] Containers that were started
 - [x] Build a docker image from a bunch of source files in package and pre-integration-test phases
-  - [ ] Allow built containers to be started in the pre-integration phase
+  - [x] Allow built containers to be started in the pre-integration phase
 - [ ] Docker provider for "local docker" via tcp
 - [x] Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
