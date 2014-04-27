@@ -37,6 +37,16 @@
     <developerConnection>scm:git:git@github.com:wouterd/docker-maven-plugin.git</developerConnection>
   </scm>
 
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/wouterd/docker-maven-plugin/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>Travis-ci</system>
+    <url>https://travis-ci.org/wouterd/docker-maven-plugin</url>
+  </ciManagement>
+
   <developers>
     <developer>
       <url>http://www.wouterdanes.net</url>
