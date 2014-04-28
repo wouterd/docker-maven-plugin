@@ -22,7 +22,7 @@ public class RemoteDockerProviderTest {
 
         RemoteDockerProvider provider = new RemoteDockerProvider();
 
-        Assert.assertEquals(String.format("RemoteDockerProvider{host='lalahost', port=1337}"), provider.toString());
+        Assert.assertEquals(String.format(provider.getClass().getName() + "{host='lalahost', port=1337}"), provider.toString());
 
     }
 
@@ -46,7 +46,7 @@ public class RemoteDockerProviderTest {
 
         RemoteDockerProvider provider = new RemoteDockerProvider();
 
-        String expectedValue = String.format("RemoteDockerProvider{host='%s', port=%s}", expectedHost, expectedPort);
+        String expectedValue = String.format(provider.getClass().getName() + "{host='%s', port=%s}", expectedHost, expectedPort);
         Assert.assertEquals(expectedValue, provider.toString());
 
     }

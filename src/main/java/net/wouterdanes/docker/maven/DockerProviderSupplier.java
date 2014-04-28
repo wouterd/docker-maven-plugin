@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.base.Supplier;
 
 import net.wouterdanes.docker.provider.DockerProvider;
+import net.wouterdanes.docker.provider.LocalDockerProvider;
 import net.wouterdanes.docker.provider.RemoteDockerProvider;
 
 /**
@@ -19,6 +20,7 @@ public class DockerProviderSupplier implements Supplier<DockerProvider> {
 
     static {
         providers.put("remote", RemoteDockerProvider.class);
+        providers.put("local", LocalDockerProvider.class);
     }
 
     public DockerProviderSupplier(final String providerName) {

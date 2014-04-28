@@ -32,6 +32,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("Using docker provider: " + providerName);
         doExecute();
     }
 

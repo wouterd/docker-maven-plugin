@@ -13,10 +13,23 @@ A maven plugin to manage docker containers and images for integration tests.
         <version>1.0-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>start</id>
+            <id>build</id>
             <goals>
-              <goal>start-containers</goal>
+              <goal>build-images</goal>
             </goals>
+            <configuration>
+              <images>
+                <image>
+                  <id>nginx</id>
+                  <files>
+                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
+                  </files>
+                </image>
+              </images>
+            </configuration>
+          </execution>
+          <execution>
+            <id>start</id>
             <configuration>
               <containers>
                 <container>
@@ -28,11 +41,14 @@ A maven plugin to manage docker containers and images for integration tests.
                   <image>busybox</image>
                 </container>
                 <container>
-                  <id>DB</id>
-                  <image>tutum/mysql</image>
+                  <id>cache</id>
+                  <image>nginx</image>
                 </container>
               </containers>
             </configuration>
+            <goals>
+              <goal>start-containers</goal>
+            </goals>
           </execution>
           <execution>
             <id>stop</id>
@@ -43,18 +59,19 @@ A maven plugin to manage docker containers and images for integration tests.
         </executions>
       </plugin>
 
-The above pom.xml element includes the plugin and starts some containers in the pre-integration-test phase and stops
-those in the post-integration-test phase. Under `<configuration>` add some containers. By giving them an `id`, you can
-reference them later and the ID is also used in the port mapping properties. The `<image>` tag specifies the docker image
-to start.
+The above pom.xml element includes the plugin and starts builds an image from the project. Then it starts some containers
+in the pre-integration-test phase, including the built container and stops those in the post-integration-test phase.
+Under `<configuration>` add some containers. By giving them an `id`, you can reference them later and the ID is also
+used in the port mapping properties. The `<image>` tag specifies the docker image to start.
 
 By default, all exposed ports are published on the host. The following two properties are set per exposed port:
-- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.DB.ports.tcp/3306.host')
-- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.DB.ports.tcp/3306.port')
+- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.cache.ports.tcp/80.host')
+- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.cache.ports.tcp/80.port')
 
 You can pass those project properties over to your integration test and use them to connect to your application.
 
-The plugin will connect to a docker instance over HTTP, linux socket support will be added after 1.0. It will look up the host/port of docker in the following way:
+The plugin will connect to a docker instance over HTTP, linux socket support will be added after 1.0. It will look up
+the host/port of docker in the following way:
 - It will grab host and port from docker.host and docker.port set by -Ddocker.host and -Ddocker.port on the command line
 - Else it will try to parse the DOCKER_HOST system environment variable
 - Finally it will default to 127.0.0.1:4243
@@ -70,8 +87,27 @@ up. It could also work with lower versions of docker, but it won't, because I sp
 strange errors from occurring.
 
 # Architecture principles
-* The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names and/or ids.
+* The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple
+    builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names
+    and/or ids.
 * Multiple "docker providers" need to be supported and pluggable
+
+# Docker providers
+Currently the plugin supports two types of docker "providers", which both connect to docker via the remote API
+(HTTP REST), unix sockets are not yet supported:
+* remote (default), which publishes all ports to the host system and returns `docker_host:dynamic_port` as the port
+    mappings for all exposed ports on containers
+* local, which doesn't publish any ports to the host and returns `container_ip:exposed_port` as the port mappings for
+    all exposed ports on containers
+
+The remote provider works for both dockers running on the same system as the client as well as boot2docker or VM based
+dockers. Just make sure DOCKER_HOST or docker.host points to the IP that is on the host-only network or that has all
+dynamic docker ports exposed (49xxx). The local provider works when the docker containers are reachable from the client
+through their IP address, so for example when the client runs on the docker host. Local is also a nice mode to use when
+consumers of your containers need to connect on the "real port" and cannot connect to a "dynamic port".
+
+You can specify the docker provider using the system property `docker.provider`, either in the pom or via the command
+line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
 
 # Musts for 1.0
 - [x] Start a container in the pre-integration-test phase based on an image:
@@ -83,7 +119,7 @@ strange errors from occurring.
   - [x] Containers that were started
 - [x] Build a docker image from a bunch of source files in package and pre-integration-test phases
   - [x] Allow built containers to be started in the pre-integration phase
-- [ ] Docker provider for "local docker" via tcp
+- [x] Docker provider for "local docker" via tcp
 - [x] Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
 # Further possible functionality
