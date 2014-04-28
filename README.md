@@ -74,7 +74,6 @@ strange errors from occurring.
 * Multiple "docker providers" need to be supported and pluggable
 
 # Musts for 1.0
-
 - [x] Start a container in the pre-integration-test phase based on an image:
   - [x] Known on the docker host by a name
   - [x] Available in a repository
