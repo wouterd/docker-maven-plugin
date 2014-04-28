@@ -13,10 +13,23 @@ A maven plugin to manage docker containers and images for integration tests.
         <version>1.0-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>start</id>
+            <id>build</id>
             <goals>
-              <goal>start-containers</goal>
+              <goal>build-images</goal>
             </goals>
+            <configuration>
+              <images>
+                <image>
+                  <id>nginx</id>
+                  <files>
+                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
+                  </files>
+                </image>
+              </images>
+            </configuration>
+          </execution>
+          <execution>
+            <id>start</id>
             <configuration>
               <containers>
                 <container>
@@ -28,11 +41,14 @@ A maven plugin to manage docker containers and images for integration tests.
                   <image>busybox</image>
                 </container>
                 <container>
-                  <id>DB</id>
-                  <image>tutum/mysql</image>
+                  <id>cache</id>
+                  <image>nginx</image>
                 </container>
               </containers>
             </configuration>
+            <goals>
+              <goal>start-containers</goal>
+            </goals>
           </execution>
           <execution>
             <id>stop</id>
@@ -43,14 +59,14 @@ A maven plugin to manage docker containers and images for integration tests.
         </executions>
       </plugin>
 
-The above pom.xml element includes the plugin and starts some containers in the pre-integration-test phase and stops
-those in the post-integration-test phase. Under `<configuration>` add some containers. By giving them an `id`, you can
-reference them later and the ID is also used in the port mapping properties. The `<image>` tag specifies the docker image
-to start.
+The above pom.xml element includes the plugin and starts builds an image from the project. Then it starts some containers
+in the pre-integration-test phase, including the built container and stops those in the post-integration-test phase.
+Under `<configuration>` add some containers. By giving them an `id`, you can reference them later and the ID is also
+used in the port mapping properties. The `<image>` tag specifies the docker image to start.
 
 By default, all exposed ports are published on the host. The following two properties are set per exposed port:
-- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.DB.ports.tcp/3306.host')
-- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.DB.ports.tcp/3306.port')
+- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.cache.ports.tcp/80.host')
+- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.cache.ports.tcp/80.port')
 
 You can pass those project properties over to your integration test and use them to connect to your application.
 
