@@ -5,6 +5,19 @@ docker-maven-plugin
 
 A maven plugin to manage docker containers and images for integration tests.
 
+# Current Functionality:
+- Start a container in the pre-integration-test phase based on an image:
+      - Known on the docker host by a name
+      - Available in a repository
+- Shut down containers in the post-integration-test phase that were started in the pre-integration-test phase
+- Supply information to the project during the integration-test phase about:
+      - Images that were built
+      - Containers that were started
+- Build a docker image from a bunch of source files in package and pre-integration-test phases
+      - Allow built containers to be started in the pre-integration phase
+- Docker provider for "local docker" via tcp
+- Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
+
 # Usage
 
 ## Example
@@ -124,19 +137,6 @@ line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
 * [Jackson](http://jackson.codehaus.org/) for parsing / creating JSON
 * [Apache Commons Compress](http://commons.apache.org/proper/commons-compress/) for creating the tar.gz archive needed to build a docker image
 
-# Current Functionality:
-- Start a container in the pre-integration-test phase based on an image:
-- Known on the docker host by a name
-- Available in a repository
-- Shut down containers in the post-integration-test phase that were started in the pre-integration-test phase
-- Supply information to the project during the integration-test phase about:
-- Images that were built
-- Containers that were started
-- Build a docker image from a bunch of source files in package and pre-integration-test phases
-- Allow built containers to be started in the pre-integration phase
-- Docker provider for "local docker" via tcp
-- Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
-
 # Architecture principles
 * The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple
     builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names
@@ -151,3 +151,4 @@ line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
 - [ ] Add support for Tutum.co
 - [ ] Create a feature complete docker remote api for Java
 - [ ] Support multiple (all) versions of the Docker Remote API
+- [ ] Push containers to a docker registry in the deploy phase
