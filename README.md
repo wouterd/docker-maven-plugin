@@ -7,6 +7,8 @@ A maven plugin to manage docker containers and images for integration tests.
 
 # Usage
 
+## Example
+
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
@@ -76,6 +78,15 @@ the host/port of docker in the following way:
 - Else it will try to parse the DOCKER_HOST system environment variable
 - Finally it will default to 127.0.0.1:4243
 
+## Using a SNAPSHOT version
+The releases of this plugin are deployed to maven central, the SNAPSHOT versions are automatically deployed to the Sonatype OSS repository. To be able to use the SNAPSHOT versions of this plugin, add the following repository to your project POM or settings.xml:
+
+      <pluginRepository>
+            <id>sonatype-oss-snapshots</id>
+            <name>Sonatype OSS Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      </pluginRepository>
+      
 # Boot2docker-cli
 Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-only network and a "public network". The VM
 also exposes port 4243 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
