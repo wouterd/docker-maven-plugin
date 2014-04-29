@@ -67,8 +67,8 @@ Under `<configuration>` add some containers. By giving them an `id`, you can ref
 used in the port mapping properties. The `<image>` tag specifies the docker image to start.
 
 By default, all exposed ports are published on the host. The following two properties are set per exposed port:
-- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.cache.ports.tcp/80.host')
-- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.cache.ports.tcp/80.port')
+- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.cache.ports.80/tcp.host')
+- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.cache.ports.80/tcp.port')
 
 You can pass those project properties over to your integration test and use them to connect to your application.
 
