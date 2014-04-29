@@ -100,12 +100,6 @@ The docker remote API implementation is based on the 1.10 docker api version. Th
 up. It could also work with lower versions of docker, but it won't, because I specifically target the 1.10 API to prevent
 strange errors from occurring.
 
-# Architecture principles
-* The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple
-    builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names
-    and/or ids.
-* Multiple "docker providers" need to be supported and pluggable
-
 # Docker providers
 Currently the plugin supports two types of docker "providers", which both connect to docker via the remote API
 (HTTP REST), unix sockets are not yet supported:
@@ -123,6 +117,13 @@ consumers of your containers need to connect on the "real port" and cannot conne
 You can specify the docker provider using the system property `docker.provider`, either in the pom or via the command
 line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
 
+# Dependencies:
+
+* [Google Guava](https://code.google.com/p/guava-libraries/) for Optional and Supplier, because it's too early for Java8
+* [Jersey Client](https://jersey.java.net/) for a light weight API to do rest calls.
+* [Jackson](http://jackson.codehaus.org/) for parsing / creating JSON
+* [Apache Commons Compress](http://commons.apache.org/proper/commons-compress/) for creating the tar.gz archive needed to build a docker image
+
 # Current Functionality:
 - Start a container in the pre-integration-test phase based on an image:
 - Known on the docker host by a name
@@ -135,6 +136,12 @@ line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
 - Allow built containers to be started in the pre-integration phase
 - Docker provider for "local docker" via tcp
 - Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
+
+# Architecture principles
+* The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple
+    builds can run on the same server in parallel. Also, docker images and containers it creates need to have unique names
+    and/or ids.
+* Multiple "docker providers" need to be supported and pluggable
 
 # Future functionality
 - [ ] Linking containers
