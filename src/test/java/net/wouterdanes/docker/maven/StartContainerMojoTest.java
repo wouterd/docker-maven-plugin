@@ -13,6 +13,10 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import net.wouterdanes.docker.provider.DockerProvider;
+import net.wouterdanes.docker.provider.DockerProviderSupplier;
+import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedPort;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

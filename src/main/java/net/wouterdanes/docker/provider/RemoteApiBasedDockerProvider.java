@@ -14,8 +14,8 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
-import net.wouterdanes.docker.maven.ContainerStartConfiguration;
-import net.wouterdanes.docker.maven.ImageBuildConfiguration;
+import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.ContainersService;
 import net.wouterdanes.docker.remoteapi.ImagesService;
 import net.wouterdanes.docker.remoteapi.MiscService;

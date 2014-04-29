@@ -1,4 +1,4 @@
-package net.wouterdanes.docker.maven;
+package net.wouterdanes.docker.provider.model;
 
 import java.io.File;
 import java.util.List;
@@ -7,7 +7,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * This class is responsible for holding the configuration of a single docker image to be built by the
- * {@link BuildImageMojo}
+ * {@link net.wouterdanes.docker.maven.BuildImageMojo}
  */
 public class ImageBuildConfiguration {
 

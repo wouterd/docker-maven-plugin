@@ -1,4 +1,4 @@
-package net.wouterdanes.docker.maven;
+package net.wouterdanes.docker.provider.model;
 
 /**
  * This class holds information about an image that was built so that it can be references in the start goal and

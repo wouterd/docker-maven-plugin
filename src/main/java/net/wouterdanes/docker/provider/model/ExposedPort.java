@@ -1,4 +1,4 @@
-package net.wouterdanes.docker.maven;
+package net.wouterdanes.docker.provider.model;
 
 /**
  * This class stores information about an exposed port on a docker container

@@ -2,9 +2,9 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
-import net.wouterdanes.docker.maven.ContainerStartConfiguration;
-import net.wouterdanes.docker.maven.ExposedPort;
-import net.wouterdanes.docker.maven.ImageBuildConfiguration;
+import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedPort;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 
 /**
  * This interface represents an implementation that provides Docker functionality. Examples are:
@@ -39,7 +39,7 @@ public interface DockerProvider {
     /**
      * Returns a list of ports exposed by the container, including information on how to reach them
      * @param containerId the Id of the container
-     * @return {@link List} of {@link net.wouterdanes.docker.maven.ExposedPort}s
+     * @return {@link List} of {@link net.wouterdanes.docker.provider.model.ExposedPort}s
      */
     List<ExposedPort> getExposedPorts(String containerId);
 

@@ -1,4 +1,6 @@
-package net.wouterdanes.docker.maven;
+package net.wouterdanes.docker.provider.model;
+
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * This class is responsible for holding the start configuration of a docker container<br/> See <a
@@ -8,7 +10,9 @@ package net.wouterdanes.docker.maven;
 @SuppressWarnings("unused")
 public class ContainerStartConfiguration {
 
+    @Parameter(required = true)
     private String image;
+    @Parameter(required = true)
     private String id;
 
     /**

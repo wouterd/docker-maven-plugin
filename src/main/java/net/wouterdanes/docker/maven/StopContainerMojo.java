@@ -5,6 +5,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
+import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**

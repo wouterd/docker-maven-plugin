@@ -14,6 +14,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import net.wouterdanes.docker.provider.DockerProvider;
+import net.wouterdanes.docker.provider.DockerProviderSupplier;
+import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 
 /**
  * Base class for all Mojos with shared functionality

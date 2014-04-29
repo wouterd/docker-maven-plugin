@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

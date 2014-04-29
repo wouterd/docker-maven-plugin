@@ -1,13 +1,9 @@
-package net.wouterdanes.docker.maven;
+package net.wouterdanes.docker.provider;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.base.Supplier;
-
-import net.wouterdanes.docker.provider.DockerProvider;
-import net.wouterdanes.docker.provider.LocalDockerProvider;
-import net.wouterdanes.docker.provider.RemoteDockerProvider;
 
 /**
  * This class creates a docker provider based on the passed name when the get() method is called. Used in for example

@@ -16,6 +16,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import net.wouterdanes.docker.provider.DockerProvider;
+import net.wouterdanes.docker.provider.model.BuiltImageInfo;
+import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**
