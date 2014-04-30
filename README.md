@@ -20,12 +20,15 @@ A maven plugin to manage docker containers and images for integration tests.
 
 # Usage
 
+Current release version: `1.0`
+Current snapshot version: `1.1-SNAPSHOT`
+
 ## Example
 
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
         <executions>
           <execution>
             <id>build</id>
