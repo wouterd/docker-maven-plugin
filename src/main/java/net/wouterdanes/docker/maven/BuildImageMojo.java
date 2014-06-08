@@ -35,10 +35,10 @@ public class BuildImageMojo extends AbstractDockerMojo {
 
         for (ImageBuildConfiguration image : images) {
             try {
-                getLog().info(String.format("Building image '%s'..", image.getId()));
+                logImageConfig(image);
                 String imageId = getDockerProvider().buildImage(image);
                 getLog().info(String.format("Image '%s' has Id '%s'", image.getId(), imageId));
-                registerBuiltImage(image.getId(), imageId);
+                registerBuiltImage(image.getId(), imageId, image.isKeep());
             } catch (DockerException e) {
                 getLog().error(String.format("Cannot build image '%s'", image.getId()), e);
                 Optional<String> apiResponse = e.getApiResponse();
@@ -47,6 +47,15 @@ public class BuildImageMojo extends AbstractDockerMojo {
                 }
             }
         }
+    }
+
+    private void logImageConfig(final ImageBuildConfiguration image) {
+        StringBuilder builder = new StringBuilder(String.format("Building image '%s'", image.getId()));
+        if (image.getNameAndTag() != null) {
+            builder.append(String.format(", with name and tag '%s'", image.getNameAndTag()));
+        }
+        builder.append("..");
+        getLog().info(builder.toString());
     }
 
     private void validateAllImages() throws MojoExecutionException {

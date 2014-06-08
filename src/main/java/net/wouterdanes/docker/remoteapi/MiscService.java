@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.base.Optional;
+
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
 
@@ -41,10 +43,17 @@ public class MiscService extends BaseService {
         return toObject(json, DockerVersionInfo.class);
     }
 
-    public String buildImage(byte[] tarArchive) {
+    /**
+     * Builds an image based on the passed tar archive. Optionally names & tags the image
+     * @param tarArchive the tar archive to use as a source for the image
+     * @param name the name and optional tag of the image.
+     * @return the ID of the created image
+     */
+    public String buildImage(byte[] tarArchive, Optional<String> name) {
         String jsonStream = getServiceEndPoint()
                 .path("/build")
                 .queryParam("q", true)
+                .queryParam("t", name.orNull())
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.entity(tarArchive, "application/tar"), String.class);
 

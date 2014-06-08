@@ -68,6 +68,8 @@
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
+                  <nameAndTag>nginx-name:tahahag</nameAndTag>
+                  <keep>true</keep>
                 </image>
               </images>
             </configuration>

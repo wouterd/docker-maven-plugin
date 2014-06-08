@@ -33,6 +33,10 @@ public class StopContainerMojo extends AbstractDockerMojo {
             }
         }
         for (BuiltImageInfo image : getBuiltImages()) {
+            if (image.shouldKeep()) {
+                getLog().info(String.format("Keeping image %s", image.getImageId()));
+                continue;
+            }
             getLog().info(String.format("Removing image '%s' (%s) ..", image.getImageId(), image.getStartId()));
             try {
                 getDockerProvider().removeImage(image.getImageId());

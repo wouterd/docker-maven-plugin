@@ -8,10 +8,12 @@ public class BuiltImageInfo {
 
     private final String startId;
     private final String imageId;
+    private final boolean keep;
 
-    public BuiltImageInfo(final String startId, final String imageId) {
+    public BuiltImageInfo(final String startId, final String imageId, final boolean keep) {
         this.startId = startId;
         this.imageId = imageId;
+        this.keep = keep;
     }
 
     public String getStartId() {
@@ -20,5 +22,9 @@ public class BuiltImageInfo {
 
     public String getImageId() {
         return imageId;
+    }
+
+    public boolean shouldKeep() {
+        return keep;
     }
 }
