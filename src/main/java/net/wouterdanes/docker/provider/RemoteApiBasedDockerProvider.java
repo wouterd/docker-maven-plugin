@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import com.google.common.base.Optional;
+
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
@@ -62,6 +64,11 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     @Override
     public String buildImage(final ImageBuildConfiguration image) {
+        byte[] bytes = getTgzArchiveForFiles(image);
+        return miscService.buildImage(bytes, Optional.fromNullable(image.getNameAndTag()));
+    }
+
+    private static byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (
                 CompressorOutputStream gzipStream = new CompressorStreamFactory().createCompressorOutputStream("gz", baos);
@@ -79,8 +86,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         } catch (CompressorException | ArchiveException | IOException e) {
             throw new IllegalStateException("Unable to create output archive", e);
         }
-        byte[] bytes = baos.toByteArray();
-        return miscService.buildImage(bytes);
+        return baos.toByteArray();
     }
 
     @Override

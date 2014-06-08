@@ -78,7 +78,7 @@ public class StartContainerMojoTest {
                 .fromImage("built-image").withId("someId");
 
         StartContainerMojo mojo = createMojo(startConfiguration);
-        mojo.registerBuiltImage("built-image", "the-image-id");
+        mojo.registerBuiltImage("built-image", "the-image-id", false);
 
         mojo.execute();
 

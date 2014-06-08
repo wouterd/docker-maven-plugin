@@ -49,9 +49,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
     }
 
-    protected void registerBuiltImage(String startId, String imageId) {
+    protected void registerBuiltImage(String startId, String imageId, boolean keep) {
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
-        builtImages.put(startId, new BuiltImageInfo(startId, imageId));
+        builtImages.put(startId, new BuiltImageInfo(startId, imageId, keep));
     }
 
     protected Collection<BuiltImageInfo> getBuiltImages() {

@@ -17,6 +17,12 @@ public class ImageBuildConfiguration {
     @Parameter(required = true)
     private String id;
 
+    @Parameter
+    private String nameAndTag;
+
+    @Parameter(defaultValue = "false")
+    private boolean keep;
+
     public List<File> getFiles() {
         return files;
     }
@@ -31,6 +37,22 @@ public class ImageBuildConfiguration {
 
     public void setId(final String id) {
         this.id = id;
+    }
+
+    public String getNameAndTag() {
+        return nameAndTag;
+    }
+
+    public void setNameAndTag(final String nameAndTag) {
+        this.nameAndTag = nameAndTag;
+    }
+
+    public boolean isKeep() {
+        return keep;
+    }
+
+    public void setKeep(final boolean keep) {
+        this.keep = keep;
     }
 
     /**

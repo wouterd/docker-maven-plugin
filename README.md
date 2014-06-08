@@ -42,6 +42,8 @@ Current snapshot version: `1.1-SNAPSHOT`
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
+                  <keep>true</keep>
+                  <nameAndTag>wouterd/my-nginx:1.0</nameAndTag>
                 </image>
               </images>
             </configuration>
@@ -93,6 +95,39 @@ the host/port of docker in the following way:
 - It will grab host and port from docker.host and docker.port set by -Ddocker.host and -Ddocker.port on the command line
 - Else it will try to parse the DOCKER_HOST system environment variable
 - Finally it will default to 127.0.0.1:4243
+
+## `build-images` goal
+The `build-images` goal allows you to build a docker image based on a list of files, one of which must be a `Dockerfile`.
+Below is an example snippet.
+
+          <execution>
+            <id>build</id>
+            <goals>
+              <goal>build-images</goal>
+            </goals>
+            <configuration>
+              <images>
+                <image>
+                  <id>nginx</id>
+                  <files>
+                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
+                  </files>
+                  <keep>true</keep>
+                  <nameAndTag>wouterd/my-nginx:1.0</nameAndTag>
+                </image>
+              </images>
+            </configuration>
+          </execution>
+
+The configuration works as follows:
+- `<images>` contains a list of images to build as `<image>` elements
+- `<id>` for an image specifies the ID you want to use to reference this image in the plugin, for example when starting 
+    a container based on a built image.
+- `<files>` contains a list of files to add to the container as `<file>` elements
+- `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing 
+    the maven build.
+- `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It's in the
+    "standard" docker format: `repository:tag`
 
 ## Using a SNAPSHOT version
 The releases of this plugin are deployed to maven central, the SNAPSHOT versions are automatically deployed to the Sonatype OSS repository. To be able to use the SNAPSHOT versions of this plugin, add the following repository to your project POM or settings.xml:
