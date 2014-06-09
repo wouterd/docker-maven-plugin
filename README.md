@@ -21,6 +21,7 @@ A maven plugin to manage docker containers and images for integration tests.
 # Usage
 
 Current release version: `1.1`
+
 Current snapshot version: `1.2-SNAPSHOT`
 
 ## Example
