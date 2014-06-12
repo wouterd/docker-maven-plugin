@@ -29,7 +29,7 @@ Current snapshot version: `1.2-SNAPSHOT`
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
         <executions>
           <execution>
             <id>build</id>
