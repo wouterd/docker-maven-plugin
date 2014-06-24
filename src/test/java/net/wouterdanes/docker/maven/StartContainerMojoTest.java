@@ -19,6 +19,7 @@ import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -87,6 +88,17 @@ public class StartContainerMojoTest {
 
         ContainerStartConfiguration passedValue = captor.getValue();
         assertEquals("the-image-id", passedValue.getImage());
+    }
+
+    @Test
+    public void testThatMojoDoesNotStartWhenSkipped() throws Exception {
+        ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration();
+        StartContainerMojo mojo = createMojo(startConfiguration);
+        mojo.setSkip(true);
+
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance, never()).startContainer(startConfiguration);
     }
 
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {

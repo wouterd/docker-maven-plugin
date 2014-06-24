@@ -187,6 +187,7 @@
                     <docker.host>${docker.host}</docker.host>
                     <docker.port>${docker.port}</docker.port>
                     <docker.provider>${docker.provider}</docker.provider>
+                    <skipTests>${skipTests}</skipTests>
                   </properties>
                 </configuration>
               </execution>
