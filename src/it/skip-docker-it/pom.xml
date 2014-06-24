@@ -62,6 +62,7 @@
               <goal>build-images</goal>
             </goals>
             <configuration>
+              <skip>true</skip>
               <images>
                 <image>
                   <id>nginx</id>
@@ -77,6 +78,7 @@
           <execution>
             <id>start</id>
             <configuration>
+              <skip>true</skip>
               <containers>
                 <container>
                   <id>Debian</id>
@@ -99,6 +101,7 @@
           <execution>
             <id>stop</id>
             <configuration>
+              <skip>true</skip>
             </configuration>
             <goals>
               <goal>stop-containers</goal>
