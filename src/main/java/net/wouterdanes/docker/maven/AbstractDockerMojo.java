@@ -28,12 +28,24 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     @Parameter(defaultValue = "remote", property = "docker.provider", required = true)
     private String providerName;
 
+    @Parameter(defaultValue = "false", property = "docker.skip", required = false)
+    private boolean skip;
+
     public void setProviderName(final String providerName) {
         this.providerName = providerName;
     }
 
+    public void setSkip(final boolean skip) {
+        this.skip = skip;
+    }
+
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException {
+    	if (skip) {
+            getLog().info("Execution skipped");
+            return;
+    	}
+
         getLog().info("Using docker provider: " + providerName);
         doExecute();
     }
