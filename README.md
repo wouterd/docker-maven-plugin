@@ -142,6 +142,23 @@ The releases of this plugin are deployed to maven central, the SNAPSHOT versions
 ## Enabling the Remote Api on the Docker Daemon
 Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 4243 (default) that only listens to the local interface, add this to your daemon startup: `-H tcp://127.0.0.1:4243`
 
+## Skipping execution of the plugin or phases
+To skip execution of the plugin, you can set the docker.skip property to true. This can be useful when you want to skip
+running tests, like: `mvn clean verify -Ddocker.skip=true -DskipTests`.
+Each individual execution can be skipped or the plugin as a whole can be skipped by configuring the `<skip>` property
+on the `<configuration>` element of the plugin or an execution.
+Adding the following profile to your pom.xml will skip the whole plugin when the `skipTests` property is set:
+
+        <profile>
+            <id>skip-docker-plugin-execution</id>
+            <activation>
+                <property>skipTests</property>
+            </activation>
+            <properties>
+                <docker.skip>true</docker.skip>
+            </properties>
+        </profile>
+
 # Boot2docker-cli
 Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-only network and a "public network". The VM
 also exposes port 4243 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
