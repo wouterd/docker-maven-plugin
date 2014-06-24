@@ -59,6 +59,16 @@
     </developer>
   </developers>
 
+  <contributors>
+    <contributor>
+      <name>Lachlan Coote</name>
+      <url>https://github.com/lcoote</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
