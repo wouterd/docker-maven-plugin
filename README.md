@@ -50,7 +50,7 @@ Current snapshot version: `1.3-SNAPSHOT`
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
                   <keep>true</keep>
-                  <nameAndTag>wouterd/my-nginx:1.0</nameAndTag>
+                  <nameAndTag>goonwarrior/my-nginx:1.0</nameAndTag>
                 </image>
               </images>
             </configuration>
