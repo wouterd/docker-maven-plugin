@@ -29,8 +29,6 @@ public class BuiltImageInfo {
     private final boolean keep;
     private final boolean push;
 
-    private boolean removed = false;
-
     public BuiltImageInfo(final String imageId, ImageBuildConfiguration imageConfig) {
         this.imageId = imageId;
         this.startId = imageConfig.getId();
@@ -57,14 +55,6 @@ public class BuiltImageInfo {
 
     public boolean shouldPush() {
         return push;
-    }
-
-    public boolean isRemoved() {
-        return removed;
-    }
-
-    public void setRemoved(boolean removed) {
-        this.removed = removed;
     }
 
 }
