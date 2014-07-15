@@ -22,9 +22,13 @@ import java.io.IOException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
+import net.wouterdanes.docker.remoteapi.model.Credentials;
+
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.google.common.io.BaseEncoding;
 
 /**
  * This class is responsible for holding the shared functionality of all Docker remoteapi services.
@@ -32,8 +36,14 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public abstract class BaseService {
 
     public static final String TARGET_DOCKER_API_VERSION = "v1.10";
+    public static final String REGISTRY_AUTH_HEADER = "X-Registry-Auth";
+
+    // required for "push" even if no credentials required
+    private static final String REGISTRY_AUTH_NULL_VALUE = "null";
+
     private final ObjectMapper objectMapper;
     private final WebTarget serviceEndPoint;
+    private Credentials credentials = null;
 
     public BaseService(String dockerApiRoot, String endPointPath) {
         objectMapper = new ObjectMapper();
@@ -49,8 +59,19 @@ public abstract class BaseService {
                 .path(endPointPath);
     }
 
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
+    }
+
     protected WebTarget getServiceEndPoint() {
         return serviceEndPoint;
+    }
+
+    protected String getRegistryAuthHeaderValue() {
+        if (credentials == null) {
+            return REGISTRY_AUTH_NULL_VALUE;
+        }
+        return BaseEncoding.base64().encode(toJson(credentials).getBytes());
     }
 
     protected String toJson(Object obj) {

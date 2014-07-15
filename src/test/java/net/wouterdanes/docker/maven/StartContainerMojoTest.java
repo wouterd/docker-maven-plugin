@@ -34,6 +34,7 @@ import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.model.Credentials;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -92,11 +93,14 @@ public class StartContainerMojoTest {
 
     @Test
     public void testThatMojoStartsBuiltImageWhenReferencedById() throws Exception {
+        ImageBuildConfiguration imageConfig = new ImageBuildConfiguration();
+        imageConfig.setId("built-image");
+
         ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()
                 .fromImage("built-image").withId("someId");
 
         StartContainerMojo mojo = createMojo(startConfiguration);
-        mojo.registerBuiltImage("built-image", "the-image-id", false);
+        mojo.registerBuiltImage("the-image-id", imageConfig);
 
         mojo.execute();
 
@@ -165,6 +169,16 @@ public class StartContainerMojoTest {
         @Override
         public void removeImage(final String imageId) {
             proxy.removeImage(imageId);
+        }
+
+        @Override
+        public void pushImage(final String imageId) {
+            proxy.pushImage(imageId);
+        }
+
+        @Override
+        public void setCredentials(Credentials credentials) {
+            proxy.setCredentials(credentials);
         }
     }
 }
