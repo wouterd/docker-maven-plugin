@@ -55,7 +55,7 @@ public class BuildImageMojo extends AbstractDockerMojo {
                 logImageConfig(image);
                 String imageId = getDockerProvider().buildImage(image);
                 getLog().info(String.format("Image '%s' has Id '%s'", image.getId(), imageId));
-                registerBuiltImage(image.getId(), imageId, image.isKeep());
+                registerBuiltImage(imageId, image);
             } catch (DockerException e) {
                 getLog().error(String.format("Cannot build image '%s'", image.getId()), e);
                 Optional<String> apiResponse = e.getApiResponse();

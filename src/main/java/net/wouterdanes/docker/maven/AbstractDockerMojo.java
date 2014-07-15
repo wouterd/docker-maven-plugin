@@ -34,6 +34,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import net.wouterdanes.docker.provider.DockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
@@ -89,9 +91,11 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
     }
 
-    protected void registerBuiltImage(String startId, String imageId, boolean keep) {
+    protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig) {
+        BuiltImageInfo info = new BuiltImageInfo(imageId, imageConfig);
+
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
-        builtImages.put(startId, new BuiltImageInfo(startId, imageId, keep));
+        builtImages.put(info.getStartId(), info);
     }
 
     protected Collection<BuiltImageInfo> getBuiltImages() {
@@ -118,6 +122,21 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     protected Optional<BuiltImageInfo> getBuiltImageForStartId(final String imageId) {
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
         return Optional.fromNullable(builtImages.get(imageId));
+    }
+
+    protected void removeImage(BuiltImageInfo image) {
+        if (image.isRemoved()) {
+            getLog().debug(String.format("Image '%s' (%s) has already been removed", image.getImageId(), image.getStartId()));
+            return;
+        }
+
+        getLog().info(String.format("Removing image '%s' (%s) ...", image.getImageId(), image.getStartId()));
+        try {
+            getDockerProvider().removeImage(image.getImageId());
+            image.setRemoved(true);
+        } catch (DockerException e) {
+            getLog().error("Failed to remove image", e);
+        }
     }
 
     @SuppressWarnings("unchecked")

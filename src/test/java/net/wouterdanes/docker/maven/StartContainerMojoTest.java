@@ -93,11 +93,14 @@ public class StartContainerMojoTest {
 
     @Test
     public void testThatMojoStartsBuiltImageWhenReferencedById() throws Exception {
+        ImageBuildConfiguration imageConfig = new ImageBuildConfiguration();
+        imageConfig.setId("built-image");
+
         ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()
                 .fromImage("built-image").withId("someId");
 
         StartContainerMojo mojo = createMojo(startConfiguration);
-        mojo.registerBuiltImage("built-image", "the-image-id", false);
+        mojo.registerBuiltImage("the-image-id", imageConfig);
 
         mojo.execute();
 

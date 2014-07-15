@@ -25,12 +25,18 @@ public class BuiltImageInfo {
 
     private final String startId;
     private final String imageId;
+    private final String nameAndTag;
     private final boolean keep;
+    private final boolean push;
 
-    public BuiltImageInfo(final String startId, final String imageId, final boolean keep) {
-        this.startId = startId;
+    private boolean removed = false;
+
+    public BuiltImageInfo(final String imageId, ImageBuildConfiguration imageConfig) {
         this.imageId = imageId;
-        this.keep = keep;
+        this.startId = imageConfig.getId();
+        this.nameAndTag = imageConfig.getNameAndTag();
+        this.keep = imageConfig.isKeep();
+        this.push = imageConfig.isPush();
     }
 
     public String getStartId() {
@@ -41,7 +47,24 @@ public class BuiltImageInfo {
         return imageId;
     }
 
-    public boolean shouldKeep() {
-        return keep;
+    public String getNameAndTag() {
+        return nameAndTag;
     }
+
+    public boolean shouldKeep() {
+        return keep || push;
+    }
+
+    public boolean shouldPush() {
+        return push;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
 }

@@ -17,17 +17,15 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 
+import com.google.common.base.Strings;
+
+import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**
@@ -38,25 +36,27 @@ import net.wouterdanes.docker.remoteapi.exception.DockerException;
 		instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
 public class PushImageMojo extends AbstractDockerMojo {
 
-    @Parameter(required = true)
-    private List<String> imageIds;
-
-    @Inject
-    public PushImageMojo(final List<String> imageIds) {
-        this.imageIds = imageIds;
-    }
-
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
-        for (String imageId : imageIds) {
-            getLog().info(String.format("Pushing image '%s' ..", imageId));
-            try {
-                getDockerProvider().pushImage(imageId);
-            } catch (DockerException e) {
-                getLog().error("Failed to push image", e);
+        for (BuiltImageInfo image : getBuiltImages()) {
+            if (image.shouldPush()) {
+                getLog().info(String.format("Pushing image %s..", image.getImageId()));
+                String pushableId = getPushableImageId(image);
+                try {
+                    getDockerProvider().pushImage(pushableId);
+                } catch (DockerException e) {
+                    getLog().error("Failed to push image", e);
+                }
             }
         }
+    }
 
+    protected String getPushableImageId(BuiltImageInfo image) {
+        String pushableId = image.getNameAndTag();
+        if (Strings.isNullOrEmpty(pushableId)) {
+            pushableId = image.getImageId();
+        }
+        return pushableId;
     }
 
 }

@@ -15,6 +15,7 @@ A maven plugin to manage docker containers and images for integration tests.
       - Containers that were started
 - Build a docker image from a bunch of source files in package and pre-integration-test phases
       - Allow built containers to be started in the pre-integration phase
+- Push that docker image to a public or private image registry in the install phase
 - Docker provider for "local docker" via tcp
 - Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
@@ -30,6 +31,11 @@ Current snapshot version: `1.3-SNAPSHOT`
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
         <version>1.1</version>
+        <configuration>
+          <userName>goonwarrior</userName>
+          <password>g0onwarr!or</password>
+          <email>goonwarrior89@hotmail.com</email>
+        </configuration>
         <executions>
           <execution>
             <id>build</id>
@@ -77,11 +83,18 @@ Current snapshot version: `1.3-SNAPSHOT`
               <goal>stop-containers</goal>
             </goals>
           </execution>
+          <execution>
+            <id>push</id>
+            <goals>
+              <goal>push-images</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
 
 The above pom.xml element includes the plugin and starts builds an image from the project. Then it starts some containers
 in the pre-integration-test phase, including the built container and stops those in the post-integration-test phase.
+Finally, in the install phase it pushes the image we built in the first step to https://registry.hub.docker.com/.
 Under `<configuration>` add some containers. By giving them an `id`, you can reference them later and the ID is also
 used in the port mapping properties. The `<image>` tag specifies the docker image to start.
 
@@ -114,6 +127,7 @@ Below is an example snippet.
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
                   <keep>true</keep>
+                  <push>true</push>
                   <nameAndTag>wouterd/my-nginx:1.0</nameAndTag>
                 </image>
               </images>
@@ -122,13 +136,39 @@ Below is an example snippet.
 
 The configuration works as follows:
 - `<images>` contains a list of images to build as `<image>` elements
-- `<id>` for an image specifies the ID you want to use to reference this image in the plugin, for example when starting 
+- `<id>` for an image specifies the ID you want to use to reference this image in the plugin, for example when starting
     a container based on a built image.
 - `<files>` contains a list of files to add to the container as `<file>` elements
-- `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing 
-    the maven build.
-- `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It's in the
-    "standard" docker format: `repository:tag`
+- `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing
+    the maven build. If false, the image will be deleted as part of the `stop-containers` goal.
+- `<push>` (defaults to false) specifies whether or not the plugin should push this image to a Docker image registry. If true, the
+    image will be pushed as part of the `push-images` goal. Additionally, when true, the `<keep>` property is ignored and
+    the image will be retained after the container is stopped.
+- `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It can be in one of the
+    "standard" docker formats: `repository:tag`; or `registry/repository:tag`.
+
+## `push-images` goal
+The `push-images` goal allows you to push any marked images that were built in a prior execution of the
+`build-images` goal to a Docker image registry.
+
+If you wish to push the image to a private registry (that is, a registry other than
+https://registry.hub.docker.com/ then the host (and port number) of the registry should be incorporated
+into the `<nameAndTag>` of the image.
+
+          E.g.
+          myregistry.corpdomain.net:5000/repo:tag
+
+If the registry is omitted, then https://registry.hub.docker.com/ is assumed.
+
+## Credentials
+Some registries (including https://registry.hub.docker.com/) will require user credentials to perform
+specific operations. The plugin provides a means to specify these credentials however, at this time
+they are only used when pushing images. These credentials can be specified within the plugin
+configuration or populated indirectly by Maven properties.
+
+- `<userName>`, Docker registry user name, defaults to the value of `docker.userName`.
+- `<password>`, Docker registry user password (in plain text), defaults to the value of `docker.password`.
+- `<email>`, Docker registry user email address, defaults to the value of `docker.email`.
 
 ## Using a SNAPSHOT version
 The releases of this plugin are deployed to maven central, the SNAPSHOT versions are automatically deployed to the Sonatype OSS repository. To be able to use the SNAPSHOT versions of this plugin, add the following repository to your project POM or settings.xml:
@@ -138,7 +178,7 @@ The releases of this plugin are deployed to maven central, the SNAPSHOT versions
             <name>Sonatype OSS Snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
       </pluginRepository>
-      
+
 ## Enabling the Remote Api on the Docker Daemon
 Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 4243 (default) that only listens to the local interface, add this to your daemon startup: `-H tcp://127.0.0.1:4243`
 
@@ -207,4 +247,3 @@ line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
 - [ ] Add support for Tutum.co
 - [ ] Create a feature complete docker remote api for Java
 - [ ] Support multiple (all) versions of the Docker Remote API
-- [ ] Push containers to a docker registry in the deploy phase

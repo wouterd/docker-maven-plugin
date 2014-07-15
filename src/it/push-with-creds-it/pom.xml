@@ -58,6 +58,9 @@
 	    <configuration>
 	      <!-- Currently skipped owing to requirements for build environment to define sensitive property values e.g. docker.password -->
 	      <skip>true</skip>
+		  <userName>@docker.userName@</userName>
+		  <email>@docker.email@</email>
+		  <password>@docker.password@</password>
 	    </configuration>
         <executions>
           <execution>
@@ -72,22 +75,45 @@
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
-                  <nameAndTag>@docker.userName@/drek:latest</nameAndTag>
+                  <nameAndTag>@docker.registry@/@docker.userName@/drek:latest</nameAndTag>
                   <keep>true</keep>
+                  <push>true</push>
                 </image>
               </images>
             </configuration>
           </execution>
           <execution>
+            <id>start</id>
+            <configuration>
+              <containers>
+                <container>
+                  <id>Debian</id>
+                  <image>debian:wheezy</image>
+                </container>
+                <container>
+                  <id>BusyBox</id>
+                  <image>busybox</image>
+                </container>
+                <container>
+                  <id>cache</id>
+                  <image>nginx</image>
+                </container>
+              </containers>
+            </configuration>
+            <goals>
+              <goal>start-containers</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop</id>
+            <configuration>
+            </configuration>
+            <goals>
+              <goal>stop-containers</goal>
+            </goals>
+          </execution>
+          <execution>
             <id>push</id>
-	        <configuration>
-		      <userName>@docker.userName@</userName>
-		      <email>@docker.email@</email>
-		      <password>@docker.password@</password>
-		      <imageIds>
-		      	<imageId>@docker.registry@/@docker.userName@/drek:latest</imageId>
-		      </imageIds>
-	        </configuration>
             <goals>
               <goal>push-images</goal>
             </goals>

@@ -40,6 +40,9 @@ public class ImageBuildConfiguration {
     @Parameter(defaultValue = "false")
     private boolean keep;
 
+    @Parameter(defaultValue = "false")
+    private boolean push;
+
     public List<File> getFiles() {
         return files;
     }
@@ -70,6 +73,14 @@ public class ImageBuildConfiguration {
 
     public void setKeep(final boolean keep) {
         this.keep = keep;
+    }
+
+    public boolean isPush() {
+        return push;
+    }
+
+    public void setPush(boolean push) {
+        this.push = push;
     }
 
     /**
