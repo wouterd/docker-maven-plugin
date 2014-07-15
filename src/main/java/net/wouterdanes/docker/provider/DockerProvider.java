@@ -22,6 +22,7 @@ import java.util.List;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
  * This interface represents an implementation that provides Docker functionality. Examples are:
@@ -33,6 +34,12 @@ import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
  * </ul>
  */
 public interface DockerProvider {
+
+	/**
+	 * Sets (or un-sets) the credentials to be used when communicating with the Docker host.
+	 * @param credentials the user credentials, may be null
+	 */
+	void setCredentials(Credentials credentials);
 
     /**
      * Starts a docker container and returns the ID of the started container
@@ -72,4 +79,10 @@ public interface DockerProvider {
      * @param imageId the Id of the images to remove
      */
     void removeImage(String imageId);
+
+    /**
+     * Pushes an image from docker to a registry.
+     * @param imageId the Id of the image to push
+     */
+    void pushImage(String imageId);
 }

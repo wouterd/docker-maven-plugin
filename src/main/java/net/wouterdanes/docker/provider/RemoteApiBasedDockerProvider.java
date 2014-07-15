@@ -22,6 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.common.base.Optional;
 
@@ -35,12 +38,14 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.BaseService;
 import net.wouterdanes.docker.remoteapi.ContainersService;
 import net.wouterdanes.docker.remoteapi.ImagesService;
 import net.wouterdanes.docker.remoteapi.MiscService;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
 import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
+import net.wouterdanes.docker.remoteapi.model.Credentials;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromEnvironmentSupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromPropertySupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerPortFromEnvironmentSupplier;
@@ -55,6 +60,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     private final ImagesService imagesService;
     private final MiscService miscService;
 
+    private final Set<BaseService> services;
+
     public static final int DEFAULT_DOCKER_PORT = 4243;
     public static final String DEFAULT_DOCKER_HOST = "127.0.0.1";
     public static final String DOCKER_HOST_SYSTEM_ENV = "DOCKER_HOST";
@@ -68,8 +75,14 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         this(getDockerHostFromEnvironment(), getDockerPortFromEnvironment());
     }
 
-
     @Override
+    public void setCredentials(Credentials credentials) {
+        for (BaseService service : services) {
+            service.setCredentials(credentials);
+        }
+    }
+
+	@Override
     public void stopContainer(final String containerId) {
         getContainersService().killContainer(containerId);
     }
@@ -112,6 +125,11 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     }
 
     @Override
+    public void pushImage(final String imageId) {
+        getImagesService().pushImage(imageId);
+    }
+
+    @Override
     public String toString() {
         return getClass().getName() + "{" +
                 "host='" + host + '\'' +
@@ -126,6 +144,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         containersService = new ContainersService(dockerApiRoot);
         imagesService = new ImagesService(dockerApiRoot);
         miscService = new MiscService(dockerApiRoot);
+        services = new HashSet<>();
+        register(containersService, imagesService, miscService);
     }
 
     protected String startContainer(ContainerStartConfiguration configuration, ContainerStartRequest startRequest) {
@@ -152,6 +172,16 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     protected ImagesService getImagesService() {
         return imagesService;
+    }
+
+    protected Collection<BaseService> getServices() {
+        return services;
+    }
+
+    protected void register(BaseService... servicesToBeRegistered) {
+        for (BaseService service : servicesToBeRegistered) {
+        	services.add(service);
+        }
     }
 
     protected String getHost() {

@@ -20,33 +20,39 @@ package net.wouterdanes.docker.remoteapi.model;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Strings;
+
 /**
  * Creates an image descriptor based on a passed image id or qualifier in the form ([registry]/[repo]/[image]:[tag])
  */
 public class ImageDescriptor {
 
-    private static final Pattern IMAGE_QUALIFIER = Pattern.compile("^(([\\w\\.]+)/)??(([\\w]+)/)?([\\w]+)(:([\\w]+))?$");
+    private static final Pattern IMAGE_QUALIFIER = Pattern.compile("^"
+            + "((?<registry>[\\w\\.\\-]+(:\\d+)?)/)??" // registry
+            + "((?<repository>[\\w]+)/)?(?<image>[\\w]+)" // repository/image
+            + "(:(?<tag>[\\w]+))?" // tag
+            + "$");
 
     private final String id;
-    private String registry;
-    private String repository;
-    private String image;
-    private String tag;
+    private final String registry;
+    private final String repository;
+    private final String image;
+    private final String tag;
 
     public ImageDescriptor(String id) {
         this.id = id;
 
-        this.registry = null;
-        this.repository = null;
-        this.image = null;
-        this.tag = null;
-
         Matcher matcher = IMAGE_QUALIFIER.matcher(id);
         if (matcher.matches()) {
-            this.registry = matcher.group(2);
-            this.repository = matcher.group(4);
-            this.image = matcher.group(5);
-            this.tag = matcher.group(7);
+            this.registry = matcher.group("registry");
+            this.repository = matcher.group("repository");
+            this.image = matcher.group("image");
+            this.tag = matcher.group("tag");
+        } else {
+            this.registry = null;
+            this.repository = null;
+            this.image = id;
+            this.tag = null;
         }
     }
 
@@ -69,4 +75,58 @@ public class ImageDescriptor {
     public String getTag() {
         return tag;
     }
+
+    public String getRepositoryAndImage() {
+        StringBuilder buf = new StringBuilder();
+        appendRepository(buf);
+        appendImage(buf);
+        return buf.toString();
+    }
+
+    public String getRepositoryImageAndTag() {
+        StringBuilder buf = new StringBuilder();
+        appendRepository(buf);
+        appendImage(buf);
+        appendTag(buf);
+        return buf.toString();
+    }
+
+    private void appendRepository(StringBuilder buf) {
+        if (!Strings.isNullOrEmpty(repository)) {
+            buf.append(repository);
+            buf.append('/');
+        }
+    }
+
+    private void appendImage(StringBuilder buf) {
+        buf.append(image);
+    }
+
+    private void appendTag(StringBuilder buf) {
+        if (!Strings.isNullOrEmpty(tag)) {
+            buf.append(':');
+            buf.append(tag);
+        }
+    }
+
+    public boolean hasRegistry() {
+        return !Strings.isNullOrEmpty(registry);
+    }
+
+    public boolean hasTag() {
+        return !Strings.isNullOrEmpty(tag);
+    }
+
+    @Override
+    public String toString() {
+        return "ImageDescriptor[id=" + id
+                + ", registry=" + registry
+                + ", repository=" + repository
+                + ", image=" + image
+                + ", tag=" + tag
+                + "]";
+    }
+
+
+
 }

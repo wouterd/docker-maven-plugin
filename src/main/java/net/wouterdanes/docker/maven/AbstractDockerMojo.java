@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -33,6 +34,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import net.wouterdanes.docker.provider.DockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
+import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
  * Base class for all Mojos with shared functionality
@@ -47,6 +49,15 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "false", property = "docker.skip", required = false)
     private boolean skip;
+
+    @Parameter(defaultValue = "", property = "docker.userName", required = false)
+    private String userName;
+
+    @Parameter(defaultValue = "", property = "docker.email", required = false)
+    private String email;
+
+    @Parameter(defaultValue = "", property = "docker.password", required = false)
+    private String password;
 
     public void setProviderName(final String providerName) {
         this.providerName = providerName;
@@ -89,7 +100,19 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected DockerProvider getDockerProvider() {
-        return new DockerProviderSupplier(providerName).get();
+        DockerProvider provider = new DockerProviderSupplier(providerName).get();
+        provider.setCredentials(getCredentials());
+        return provider;
+    }
+
+    protected Credentials getCredentials() {
+        if (Strings.isNullOrEmpty(userName)) {
+            getLog().info("No user name provided");
+            return null;
+        }
+
+        getLog().info("Using credentials: " + userName);
+        return new Credentials(userName, password, email, null);
     }
 
     protected Optional<BuiltImageInfo> getBuiltImageForStartId(final String imageId) {

@@ -18,6 +18,7 @@
 package net.wouterdanes.docker.remoteapi;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
@@ -35,7 +36,6 @@ public class ImagesService extends BaseService {
     }
 
     public String pullImage(String image) {
-
         ImageDescriptor descriptor = new ImageDescriptor(image);
 
         return getServiceEndPoint()
@@ -45,6 +45,27 @@ public class ImagesService extends BaseService {
                 .queryParam("tag", descriptor.getTag())
                 .queryParam("registry", descriptor.getRegistry())
                 .request()
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .post(null, String.class);
+    }
+
+    public String pushImage(String imageId) {
+        ImageDescriptor descriptor = new ImageDescriptor(imageId);
+
+        WebTarget target = getServiceEndPoint()
+                .path(descriptor.getRepositoryAndImage())
+                .path("push");
+
+        if (descriptor.hasRegistry()) {
+            target = target.queryParam("registry", descriptor.getRegistry());
+        }
+
+        if (descriptor.hasTag()) {
+            target = target.queryParam("tag", descriptor.getTag());
+        }
+
+        return target.request()
+                .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .post(null, String.class);
     }
