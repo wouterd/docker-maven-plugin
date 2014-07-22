@@ -1,5 +1,9 @@
 package net.wouterdanes.docker.maven;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
@@ -16,7 +20,19 @@ public class VerifyMojo extends AbstractDockerMojo {
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
 
-        if (!getPluginErrors().isEmpty()) {
+        List<DockerPluginError> errors = getPluginErrors();
+        if (!errors.isEmpty()) {
+
+            Set<String> erronousGoals = new HashSet<>();
+            for (DockerPluginError error : errors) {
+                erronousGoals.add(error.getGoal());
+            }
+            StringBuilder sb = new StringBuilder("The following goals had errors: \n");
+            for (String goal : erronousGoals) {
+                sb.append(" - ").append(goal).append('\n');
+            }
+            getLog().error(sb);
+
             throw new MojoFailureException("Errors occurred, stopping the build");
         }
 
