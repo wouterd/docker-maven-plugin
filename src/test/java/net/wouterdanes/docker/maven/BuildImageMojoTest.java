@@ -46,6 +46,7 @@ public class BuildImageMojoTest {
         mojo.setImages(images);
 
         executeMojo(FAKE_PROVIDER_KEY);
+        assert mojo.getPluginErrors().isEmpty();
 
     }
 
@@ -60,6 +61,7 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         Mockito.verify(FakeDockerProvider.instance, Mockito.atLeastOnce()).buildImage(any(ImageBuildConfiguration.class));
+        assert mojo.getPluginErrors().isEmpty();
 
     }
 
