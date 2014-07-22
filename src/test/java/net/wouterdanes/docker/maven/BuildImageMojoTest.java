@@ -29,7 +29,7 @@ public class BuildImageMojoTest {
         FakeDockerProvider.instance = Mockito.mock(FakeDockerProvider.class);
 
         DockerProviderSupplier.registerProvider(FAKE_PROVIDER_KEY, FakeDockerProvider.class);
-        Class.forName(DockerExceptionThrowingDockerProvider.class.getName());
+        DockerExceptionThrowingDockerProvider.class.newInstance();
     }
 
     @After

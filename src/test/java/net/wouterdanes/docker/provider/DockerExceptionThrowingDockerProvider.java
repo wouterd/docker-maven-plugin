@@ -13,7 +13,7 @@ import net.wouterdanes.docker.remoteapi.model.Credentials;
  * {@link net.wouterdanes.docker.remoteapi.exception.DockerException}s
  *
  * If you want to use this provider in your tests, simply write:
- * <code>Class.forName(DockerExceptionThrowingDockerProvider.class.getName())</code>
+ * <code>DockerExceptionThrowingDockerProvider.class.newInstance();</code>
  */
 public class DockerExceptionThrowingDockerProvider implements DockerProvider {
 
