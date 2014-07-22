@@ -17,13 +17,13 @@
 
 package net.wouterdanes.docker.maven;
 
+import com.google.common.base.Strings;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-
-import com.google.common.base.Strings;
 
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
@@ -45,7 +45,8 @@ public class PushImageMojo extends AbstractDockerMojo {
                 try {
                     getDockerProvider().pushImage(pushableId);
                 } catch (DockerException e) {
-                    getLog().error("Failed to push image", e);
+                    String message = String.format("Cannot push image '%s'", image.getImageId());
+                    throw new MojoFailureException(message, e);
                 }
             }
         }
