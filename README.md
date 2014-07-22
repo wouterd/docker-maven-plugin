@@ -17,6 +17,7 @@ A maven plugin to manage docker containers and images for integration tests.
       - Containers that were started
 - Verifies the build in the "verify" phase which tests if anything upto the integration test phase failed.
 - Push docker images to a public or private image registry in the install phase
+- Assign release tags to a docker image and push it to a public or private image registry in the deploy phase
 - Docker provider for "local docker" via tcp
 - Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
@@ -51,7 +52,7 @@ Current snapshot version: `1.4-SNAPSHOT`
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
                   <keep>true</keep>
-                  <nameAndTag>goonwarrior/my-nginx:1.0</nameAndTag>
+                  <nameAndTag>goonwarrior/my-nginx:1.0-SNAPSHOT</nameAndTag>
                 </image>
               </images>
             </configuration>
@@ -96,14 +97,35 @@ Current snapshot version: `1.4-SNAPSHOT`
               <goal>push-images</goal>
             </goals>
           </execution>
+          <execution>
+            <id>release</id>
+            <goals>
+              <goal>tag-images</goal>
+            </goals>
+            <configuration>
+              <images>
+                <image>
+                  <id>nginx</id>
+                  <tags>
+                  	<tag>goonwarrior/my-nginx:1.0</tag>
+                  	<tag>goonwarrior/my-nginx:latest</tag>
+                  </tags>
+                  <push>true</push>
+                </image>
+              </images>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
 The above pom.xml element includes the plugin and starts builds an image from the project. Then it starts some containers
 in the pre-integration-test phase, including the built container and stops those in the post-integration-test phase.
-Finally, in the install phase it pushes the image we built in the first step to https://registry.hub.docker.com/.
 Under `<configuration>` add some containers. By giving them an `id`, you can reference them later and the ID is also
 used in the port mapping properties. The `<image>` tag specifies the docker image to start.
+Then, in the install phase it pushes the image we built in the first step to https://registry.hub.docker.com/
+with the repository and tag `goonwarrior/my-nginx:1.0-SNAPSHOT`. Finally, during the deploy phase it assign
+new release tags to the image, "goonwarrior/my-nginx:1.0" and "goonwarrior/my-nginx:latest", and push these to
+public registry also.
 
 By default, all exposed ports are published on the host. The following two properties are set per exposed port:
 - docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.cache.ports.80/tcp.host')
@@ -135,6 +157,7 @@ Below is an example snippet.
                   </files>
                   <keep>true</keep>
                   <push>true</push>
+                  <registry>mydocker-registry.corp.com:5000</registry>
                   <nameAndTag>wouterd/my-nginx:1.0</nameAndTag>
                 </image>
               </images>
@@ -148,24 +171,58 @@ The configuration works as follows:
 - `<files>` contains a list of files to add to the container as `<file>` elements
 - `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing
     the maven build. If false, the image will be deleted as part of the `stop-containers` goal.
+- `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It can be in one of the
+    "standard" docker formats: `repository:tag`; or `registry/repository:tag`.
 - `<push>` (defaults to false) specifies whether or not the plugin should push this image to a Docker image registry. If true, the
     image will be pushed as part of the `push-images` goal. Additionally, when true, the `<keep>` property is ignored and
     the image will be retained after the container is stopped.
-- `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It can be in one of the
-    "standard" docker formats: `repository:tag`; or `registry/repository:tag`.
+- `<registry>` captures the host name and port of a private Docker registry, to which the image should be pushed, optional.
 
 ## `push-images` goal
 The `push-images` goal allows you to push any marked images that were built in a prior execution of the
 `build-images` goal to a Docker image registry.
 
 If you wish to push the image to a private registry (that is, a registry other than
-https://registry.hub.docker.com/ then the host (and port number) of the registry should be incorporated
-into the `<nameAndTag>` of the image.
+https://registry.hub.docker.com/ then the host (and port number) of the registry should be explicitly
+specified in the `<registry>` parameter of the image or incorporated into the `<nameAndTag>`.
 
           E.g.
           myregistry.corpdomain.net:5000/repo:tag
 
 If the registry is omitted, then https://registry.hub.docker.com/ is assumed.
+
+## `tag-images` goal
+The `tag-images` goal allows you to assign additional tags to any images which may have been built in a prior execution
+of the `build-images` goal, and optionally push these tags to a Docker image registry.
+Below is an example snippet.
+
+          <execution>
+            <id>release</id>
+            <goals>
+              <goal>tag-images</goal>
+            </goals>
+            <configuration>
+              <images>
+                <image>
+                  <id>nginx</id>
+                  <tags>
+                  	<tag>goonwarrior/my-nginx:1.0</tag>
+                  	<tag>goonwarrior/my-nginx:latest</tag>
+                  </tags>
+                  <push>true</push>
+                  <registry>mydocker-registry.corp.com:5000</registry>
+                </image>
+              </images>
+            </configuration>
+          </execution>
+
+The configuration works as follows:
+- `<images>` contains a list of images to build as `<image>` elements
+- `<id>` specifies the ID of a previously built image.
+- `<tags>` contains a list of repository, name and/or tags to assign to the image as `<tag>` elements, Each can be in one of
+	the "standard" docker formats: `repository:tag`; or `registry/repository:tag`.
+- `<push>` (defaults to false) specifies whether or not the plugin should push the tagged image to a Docker image registry.
+- `<registry>` captures the host name and port of a private Docker registry, to which the image should be pushed, optional.
 
 ## Credentials
 Some registries (including https://registry.hub.docker.com/) will require user credentials to perform

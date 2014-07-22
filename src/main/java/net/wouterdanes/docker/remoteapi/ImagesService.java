@@ -20,8 +20,10 @@ package net.wouterdanes.docker.remoteapi;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import com.google.common.base.Optional;
+
 import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
 
 /**
@@ -35,39 +37,81 @@ public class ImagesService extends BaseService {
         super(dockerApiRoot, "/images");
     }
 
-    public String pullImage(String image) {
+    public String pullImage(final String image) {
         ImageDescriptor descriptor = new ImageDescriptor(image);
 
-        return getServiceEndPoint()
+        WebTarget target = getServiceEndPoint()
                 .path("create")
-                .queryParam("fromImage", descriptor.getImage())
-                .queryParam("repo", descriptor.getRepository())
-                .queryParam("tag", descriptor.getTag())
-                .queryParam("registry", descriptor.getRegistry())
-                .request()
+                .queryParam("fromImage", descriptor.getImage());
+
+        if (descriptor.getRepository().isPresent()) {
+            target = target.queryParam("repo", descriptor.getRepository().get());
+        }
+
+        if (descriptor.getTag().isPresent()) {
+            target = target.queryParam("tag", descriptor.getTag().get());
+        }
+
+        if (descriptor.getRegistry().isPresent()) {
+            target = target.queryParam("registry", descriptor.getRegistry().get());
+        }
+
+        return target.request()
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .post(null, String.class);
     }
 
-    public String pushImage(String imageId) {
-        ImageDescriptor descriptor = new ImageDescriptor(imageId);
+    public String pushImage(final String imageId, final Optional<String> registry) {
+        try {
+            ImageDescriptor descriptor = new ImageDescriptor(imageId);
+
+            WebTarget target = getServiceEndPoint()
+                    .path(descriptor.getRepositoryAndImage())
+                    .path("push");
+
+            Optional<String> targetRegistry = registry.or(descriptor.getRegistry());
+            if (targetRegistry.isPresent()) {
+                target = target.queryParam("registry", targetRegistry.get());
+            }
+
+            Optional<String> targetTag = descriptor.getTag();
+            if (targetTag.isPresent()) {
+                target = target.queryParam("tag", targetTag.get());
+            }
+
+            return target.request()
+                    .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
+                    .accept(MediaType.APPLICATION_JSON_TYPE)
+                    .post(null, String.class);
+
+        } catch (WebApplicationException e) {
+            throw makeImageTargetingException(imageId, e);
+
+        }
+    }
+
+    public void tagImage(final String imageId, final String nameAndTag) {
+        ImageDescriptor descriptor = new ImageDescriptor(nameAndTag);
 
         WebTarget target = getServiceEndPoint()
-                .path(descriptor.getRepositoryAndImage())
-                .path("push");
+                .path(imageId)
+                .path("tag")
+                .queryParam("repo", descriptor.getRepositoryAndImage());
 
-        if (descriptor.hasRegistry()) {
-            target = target.queryParam("registry", descriptor.getRegistry());
+        Optional<String> targetTag = descriptor.getTag();
+        if (targetTag.isPresent()) {
+            target = target.queryParam("tag", targetTag.get());
         }
 
-        if (descriptor.hasTag()) {
-            target = target.queryParam("tag", descriptor.getTag());
-        }
-
-        return target.request()
-                .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
+        Response response = target.request()
                 .accept(MediaType.APPLICATION_JSON_TYPE)
-                .post(null, String.class);
+                .post(null);
+
+        Response.StatusType statusInfo = response.getStatusInfo();
+
+        response.close();
+
+        checkImageTargetingResponse(imageId, statusInfo);
     }
 
     public void deleteImage(final String imageId) {
@@ -77,7 +121,7 @@ public class ImagesService extends BaseService {
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .delete(String.class);
         } catch (WebApplicationException e) {
-            throw new DockerException("Cannot remove image", e);
+            throw makeImageTargetingException("Cannot remove image", e);
         }
     }
 }

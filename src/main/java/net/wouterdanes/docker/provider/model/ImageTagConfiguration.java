@@ -17,42 +17,27 @@
 
 package net.wouterdanes.docker.provider.model;
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * This class is responsible for holding the configuration of a single docker image to be built by the
- * {@link net.wouterdanes.docker.maven.BuildImageMojo}
+ * This class is responsible for holding the configuration to assign one or more tags to a single
+ * docker image within the {@link net.wouterdanes.docker.maven.TagImageMojo}
  */
-public class ImageBuildConfiguration {
-
-    @Parameter(required = true)
-    private List<File> files;
+public class ImageTagConfiguration {
 
     @Parameter(required = true)
     private String id;
 
-    @Parameter
-    private String nameAndTag;
-
-    @Parameter(defaultValue = "false")
-    private boolean keep;
+    @Parameter(required = true)
+    private List<String> tags;
 
     @Parameter(defaultValue = "false")
     private boolean push;
 
     @Parameter
     private String registry;
-
-    public List<File> getFiles() {
-        return files;
-    }
-
-    public void setFiles(final List<File> files) {
-        this.files = files;
-    }
 
     public String getId() {
         return id;
@@ -62,20 +47,12 @@ public class ImageBuildConfiguration {
         this.id = id;
     }
 
-    public String getNameAndTag() {
-        return nameAndTag;
+    public List<String> getTags() {
+        return tags;
     }
 
-    public void setNameAndTag(final String nameAndTag) {
-        this.nameAndTag = nameAndTag;
-    }
-
-    public boolean isKeep() {
-        return keep;
-    }
-
-    public void setKeep(final boolean keep) {
-        this.keep = keep;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public boolean isPush() {
@@ -94,16 +71,4 @@ public class ImageBuildConfiguration {
         this.registry = registry;
     }
 
-    /**
-     * Checks if this is a valid configuration, every image build package should have a Dockerfile included.
-     * @return <code>true</code> if this configuration can be built, <code>false</code> otherwise.
-     */
-    public boolean isValid() {
-        for (File file : files) {
-            if (file.getName().equals("Dockerfile")) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -17,6 +17,8 @@
 
 package net.wouterdanes.docker.provider.model;
 
+import com.google.common.base.Optional;
+
 /**
  * This class holds information about an image that was built so that it can be references in the start goal and
  * removed in the stop goal.
@@ -26,6 +28,7 @@ public class BuiltImageInfo {
     private final String startId;
     private final String imageId;
     private final String nameAndTag;
+    private final Optional<String> registry;
     private final boolean keep;
     private final boolean push;
 
@@ -33,6 +36,7 @@ public class BuiltImageInfo {
         this.imageId = imageId;
         this.startId = imageConfig.getId();
         this.nameAndTag = imageConfig.getNameAndTag();
+        this.registry = Optional.fromNullable(imageConfig.getRegistry());
         this.keep = imageConfig.isKeep();
         this.push = imageConfig.isPush();
     }
@@ -47,6 +51,10 @@ public class BuiltImageInfo {
 
     public String getNameAndTag() {
         return nameAndTag;
+    }
+
+    public Optional<String> getRegistry() {
+        return registry;
     }
 
     public boolean shouldKeep() {

@@ -2,6 +2,8 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -52,8 +54,13 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     }
 
     @Override
-    public void pushImage(final String imageId) {
-        proxy.pushImage(imageId);
+    public void pushImage(final String imageId, final Optional<String> registry) {
+        proxy.pushImage(imageId, registry);
+    }
+
+    @Override
+    public void tagImage(final String imageId, final String nameAndTag) {
+        proxy.tagImage(imageId, nameAndTag);
     }
 
     @Override

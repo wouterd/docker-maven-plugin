@@ -40,10 +40,11 @@ public class PushImageMojo extends AbstractDockerMojo {
     public void doExecute() throws MojoExecutionException, MojoFailureException {
         for (BuiltImageInfo image : getBuiltImages()) {
             if (image.shouldPush()) {
-                getLog().info(String.format("Pushing image %s..", image.getImageId()));
+                getLog().info(String.format("Pushing image %s to registry %s..",
+                        image.getImageId(), image.getRegistry().or("<Unspecified>")));
                 String pushableId = getPushableImageId(image);
                 try {
-                    getDockerProvider().pushImage(pushableId);
+                    getDockerProvider().pushImage(pushableId, image.getRegistry());
                 } catch (DockerException e) {
                     String message = String.format("Cannot push image '%s'", image.getImageId());
                     throw new MojoFailureException(message, e);
