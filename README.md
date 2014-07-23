@@ -6,6 +6,8 @@ docker-maven-plugin
 A maven plugin to manage docker containers and images for integration tests.
 
 # Current Functionality:
+- Build a docker image from a bunch of source files in package and pre-integration-test phases
+      - Allow built containers to be started in the pre-integration phase
 - Start a container in the pre-integration-test phase based on an image:
       - Known on the docker host by a name
       - Available in a repository
@@ -13,9 +15,8 @@ A maven plugin to manage docker containers and images for integration tests.
 - Supply information to the project during the integration-test phase about:
       - Images that were built
       - Containers that were started
-- Build a docker image from a bunch of source files in package and pre-integration-test phases
-      - Allow built containers to be started in the pre-integration phase
-- Push that docker image to a public or private image registry in the install phase
+- Verifies the build in the "verify" phase which tests if anything upto the integration test phase failed.
+- Push docker images to a public or private image registry in the install phase
 - Docker provider for "local docker" via tcp
 - Docker provider for "remote docker" via tcp (boot2docker/vm/server/localhost via tcp)
 
@@ -81,6 +82,12 @@ Current snapshot version: `1.4-SNAPSHOT`
             <id>stop</id>
             <goals>
               <goal>stop-containers</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify</id>
+            <goals>
+              <goal>verify</goal>
             </goals>
           </execution>
           <execution>
