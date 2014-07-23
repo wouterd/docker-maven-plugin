@@ -1,7 +1,7 @@
 FROM ubuntu:precise
 
-RUN apt-get install -y nginx && echo "\ndaemon off;" >> /etc/nginx/nginx.conf
+RUN apt-get update && apt-get install -y nginx && echo "\ndaemon off;" >> /etc/nginx/nginx.conf
 
-ENTRYPOINT ["nginx"]
+CMD ["nginx"]
 
 EXPOSE 80
