@@ -48,6 +48,12 @@ public class BuildImageMojo extends AbstractDockerMojo {
 
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
+
+        if (images == null || images.isEmpty()) {
+            getLog().warn("No images to build specified.");
+            return;
+        }
+
         validateAllImages();
 
         for (ImageBuildConfiguration image : images) {
@@ -57,11 +63,13 @@ public class BuildImageMojo extends AbstractDockerMojo {
                 getLog().info(String.format("Image '%s' has Id '%s'", image.getId(), imageId));
                 registerBuiltImage(imageId, image);
             } catch (DockerException e) {
-                getLog().error(String.format("Cannot build image '%s'", image.getId()), e);
+                String errorMessage = String.format("Cannot build image '%s'", image.getId());
+                getLog().error(errorMessage, e);
                 Optional<String> apiResponse = e.getApiResponse();
                 if (apiResponse.isPresent()) {
                     getLog().info(String.format("Api response:\n%s", apiResponse.get()));
                 }
+                registerPluginError(new DockerPluginError("build-images", errorMessage, e));
             }
         }
     }

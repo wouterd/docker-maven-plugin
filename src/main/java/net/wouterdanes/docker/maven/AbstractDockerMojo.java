@@ -19,6 +19,7 @@ package net.wouterdanes.docker.maven;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     private static final String STARTED_CONTAINERS_KEY = "startedContainers";
     private static final String BUILT_IMAGES_KEY = "builtImages";
+    private static final String ERRORS_KEY = "errors";
 
     @Parameter(defaultValue = "remote", property = "docker.provider", required = true)
     private String providerName;
@@ -70,10 +72,10 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException {
-    	if (skip) {
+        if (skip) {
             getLog().info("Execution skipped");
             return;
-    	}
+        }
 
         getLog().info("Using docker provider: " + providerName);
         doExecute();
@@ -99,7 +101,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected Collection<BuiltImageInfo> getBuiltImages() {
         Map<String, BuiltImageInfo> builtImagesMap = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
-        return builtImagesMap.values();
+        return Collections.unmodifiableCollection(builtImagesMap.values());
     }
 
     protected DockerProvider getDockerProvider() {
@@ -121,6 +123,16 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     protected Optional<BuiltImageInfo> getBuiltImageForStartId(final String imageId) {
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
         return Optional.fromNullable(builtImages.get(imageId));
+    }
+
+    protected void registerPluginError(DockerPluginError error) {
+        List<DockerPluginError> errors = obtainListFromPluginContext(ERRORS_KEY);
+        errors.add(error);
+    }
+
+    protected List<DockerPluginError> getPluginErrors() {
+        List<DockerPluginError> list = obtainListFromPluginContext(ERRORS_KEY);
+        return Collections.unmodifiableList(list);
     }
 
     @SuppressWarnings("unchecked")

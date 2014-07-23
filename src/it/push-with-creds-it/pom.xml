@@ -106,8 +106,6 @@
           </execution>
           <execution>
             <id>stop</id>
-            <configuration>
-            </configuration>
             <goals>
               <goal>stop-containers</goal>
             </goals>
@@ -116,6 +114,12 @@
             <id>push</id>
             <goals>
               <goal>push-images</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify</id>
+            <goals>
+              <goal>verify</goal>
             </goals>
           </execution>
         </executions>

@@ -21,20 +21,22 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.apache.maven.project.MavenProject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import net.wouterdanes.docker.provider.DockerProvider;
+import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
+import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-import net.wouterdanes.docker.remoteapi.model.Credentials;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -43,12 +45,12 @@ import static org.mockito.Mockito.when;
 
 public class StartContainerMojoTest {
 
-    private MavenProject mavenProject;
+    private static final String FAKE_PROVIDER_KEY = UUID.randomUUID().toString();
+
+    private final MavenProject mavenProject = mock(MavenProject.class);
 
     @Before
     public void setUp() throws Exception {
-
-        mavenProject = mock(MavenProject.class);
         Properties mavenProjectProperties = new Properties();
         when(mavenProject.getProperties()).thenReturn(mavenProjectProperties);
 
@@ -56,7 +58,14 @@ public class StartContainerMojoTest {
 
         Mockito.when(FakeDockerProvider.instance.startContainer(Matchers.any(ContainerStartConfiguration.class)))
                 .thenReturn("someId");
-        DockerProviderSupplier.registerProvider("fake", FakeDockerProvider.class);
+        DockerProviderSupplier.registerProvider(FAKE_PROVIDER_KEY, FakeDockerProvider.class);
+
+        DockerExceptionThrowingDockerProvider.class.newInstance();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        DockerProviderSupplier.removeProvider(FAKE_PROVIDER_KEY);
     }
 
     @Test
@@ -67,6 +76,8 @@ public class StartContainerMojoTest {
         mojo.execute();
 
         verify(FakeDockerProvider.instance).startContainer(startConfiguration);
+
+        assert mojo.getPluginErrors().isEmpty();
     }
 
     @Test
@@ -89,6 +100,8 @@ public class StartContainerMojoTest {
         assertEquals("1337", properties.getProperty("docker.containers.ubuntu.ports.tcp/8080.port"));
         assertEquals("localhost", properties.getProperty("docker.containers.ubuntu.ports.tcp/9000.host"));
         assertEquals("41329", properties.getProperty("docker.containers.ubuntu.ports.tcp/9000.port"));
+
+        assert mojo.getPluginErrors().isEmpty();
     }
 
     @Test
@@ -109,6 +122,8 @@ public class StartContainerMojoTest {
 
         ContainerStartConfiguration passedValue = captor.getValue();
         assertEquals("the-image-id", passedValue.getImage());
+
+        assert mojo.getPluginErrors().isEmpty();
     }
 
     @Test
@@ -120,65 +135,38 @@ public class StartContainerMojoTest {
         mojo.execute();
 
         verify(FakeDockerProvider.instance, never()).startContainer(startConfiguration);
+        assert mojo.getPluginErrors().isEmpty();
+    }
+
+    @Test
+    public void testThatAnErrorIsRegisteredWhenStartingAContainerFails() throws Exception {
+        StartContainerMojo mojo = createMojo(new ContainerStartConfiguration(),
+                DockerExceptionThrowingDockerProvider.PROVIDER_KEY);
+
+        mojo.execute();
+
+        assert !mojo.getPluginErrors().isEmpty();
     }
 
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {
+        return createMojo(startConfiguration, FAKE_PROVIDER_KEY);
+    }
+
+    private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration, String provider) {
         StartContainerMojo mojo = new StartContainerMojo(Arrays.asList(startConfiguration));
 
         mojo.setProject(mavenProject);
-        mojo.setProviderName("fake");
+        mojo.setProviderName(provider);
         mojo.setPluginContext(new HashMap());
         return mojo;
     }
 
-    public static class FakeDockerProvider implements DockerProvider {
-
+    public static class FakeDockerProvider extends AbstractFakeDockerProvider {
         private static FakeDockerProvider instance;
 
-        private final FakeDockerProvider proxy;
-
-        public FakeDockerProvider() {
-            proxy = instance;
-        }
-
         @Override
-        public String startContainer(final ContainerStartConfiguration configuration) {
-            return proxy.startContainer(configuration);
-        }
-
-        @Override
-        public void stopContainer(final String containerId) {
-            proxy.stopContainer(containerId);
-        }
-
-        @Override
-        public void deleteContainer(final String containerId) {
-            proxy.deleteContainer(containerId);
-        }
-
-        @Override
-        public List<ExposedPort> getExposedPorts(final String containerId) {
-            return proxy.getExposedPorts(containerId);
-        }
-
-        @Override
-        public String buildImage(final ImageBuildConfiguration image) {
-            return proxy.buildImage(image);
-        }
-
-        @Override
-        public void removeImage(final String imageId) {
-            proxy.removeImage(imageId);
-        }
-
-        @Override
-        public void pushImage(final String imageId) {
-            proxy.pushImage(imageId);
-        }
-
-        @Override
-        public void setCredentials(Credentials credentials) {
-            proxy.setCredentials(credentials);
+        protected AbstractFakeDockerProvider getInstance() {
+            return instance;
         }
     }
 }

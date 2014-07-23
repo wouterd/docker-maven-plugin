@@ -75,7 +75,9 @@ public class StartContainerMojo extends AbstractDockerMojo {
                 getLog().info(String.format("Started container with id '%s'", containerId));
                 registerStartedContainer(containerId);
             } catch (DockerException e) {
-                getLog().error("Failed to start container", e);
+                String message = String.format("Failed to start container '%s'", configuration.getId());
+                getLog().error(message, e);
+                registerPluginError(new DockerPluginError("start-containers", message, e));
             }
         }
         getLog().debug("Properties after exposing ports: " + project.getProperties());
