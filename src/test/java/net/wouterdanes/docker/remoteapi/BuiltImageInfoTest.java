@@ -11,6 +11,12 @@ import com.google.common.base.Optional;
 
 public class BuiltImageInfoTest {
 
+    private static final boolean KEEP = true;
+    private static final boolean DONT_KEEP = false;
+
+    private static final boolean PUSH = true;
+    private static final boolean DONT_PUSH = false;
+
     private static final String IMAGEID = "x56543d5";
     private static final String STARTID = "start";
     private static final String REGISTRYID = "registry";
@@ -20,12 +26,12 @@ public class BuiltImageInfoTest {
 
     @Test
     public void testConstruction() {
-        assertExpected(NON_NULL_REGISTRY, false, makeTarget(REGISTRYID, false, false));
-        assertExpected(NON_NULL_REGISTRY, false, makeTarget(REGISTRYID, false, true));
-        assertExpected(NON_NULL_REGISTRY, false, makeTarget(REGISTRYID, true, true));
-        assertExpected(NON_NULL_REGISTRY, true, makeTarget(REGISTRYID, true, false));
+        assertExpected(NON_NULL_REGISTRY, DONT_KEEP, makeTarget(REGISTRYID, DONT_KEEP, DONT_PUSH));
+        assertExpected(NON_NULL_REGISTRY, KEEP, makeTarget(REGISTRYID, DONT_KEEP, PUSH));
+        assertExpected(NON_NULL_REGISTRY, KEEP, makeTarget(REGISTRYID, KEEP, PUSH));
+        assertExpected(NON_NULL_REGISTRY, KEEP, makeTarget(REGISTRYID, KEEP, DONT_PUSH));
 
-        assertExpected(NULL_REGISTRY, false, makeTarget(null, false, false));
+        assertExpected(NULL_REGISTRY, DONT_KEEP, makeTarget(null, DONT_KEEP, DONT_KEEP));
     }
 
     private BuiltImageInfo makeTarget(String registry, boolean keep, boolean push) {
@@ -42,12 +48,12 @@ public class BuiltImageInfoTest {
     }
 
     private void assertExpected(Optional<String> expectedRegistry,
-            boolean expectedShouldDelete,
+            boolean expectedKeep,
             BuiltImageInfo actual) {
         assertEquals(IMAGEID, actual.getImageId());
         assertEquals(STARTID, actual.getStartId());
         assertEquals(expectedRegistry, actual.getRegistry());
-        assertEquals(expectedShouldDelete, actual.shouldDeleteAfterStopping());
+        assertEquals(expectedKeep, actual.shouldKeepAfterStopping());
     }
 
 }

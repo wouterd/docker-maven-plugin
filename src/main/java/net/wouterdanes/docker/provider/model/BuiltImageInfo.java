@@ -28,13 +28,13 @@ public class BuiltImageInfo {
     private final String startId;
     private final String imageId;
     private final Optional<String> registry;
-    private final boolean deleteAfterStopping;
+    private final boolean keepAfterStopping;
 
     public BuiltImageInfo(final String imageId, ImageBuildConfiguration imageConfig) {
         this.imageId = imageId;
         this.startId = imageConfig.getId();
         this.registry = Optional.fromNullable(imageConfig.getRegistry());
-        this.deleteAfterStopping = imageConfig.isKeep() && !imageConfig.isPush();
+        this.keepAfterStopping = imageConfig.isKeep() || imageConfig.isPush();
     }
 
     public String getStartId() {
@@ -49,8 +49,8 @@ public class BuiltImageInfo {
         return registry;
     }
 
-    public boolean shouldDeleteAfterStopping() {
-        return deleteAfterStopping;
+    public boolean shouldKeepAfterStopping() {
+        return keepAfterStopping;
     }
 
 }
