@@ -44,6 +44,7 @@
                   </files>
                   <nameAndTag>@docker.userName@/dross:snapshot</nameAndTag>
                   <keep>true</keep>
+                  <push>true</push>
                   <registry>@docker.registry@</registry>
                 </image>
               </images>
@@ -63,10 +64,15 @@
                     <tag>@docker.userName@/dross:4.1</tag>
                   </tags>
                   <push>true</push>
-                  <registry>@docker.registry@</registry>
                 </image>
               </images>
             </configuration>
+          </execution>
+          <execution>
+            <id>push</id>
+            <goals>
+              <goal>push-images</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

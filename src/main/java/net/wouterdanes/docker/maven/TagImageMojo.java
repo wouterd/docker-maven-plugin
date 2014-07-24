@@ -33,10 +33,10 @@ import net.wouterdanes.docker.provider.model.ImageTagConfiguration;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**
- * This class is responsible for tagging docking images in the deploy phase of the maven build. The goal
+ * This class is responsible for tagging docking images in the install phase of the maven build. The goal
  * is called "tag-images"
  */
-@Mojo(defaultPhase = LifecyclePhase.DEPLOY, name = "tag-images", threadSafe = true,
+@Mojo(defaultPhase = LifecyclePhase.INSTALL, name = "tag-images", threadSafe = true,
 		instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
 public class TagImageMojo extends AbstractDockerMojo {
 
@@ -54,7 +54,7 @@ public class TagImageMojo extends AbstractDockerMojo {
         }
     }
 
-    private void applyTagsToImage(ImageTagConfiguration config) {
+    private void applyTagsToImage(ImageTagConfiguration config) throws MojoFailureException {
         String startId = config.getId();
         String imageId = startId;
         boolean push = config.isPush();
@@ -72,23 +72,17 @@ public class TagImageMojo extends AbstractDockerMojo {
         }
     }
 
-    private void applyTagToImage(String imageId, String nameAndTag, Optional<String> registry, boolean push) {
+    private void applyTagToImage(String imageId, String nameAndTag, Optional<String> registry, boolean push) throws MojoFailureException {
         try {
             getLog().info(String.format("Tagging image '%s' with tag '%s'..", imageId, nameAndTag));
             getDockerProvider().tagImage(imageId, nameAndTag);
         } catch (DockerException e) {
-            getLog().error("Failed to tag image", e);
-            return;
+            String message = String.format("Failed to add tag '%s' to image '%s'", imageId, nameAndTag);
+            throw new MojoFailureException(message, e);
         }
 
         if (push) {
-            try {
-                getLog().info(String.format("Pushing image %s to registry %s..",
-                        imageId, registry.or("<Unspecified>")));
-                getDockerProvider().pushImage(nameAndTag, registry);
-            } catch (DockerException e) {
-                getLog().error("Failed to push image", e);
-            }
+            enqueueForPushing(nameAndTag, registry);
         }
     }
 

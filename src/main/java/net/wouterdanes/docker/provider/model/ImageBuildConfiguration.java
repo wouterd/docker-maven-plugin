@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.apache.maven.plugins.annotations.Parameter;
 
+import com.google.common.base.Strings;
+
 /**
  * This class is responsible for holding the configuration of a single docker image to be built by the
  * {@link net.wouterdanes.docker.maven.BuildImageMojo}

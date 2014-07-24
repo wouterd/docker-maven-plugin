@@ -36,6 +36,7 @@ import net.wouterdanes.docker.provider.DockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.provider.model.PushableImage;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
@@ -45,6 +46,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     private static final String STARTED_CONTAINERS_KEY = "startedContainers";
     private static final String BUILT_IMAGES_KEY = "builtImages";
+    private static final String PUSHABLE_IMAGES_KEY = "pushableImages";
     private static final String ERRORS_KEY = "errors";
 
     @Parameter(defaultValue = "remote", property = "docker.provider", required = true)
@@ -97,6 +99,10 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
         builtImages.put(info.getStartId(), info);
+
+        if (imageConfig.isPush()) {
+            enqueueForPushing(imageId, imageConfig);
+        }
     }
 
     protected Collection<BuiltImageInfo> getBuiltImages() {
@@ -132,6 +138,30 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected List<DockerPluginError> getPluginErrors() {
         List<DockerPluginError> list = obtainListFromPluginContext(ERRORS_KEY);
+        return Collections.unmodifiableList(list);
+    }
+
+    protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig) {
+       String pushableId = imageConfig.getNameAndTag();
+       if (Strings.isNullOrEmpty(pushableId)) {
+           pushableId = imageId;
+       }
+
+       enqueueForPushing(pushableId, Optional.fromNullable(imageConfig.getRegistry()));
+    }
+
+    protected void enqueueForPushing(final String imageId, Optional<String> registry) {
+        getLog().info(String.format("Enqueuing image '%s' to be pushed to registry '%s'..", imageId, registry.or("<Default>")));
+
+        List<PushableImage> images = obtainListFromPluginContext(PUSHABLE_IMAGES_KEY);
+        PushableImage newImage = new PushableImage(imageId, registry);
+        if (!images.contains(newImage)) {
+            images.add(newImage);
+        }
+    }
+
+    protected List<PushableImage> getImagesToPush() {
+        List<PushableImage> list = obtainListFromPluginContext(PUSHABLE_IMAGES_KEY);
         return Collections.unmodifiableList(list);
     }
 

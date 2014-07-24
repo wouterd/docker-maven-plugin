@@ -50,7 +50,7 @@ public class StopContainerMojo extends AbstractDockerMojo {
             }
         }
         for (BuiltImageInfo image : getBuiltImages()) {
-            if (image.shouldKeep()) {
+            if (image.shouldDeleteAfterStopping()) {
                 getLog().info(String.format("Keeping image %s", image.getImageId()));
                 continue;
             }

@@ -17,7 +17,6 @@
 
 package net.wouterdanes.docker.maven;
 
-import com.google.common.base.Strings;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -25,40 +24,30 @@ import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import net.wouterdanes.docker.provider.model.BuiltImageInfo;
+import net.wouterdanes.docker.provider.model.PushableImage;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**
- * This class is responsible for pushing docking images in the install phase of the maven build. The goal
+ * This class is responsible for pushing docking images in the deploy phase of the maven build. The goal
  * is called "push-images"
  */
-@Mojo(defaultPhase = LifecyclePhase.INSTALL, name = "push-images", threadSafe = true,
+@Mojo(defaultPhase = LifecyclePhase.DEPLOY, name = "push-images", threadSafe = true,
 		instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
 public class PushImageMojo extends AbstractDockerMojo {
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
-        for (BuiltImageInfo image : getBuiltImages()) {
-            if (image.shouldPush()) {
-                getLog().info(String.format("Pushing image %s to registry %s..",
-                        image.getImageId(), image.getRegistry().or("<Unspecified>")));
-                String pushableId = getPushableImageId(image);
-                try {
-                    getDockerProvider().pushImage(pushableId, image.getRegistry());
-                } catch (DockerException e) {
-                    String message = String.format("Cannot push image '%s'", image.getImageId());
-                    throw new MojoFailureException(message, e);
-                }
+        for (PushableImage image : getImagesToPush()) {
+            getLog().info(String.format("Pushing image %s to registry %s..",
+                    image.getImageId(), image.getRegistry().or("<Default>")));
+            try {
+                getDockerProvider().pushImage(image.getImageId(), image.getRegistry());
+            } catch (DockerException e) {
+                String message = String.format("Cannot push image '%s' to registry '%s'",
+                        image.getImageId(), image.getRegistry().or("<Default>"));
+                throw new MojoFailureException(message, e);
             }
         }
-    }
-
-    protected String getPushableImageId(BuiltImageInfo image) {
-        String pushableId = image.getNameAndTag();
-        if (Strings.isNullOrEmpty(pushableId)) {
-            pushableId = image.getImageId();
-        }
-        return pushableId;
     }
 
 }

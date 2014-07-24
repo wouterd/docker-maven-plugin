@@ -27,18 +27,14 @@ public class BuiltImageInfo {
 
     private final String startId;
     private final String imageId;
-    private final String nameAndTag;
     private final Optional<String> registry;
-    private final boolean keep;
-    private final boolean push;
+    private final boolean deleteAfterStopping;
 
     public BuiltImageInfo(final String imageId, ImageBuildConfiguration imageConfig) {
         this.imageId = imageId;
         this.startId = imageConfig.getId();
-        this.nameAndTag = imageConfig.getNameAndTag();
         this.registry = Optional.fromNullable(imageConfig.getRegistry());
-        this.keep = imageConfig.isKeep();
-        this.push = imageConfig.isPush();
+        this.deleteAfterStopping = imageConfig.isKeep() && !imageConfig.isPush();
     }
 
     public String getStartId() {
@@ -49,20 +45,12 @@ public class BuiltImageInfo {
         return imageId;
     }
 
-    public String getNameAndTag() {
-        return nameAndTag;
-    }
-
     public Optional<String> getRegistry() {
         return registry;
     }
 
-    public boolean shouldKeep() {
-        return keep || push;
-    }
-
-    public boolean shouldPush() {
-        return push;
+    public boolean shouldDeleteAfterStopping() {
+        return deleteAfterStopping;
     }
 
 }
