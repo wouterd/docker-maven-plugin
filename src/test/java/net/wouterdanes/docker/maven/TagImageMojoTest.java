@@ -20,8 +20,8 @@ import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.provider.model.ImageTagConfiguration;
 import net.wouterdanes.docker.provider.model.PushableImage;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 
@@ -41,7 +41,6 @@ public class TagImageMojoTest {
     private ImageBuildConfiguration mockImage;
 
     private ImageTagConfiguration mockTag;
-    private List<ImageTagConfiguration> tags;
 
     @Before
     public void setUp() throws Exception {
@@ -60,7 +59,7 @@ public class TagImageMojoTest {
         Mockito.when(mockTag.getId()).thenReturn(STARTID);
         Mockito.when(mockTag.getTags()).thenReturn(Arrays.asList(TAG1, NAMEANDTAG, TAG2));
 
-        tags = Collections.singletonList(mockTag);
+        List<ImageTagConfiguration> tags = Collections.singletonList(mockTag);
 
         mojo.setImages(tags);
     }
