@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -179,14 +179,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         return imagesService;
     }
 
-    protected Collection<BaseService> getServices() {
-        return services;
-    }
-
     protected void register(BaseService... servicesToBeRegistered) {
-        for (BaseService service : servicesToBeRegistered) {
-        	services.add(service);
-        }
+        Collections.addAll(services, servicesToBeRegistered);
     }
 
     protected String getHost() {

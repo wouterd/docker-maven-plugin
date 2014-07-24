@@ -92,7 +92,7 @@ public interface DockerProvider {
     /**
      * Associates an image with a new repo/tag.
      * @param imageId the Id of the image to tag
-     * @param nameAndTage the repo/tag to assign
+     * @param nameAndTag the repo/tag to assign
      */
     void tagImage(String imageId, String nameAndTag);
 }

@@ -37,7 +37,7 @@ import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
  */
 public class LocalDockerProvider extends RemoteApiBasedDockerProvider {
 
-    private static final Pattern TCP_PORT_MATCHER = Pattern.compile("([0-9]+)/tcp");
+    private static final Pattern TCP_PORT_MATCHER = Pattern.compile("(?<port>[0-9]+)/tcp");
 
     public LocalDockerProvider() {
         super();
@@ -60,7 +60,7 @@ public class LocalDockerProvider extends RemoteApiBasedDockerProvider {
         for (String port : ports) {
             Matcher matcher = TCP_PORT_MATCHER.matcher(port);
             if (matcher.matches()) {
-                int tcpPort = Integer.parseInt(matcher.group(1));
+                int tcpPort = Integer.parseInt(matcher.group("port"));
                 exposedPorts.add(new ExposedPort(port, tcpPort, containerIp));
             }
         }
