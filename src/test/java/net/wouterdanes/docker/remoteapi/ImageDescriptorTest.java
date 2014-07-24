@@ -64,18 +64,23 @@ public class ImageDescriptorTest {
                 "index_01-reg.tutum.co:5000/wouter/ubuntu:precise", "index_01-reg.tutum.co:5000", "wouter", "ubuntu", "precise",
                 "wouter/ubuntu", "wouter/ubuntu:precise");
 
-
+        // check for tags "." and "-" in them
+        assertDescriptor("ubuntu:14.04", "ubuntu:14.04", null, null, "ubuntu", "14.04",
+                "ubuntu", "ubuntu:14.04");
+        assertDescriptor("ubuntu:mark-2", "ubuntu:mark-2", null, null, "ubuntu", "mark-2",
+                "ubuntu", "ubuntu:mark-2");
     }
 
 
-    private static void assertDescriptor(String qualifier, String id, String registry, String repository,
+    private static void assertDescriptor(String qualifier,
+            String id, String registry, String repository,
             String image, String tag, String repoAndImage, String repoImageAndTag) {
         ImageDescriptor descriptor = new ImageDescriptor(qualifier);
         assertEquals("Id should be correct", id, descriptor.getId());
-        assertEquals("Registry should be correct", registry, descriptor.getRegistry());
-        assertEquals("Repository should be correct", repository, descriptor.getRepository());
+        assertEquals("Registry should be correct", registry, descriptor.getRegistry().orNull());
+        assertEquals("Repository should be correct", repository, descriptor.getRepository().orNull());
         assertEquals("Image should be correct", image, descriptor.getImage());
-        assertEquals("Tag should be correct", tag, descriptor.getTag());
+        assertEquals("Tag should be correct", tag, descriptor.getTag().orNull());
         assertEquals("Repository+Image should be correct", repoAndImage, descriptor.getRepositoryAndImage());
         assertEquals("Repository+Image+Tag should be correct", repoImageAndTag, descriptor.getRepositoryImageAndTag());
     }

@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.apache.maven.plugins.annotations.Parameter;
 
+import com.google.common.base.Strings;
+
 /**
  * This class is responsible for holding the configuration of a single docker image to be built by the
  * {@link net.wouterdanes.docker.maven.BuildImageMojo}
@@ -42,6 +44,9 @@ public class ImageBuildConfiguration {
 
     @Parameter(defaultValue = "false")
     private boolean push;
+
+    @Parameter
+    private String registry;
 
     public List<File> getFiles() {
         return files;
@@ -81,6 +86,14 @@ public class ImageBuildConfiguration {
 
     public void setPush(boolean push) {
         this.push = push;
+    }
+
+    public String getRegistry() {
+        return registry;
+    }
+
+    public void setRegistry(String registry) {
+        this.registry = registry;
     }
 
     /**

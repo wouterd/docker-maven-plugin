@@ -2,6 +2,8 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -58,7 +60,12 @@ public class DockerExceptionThrowingDockerProvider implements DockerProvider {
     }
 
     @Override
-    public void pushImage(final String imageId) {
+    public void pushImage(final String imageId, final Optional<String> registry) {
+        throw new DockerException("Bad stuff");
+    }
+
+    @Override
+    public void tagImage(final String imageId, final String nameAndTag) {
         throw new DockerException("Bad stuff");
     }
 }

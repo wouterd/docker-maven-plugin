@@ -48,7 +48,6 @@ public class BuildImageMojo extends AbstractDockerMojo {
 
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
-
         if (images == null || images.isEmpty()) {
             getLog().warn("No images to build specified.");
             return;
@@ -91,4 +90,5 @@ public class BuildImageMojo extends AbstractDockerMojo {
             }
         }
     }
+
 }

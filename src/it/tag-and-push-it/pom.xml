@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>net.wouterdanes.docker.it</groupId>
-  <artifactId>simple-it</artifactId>
+  <artifactId>tag-and-push-it</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <description>A simple IT verifying the basic use case.</description>
@@ -13,49 +13,22 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <docker.skip>true</docker.skip>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.3.3</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.17</version>
-        <executions>
-          <execution>
-            <id>run-tests</id>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-            <configuration>
-              <systemPropertyVariables>
-                <cache.base.url>http://${docker.containers.cache.ports.80/tcp.host}:${docker.containers.cache.ports.80/tcp.port}</cache.base.url>
-              </systemPropertyVariables>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>@project.groupId@</groupId>
         <artifactId>@project.artifactId@</artifactId>
         <version>@project.version@</version>
+        <configuration>
+          <!-- Currently skipped owing to requirements for build environment to
+            define sensitive property values e.g. docker.password -->
+          <skip>true</skip>
+          <userName>@docker.userName@</userName>
+          <email>@docker.email@</email>
+          <password>@docker.password@</password>
+        </configuration>
         <executions>
           <execution>
             <id>build</id>
@@ -69,44 +42,36 @@
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
-                  <nameAndTag>nginx-name:tahahag</nameAndTag>
+                  <nameAndTag>@docker.userName@/dross:snapshot</nameAndTag>
                   <keep>true</keep>
+                  <push>true</push>
+                  <registry>@docker.registry@</registry>
                 </image>
               </images>
             </configuration>
           </execution>
           <execution>
-            <id>start</id>
+            <id>tag</id>
+            <goals>
+              <goal>tag-images</goal>
+            </goals>
             <configuration>
-              <containers>
-                <container>
-                  <id>Debian</id>
-                  <image>debian:wheezy</image>
-                </container>
-                <container>
-                  <id>BusyBox</id>
-                  <image>busybox</image>
-                </container>
-                <container>
-                  <id>cache</id>
-                  <image>nginx</image>
-                </container>
-              </containers>
+              <images>
+                <image>
+                  <id>nginx</id>
+                  <tags>
+                    <tag>@docker.userName@/dross:release</tag>
+                    <tag>@docker.userName@/dross:4.1</tag>
+                  </tags>
+                  <push>true</push>
+                </image>
+              </images>
             </configuration>
-            <goals>
-              <goal>start-containers</goal>
-            </goals>
           </execution>
           <execution>
-            <id>stop</id>
+            <id>push</id>
             <goals>
-              <goal>stop-containers</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
+              <goal>push-images</goal>
             </goals>
           </execution>
         </executions>

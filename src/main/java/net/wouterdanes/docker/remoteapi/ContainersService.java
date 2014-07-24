@@ -25,7 +25,6 @@ import javax.ws.rs.core.Response;
 
 import net.wouterdanes.docker.remoteapi.exception.ContainerNotFoundException;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateResponse;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
@@ -50,13 +49,7 @@ public class ContainersService extends BaseService {
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .post(Entity.entity(toJson(request), MediaType.APPLICATION_JSON_TYPE), String.class);
         } catch (WebApplicationException e) {
-            Response.StatusType statusInfo = e.getResponse().getStatusInfo();
-            switch (statusInfo.getStatusCode()) {
-                case 404:
-                    throw new ImageNotFoundException(request.getImage(), e);
-                default:
-                    throw new DockerException(e);
-            }
+            throw makeImageTargetingException(request.getImage(), e);
         }
 
         ContainerCreateResponse createResponse = toObject(createResponseStr, ContainerCreateResponse.class);

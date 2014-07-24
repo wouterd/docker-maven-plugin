@@ -18,7 +18,17 @@
 package net.wouterdanes.docker.remoteapi.exception;
 
 public class ImageNotFoundException extends DockerException {
-    public ImageNotFoundException(String imageName, Throwable cause) {
-        super(String.format("Image '%s' not found.", imageName), cause);
+
+    public ImageNotFoundException(String imageName) {
+        super(makeMessage(imageName));
     }
+
+    public ImageNotFoundException(String imageName, Throwable cause) {
+        super(makeMessage(imageName), cause);
+    }
+
+    private static String makeMessage(String imageName) {
+        return String.format("Image '%s' not found.", imageName);
+    }
+
 }

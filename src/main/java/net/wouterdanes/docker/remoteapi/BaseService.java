@@ -19,9 +19,14 @@ package net.wouterdanes.docker.remoteapi;
 
 import java.io.IOException;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
 
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -87,6 +92,30 @@ public abstract class BaseService {
             return objectMapper.readValue(json, clazz);
         } catch (IOException e) {
             throw new IllegalStateException("Cannot convert Json", e);
+        }
+    }
+
+    protected static void checkImageTargetingResponse(final String id, final Response.StatusType statusInfo) {
+        if (statusInfo.getFamily() == Family.SUCCESSFUL) {
+            // no error
+            return;
+        }
+
+        switch (statusInfo.getStatusCode()) {
+            case 404:
+                throw new ImageNotFoundException(id);
+            default:
+                throw new DockerException(statusInfo.getReasonPhrase());
+        }
+    }
+
+    protected static DockerException makeImageTargetingException(final String id, final WebApplicationException cause) {
+        Response.StatusType statusInfo = cause.getResponse().getStatusInfo();
+        switch (statusInfo.getStatusCode()) {
+            case 404:
+                return new ImageNotFoundException(id, cause);
+            default:
+                return new DockerException(statusInfo.getReasonPhrase(), cause);
         }
     }
 }

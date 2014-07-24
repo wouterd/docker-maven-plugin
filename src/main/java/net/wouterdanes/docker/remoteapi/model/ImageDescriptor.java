@@ -20,6 +20,8 @@ package net.wouterdanes.docker.remoteapi.model;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 /**
@@ -30,29 +32,32 @@ public class ImageDescriptor {
     private static final Pattern IMAGE_QUALIFIER = Pattern.compile("^"
             + "((?<registry>[\\w\\.\\-]+(:\\d+)?)/)??" // registry
             + "((?<repository>[\\w]+)/)?(?<image>[\\w]+)" // repository/image
-            + "(:(?<tag>[\\w]+))?" // tag
+            + "(:(?<tag>[\\w\\.\\-]+))?" // tag
             + "$");
 
     private final String id;
-    private final String registry;
-    private final String repository;
+    private final Optional<String> registry;
+    private final Optional<String> repository;
     private final String image;
-    private final String tag;
+    private final Optional<String> tag;
 
     public ImageDescriptor(String id) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(id), "Id was null or empty");
+
         this.id = id;
 
         Matcher matcher = IMAGE_QUALIFIER.matcher(id);
         if (matcher.matches()) {
-            this.registry = matcher.group("registry");
-            this.repository = matcher.group("repository");
+            // because Optional.orNull(x) cannot handle null values of x
+            this.registry = Optional.fromNullable(matcher.group("registry"));
+            this.repository = Optional.fromNullable(matcher.group("repository"));
             this.image = matcher.group("image");
-            this.tag = matcher.group("tag");
+            this.tag = Optional.fromNullable(matcher.group("tag"));
         } else {
-            this.registry = null;
-            this.repository = null;
+            this.registry = Optional.absent();
+            this.repository = Optional.absent();
             this.image = id;
-            this.tag = null;
+            this.tag = Optional.absent();
         }
     }
 
@@ -60,11 +65,11 @@ public class ImageDescriptor {
         return id;
     }
 
-    public String getRegistry() {
+    public Optional<String> getRegistry() {
         return registry;
     }
 
-    public String getRepository() {
+    public Optional<String> getRepository() {
         return repository;
     }
 
@@ -72,7 +77,7 @@ public class ImageDescriptor {
         return image;
     }
 
-    public String getTag() {
+    public Optional<String> getTag() {
         return tag;
     }
 
@@ -92,8 +97,8 @@ public class ImageDescriptor {
     }
 
     private void appendRepository(StringBuilder buf) {
-        if (!Strings.isNullOrEmpty(repository)) {
-            buf.append(repository);
+        if (repository.isPresent()) {
+            buf.append(repository.get());
             buf.append('/');
         }
     }
@@ -103,27 +108,19 @@ public class ImageDescriptor {
     }
 
     private void appendTag(StringBuilder buf) {
-        if (!Strings.isNullOrEmpty(tag)) {
+        if (tag.isPresent()) {
             buf.append(':');
-            buf.append(tag);
+            buf.append(tag.get());
         }
-    }
-
-    public boolean hasRegistry() {
-        return !Strings.isNullOrEmpty(registry);
-    }
-
-    public boolean hasTag() {
-        return !Strings.isNullOrEmpty(tag);
     }
 
     @Override
     public String toString() {
         return "ImageDescriptor[id=" + id
-                + ", registry=" + registry
-                + ", repository=" + repository
+                + ", registry=" + registry.orNull()
+                + ", repository=" + repository.orNull()
                 + ", image=" + image
-                + ", tag=" + tag
+                + ", tag=" + tag.orNull()
                 + "]";
     }
 
