@@ -50,7 +50,7 @@ public class StartContainerMojo extends AbstractDockerMojo {
     private List<ContainerStartConfiguration> containers;
 
     @Inject
-    public StartContainerMojo(final List<ContainerStartConfiguration> containers) {
+    public StartContainerMojo(List<ContainerStartConfiguration> containers) {
         this.containers = containers;
     }
 
@@ -66,12 +66,7 @@ public class StartContainerMojo extends AbstractDockerMojo {
                 getLog().info(String.format("Starting container '%s'..", configuration.getId()));
                 String containerId = provider.startContainer(configuration);
                 List<ExposedPort> exposedPorts = provider.getExposedPorts(containerId);
-                for (ExposedPort exposedPort : exposedPorts) {
-                    String prefix = String.format("docker.containers.%s.ports.%s.",
-                            configuration.getId(), exposedPort.getContainerPort());
-                    addPropertyToProject(prefix + "host", exposedPort.getHost());
-                    addPropertyToProject(prefix + "port", String.valueOf(exposedPort.getExternalPort()));
-                }
+                exposePortsToProject(configuration, exposedPorts);
                 getLog().info(String.format("Started container with id '%s'", containerId));
                 registerStartedContainer(containerId);
             } catch (DockerException e) {
@@ -83,18 +78,27 @@ public class StartContainerMojo extends AbstractDockerMojo {
         getLog().debug("Properties after exposing ports: " + project.getProperties());
     }
 
-    private void replaceImageWithBuiltImageIdIfInternalId(final ContainerStartConfiguration configuration) {
+    private void exposePortsToProject(ContainerStartConfiguration configuration, List<ExposedPort> exposedPorts) {
+        for (ExposedPort exposedPort : exposedPorts) {
+            String prefix = String.format("docker.containers.%s.ports.%s.",
+                    configuration.getId(), exposedPort.getContainerPort());
+            addPropertyToProject(prefix + "host", exposedPort.getHost());
+            addPropertyToProject(prefix + "port", String.valueOf(exposedPort.getExternalPort()));
+        }
+    }
+
+    private void replaceImageWithBuiltImageIdIfInternalId(ContainerStartConfiguration configuration) {
         Optional<BuiltImageInfo> builtImage = getBuiltImageForStartId(configuration.getImage());
         if (builtImage.isPresent()) {
             configuration.fromImage(builtImage.get().getImageId());
         }
     }
 
-    public void setProject(final MavenProject project) {
+    public void setProject(MavenProject project) {
         this.project = project;
     }
 
-    private void addPropertyToProject(final String key, final String value) {
+    private void addPropertyToProject(String key, String value) {
         getLog().info(String.format("Setting property '%s' to '%s'", key, value));
         project.getProperties().setProperty(key, value);
     }
