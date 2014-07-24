@@ -23,12 +23,12 @@ public class VerifyMojo extends AbstractDockerMojo {
         List<DockerPluginError> errors = getPluginErrors();
         if (!errors.isEmpty()) {
 
-            Set<String> erronousGoals = new HashSet<>();
+            Set<String> erroneousGoals = new HashSet<>();
             for (DockerPluginError error : errors) {
-                erronousGoals.add(error.getGoal());
+                erroneousGoals.add(error.getGoal());
             }
             StringBuilder sb = new StringBuilder("The following goals had errors: \n");
-            for (String goal : erronousGoals) {
+            for (String goal : erroneousGoals) {
                 sb.append(" - ").append(goal).append('\n');
             }
             getLog().error(sb);
