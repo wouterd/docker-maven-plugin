@@ -1,5 +1,7 @@
 package net.wouterdanes.docker.maven;
 
+import com.google.common.base.Optional;
+
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**
@@ -8,25 +10,33 @@ import net.wouterdanes.docker.remoteapi.exception.DockerException;
  */
 public class DockerPluginError {
 
-    private final String goal;
+    private final String pluginGoal;
     private final String message;
-    private final DockerException exception;
+    private final Optional<DockerException> exception;
 
-    public DockerPluginError(final String goal, final String message, final DockerException exception) {
-        this.goal = goal;
+    public DockerPluginError(final String pluginGoal, final String message, final DockerException exception) {
+        this(pluginGoal, message, Optional.of(exception));
+    }
+
+    public DockerPluginError(final String pluginGoal, final String message) {
+        this(pluginGoal, message, Optional.<DockerException>absent());
+    }
+
+    public DockerPluginError(final String pluginGoal, final String message, final Optional<DockerException> exception) {
+        this.pluginGoal = pluginGoal;
         this.message = message;
         this.exception = exception;
     }
 
-    public String getGoal() {
-        return goal;
+    public String getPluginGoal() {
+        return pluginGoal;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public DockerException getException() {
+    public Optional<DockerException> getException() {
         return exception;
     }
 }

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +39,7 @@ import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -48,6 +50,7 @@ public class StartContainerMojoTest {
     private static final String FAKE_PROVIDER_KEY = UUID.randomUUID().toString();
 
     private final MavenProject mavenProject = mock(MavenProject.class);
+    private final MojoExecution mojoExecution = new MojoExecution(null, "start-containers", "some-id");
 
     @Before
     public void setUp() throws Exception {
@@ -148,16 +151,34 @@ public class StartContainerMojoTest {
         assert !mojo.getPluginErrors().isEmpty();
     }
 
+    @Test
+    public void testThatMojoAddsAnErrorWhenThereIsDuplicateContainerIds() throws Exception {
+        ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()
+                .withId("duplicate-id");
+
+        StartContainerMojo mojo = createMojo(Arrays.asList(startConfiguration, startConfiguration), FAKE_PROVIDER_KEY);
+
+        mojo.execute();
+
+        assert !mojo.getPluginErrors().isEmpty();
+        verify(FakeDockerProvider.instance, never()).startContainer(any(ContainerStartConfiguration.class));
+    }
+
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {
         return createMojo(startConfiguration, FAKE_PROVIDER_KEY);
     }
 
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration, String provider) {
-        StartContainerMojo mojo = new StartContainerMojo(Arrays.asList(startConfiguration));
+        return createMojo(Arrays.asList(startConfiguration), provider);
+    }
 
+    private StartContainerMojo createMojo(List<ContainerStartConfiguration> startConfigurations, String provider) {
+        StartContainerMojo mojo = new StartContainerMojo(startConfigurations);
         mojo.setProject(mavenProject);
         mojo.setProviderName(provider);
         mojo.setPluginContext(new HashMap());
+        mojo.setMojoExecution(mojoExecution);
+
         return mojo;
     }
 

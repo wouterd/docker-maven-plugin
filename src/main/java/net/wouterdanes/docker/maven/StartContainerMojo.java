@@ -17,12 +17,15 @@
 
 package net.wouterdanes.docker.maven;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -57,8 +60,14 @@ public class StartContainerMojo extends AbstractDockerMojo {
     @Component
     private MavenProject project;
 
+    @Component
+    private MojoExecution mojoExecution;
+
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
+        if (hasDuplicateIds()) {
+            return;
+        }
         DockerProvider provider = getDockerProvider();
         for (ContainerStartConfiguration configuration : containers) {
             replaceImageWithBuiltImageIdIfInternalId(configuration);
@@ -76,6 +85,21 @@ public class StartContainerMojo extends AbstractDockerMojo {
             }
         }
         getLog().debug("Properties after exposing ports: " + project.getProperties());
+    }
+
+    private boolean hasDuplicateIds() {
+        Set<String> ids = new HashSet<>(containers.size());
+        for (ContainerStartConfiguration configuration : containers) {
+            if (ids.contains(configuration.getId())) {
+                String message = String.format("Container ID '%s' used twice, Container IDs should be unique!",
+                        configuration.getId());
+                getLog().error(message);
+                registerPluginError(new DockerPluginError(mojoExecution.getGoal(), message));
+                return true;
+            }
+            ids.add(configuration.getId());
+        }
+        return false;
     }
 
     private void exposePortsToProject(ContainerStartConfiguration configuration, List<ExposedPort> exposedPorts) {
@@ -96,6 +120,10 @@ public class StartContainerMojo extends AbstractDockerMojo {
 
     public void setProject(MavenProject project) {
         this.project = project;
+    }
+
+    public void setMojoExecution(final MojoExecution mojoExecution) {
+        this.mojoExecution = mojoExecution;
     }
 
     private void addPropertyToProject(String key, String value) {
