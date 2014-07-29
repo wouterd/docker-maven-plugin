@@ -5,6 +5,8 @@ docker-maven-plugin
 
 A maven plugin to manage docker containers and images for integration tests.
 
+Minimum required maven version: 3.1.1
+
 # Current Functionality:
 - Build a docker image from a bunch of source files in package and pre-integration-test phases
       - Allow built containers to be started in the pre-integration phase
