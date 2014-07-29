@@ -17,7 +17,9 @@
 
 package net.wouterdanes.docker.maven;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Optional;
 
@@ -83,7 +85,13 @@ public class BuildImageMojo extends AbstractDockerMojo {
     }
 
     private void validateAllImages() throws MojoExecutionException {
+        Set<String> ids = new HashSet<>(images.size());
         for (ImageBuildConfiguration image : images) {
+            if (ids.contains(image.getId())) {
+                throw new MojoExecutionException(String.format("Image ID '%s' used twice, Image IDs must be unique!",
+                        image.getId()));
+            }
+            ids.add(image.getId());
             if (!image.isValid()) {
                 throw new MojoExecutionException(String.format("Image '%s' not valid, did you specify a Dockerfile?",
                         image.getId()));
