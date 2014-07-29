@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>net.wouterdanes.docker.it</groupId>
@@ -55,13 +55,13 @@
         <groupId>@project.groupId@</groupId>
         <artifactId>@project.artifactId@</artifactId>
         <version>@project.version@</version>
-	    <configuration>
-	      <!-- Currently skipped owing to requirements for build environment to define sensitive property values e.g. docker.password -->
-	      <skip>true</skip>
-		  <userName>@docker.userName@</userName>
-		  <email>@docker.email@</email>
-		  <password>@docker.password@</password>
-	    </configuration>
+        <configuration>
+          <!-- Currently skipped owing to requirements for build environment to define sensitive property values e.g. docker.password -->
+          <skip>true</skip>
+          <userName>@docker.userName@</userName>
+          <email>@docker.email@</email>
+          <password>@docker.password@</password>
+        </configuration>
         <executions>
           <execution>
             <id>build</id>
@@ -139,6 +139,25 @@
         <configuration>
           <skip>true</skip>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.3.1</version>
+        <executions>
+          <execution>
+            <id>enforce-maven-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.1.1</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
