@@ -7,6 +7,10 @@
     <version>7</version>
   </parent>
 
+  <prerequisites>
+    <maven>3.1.1</maven>
+  </prerequisites>
+
   <groupId>net.wouterdanes.docker</groupId>
   <artifactId>docker-maven-plugin</artifactId>
   <version>1.6-SNAPSHOT</version>
@@ -73,8 +77,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <docker.host />
-    <docker.port />
+    <docker.host/>
+    <docker.port/>
   </properties>
 
   <dependencies>
@@ -210,6 +214,25 @@
               <target>${maven.compiler.target}</target>
               <encoding>${project.build.sourceEncoding}</encoding>
             </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>1.3.1</version>
+            <executions>
+              <execution>
+                <id>enforce-maven-version</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireMavenVersion>
+                      <version>3.1.1</version>
+                    </requireMavenVersion>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
