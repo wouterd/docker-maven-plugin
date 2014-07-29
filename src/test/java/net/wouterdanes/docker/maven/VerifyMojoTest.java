@@ -45,7 +45,7 @@ public class VerifyMojoTest {
     @Test(expected = MojoFailureException.class)
     public void testThatBuildFailsAndLogsAnErrorWhenErrorsHaveHappened() throws Exception {
 
-        DockerPluginError error = new DockerPluginError("some-goal", "Something went wrong", null);
+        DockerPluginError error = new DockerPluginError("some-goal", "Something went wrong");
         fakePluginContext.put("errors", Collections.singletonList(error));
         Log fakeLog = Mockito.mock(Log.class);
         mojo.setLog(fakeLog);
