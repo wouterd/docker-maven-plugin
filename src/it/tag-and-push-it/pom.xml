@@ -24,7 +24,7 @@
         <configuration>
           <!-- Currently skipped owing to requirements for build environment to
             define sensitive property values e.g. docker.password -->
-          <skip>false</skip>
+          <skip>true</skip>
           <userName>@docker.userName@</userName>
           <email>@docker.email@</email>
           <password>@docker.password@</password>
@@ -44,6 +44,7 @@
                   </files>
                   <nameAndTag>@docker.userName@/dross:snapshot</nameAndTag>
                   <keep>true</keep>
+                  <push>true</push>
                   <registry>@docker.registry@</registry>
                 </image>
               </images>
