@@ -21,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Optional;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
@@ -39,7 +37,7 @@ import net.wouterdanes.docker.remoteapi.exception.DockerException;
  */
 @Mojo(name = "build-images", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true,
         instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
-public class BuildImageMojo extends AbstractDockerMojo {
+public class BuildImageMojo extends AbstractPreVerifyDockerMojo {
 
     @Parameter(required = true)
     private List<ImageBuildConfiguration> images;
@@ -65,12 +63,7 @@ public class BuildImageMojo extends AbstractDockerMojo {
                 registerBuiltImage(imageId, image);
             } catch (DockerException e) {
                 String errorMessage = String.format("Cannot build image '%s'", image.getId());
-                getLog().error(errorMessage, e);
-                Optional<String> apiResponse = e.getApiResponse();
-                if (apiResponse.isPresent()) {
-                    getLog().info(String.format("Api response:\n%s", apiResponse.get()));
-                }
-                registerPluginError(new DockerPluginError("build-images", errorMessage, e));
+                handleDockerException(errorMessage, e);
             }
         }
     }
@@ -97,6 +90,11 @@ public class BuildImageMojo extends AbstractDockerMojo {
                         image.getId()));
             }
         }
+    }
+
+    @Override
+    protected String getMojoGoalName() {
+        return "build-images";
     }
 
 }

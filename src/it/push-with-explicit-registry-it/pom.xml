@@ -24,7 +24,7 @@
         <configuration>
           <!-- Currently skipped owing to requirements for build environment
             to define sensitive property values e.g. docker.password -->
-          <skip>true</skip>
+          <skip>false</skip>
           <userName>@docker.userName@</userName>
           <email>@docker.email@</email>
           <password>@docker.password@</password>

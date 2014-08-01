@@ -29,27 +29,27 @@ import com.google.common.base.Strings;
 public class PushableImage {
 
     private final String imageId;
-    private final Optional<String> registry;
+    private final Optional<String> nameAndTag;
 
-    public PushableImage(final String imageId, final Optional<String> registry) {
+    public PushableImage(final String imageId, final Optional<String> nameAndTag) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(imageId), "Image id was null or empty");
-        Preconditions.checkNotNull(registry, "Registry was null");
+        Preconditions.checkNotNull(nameAndTag, "Name and tag was null or empty");
 
         this.imageId = imageId;
-        this.registry = registry;
+        this.nameAndTag = nameAndTag;
     }
 
     public String getImageId() {
         return imageId;
     }
 
-    public Optional<String> getRegistry() {
-        return registry;
+    public Optional<String> getNameAndTag() {
+        return nameAndTag;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(imageId, registry);
+        return Objects.hash(imageId, nameAndTag);
     }
 
     @Override
@@ -63,14 +63,14 @@ public class PushableImage {
         }
 
         PushableImage other = (PushableImage) obj;
-        return imageId.equals(other.getImageId()) && registry.equals(other.getRegistry());
+        return imageId.equals(other.getImageId()) && nameAndTag.equals(other.getNameAndTag());
     }
 
     @Override
     public String toString() {
         return "PushableImage["
                 + "imageId=" + imageId
-                + ", registry=" + registry.or("<Unspecified>")
+                + ", nameAndTag=" + nameAndTag.or("<Unspecified>")
                 + "]";
     }
 

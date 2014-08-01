@@ -44,13 +44,21 @@ import static org.mockito.Mockito.times;
 public class TagImageMojoTest {
 
     private static final String FAKE_PROVIDER_KEY = UUID.randomUUID().toString();
-    private static final String IMAGEID = UUID.randomUUID().toString();
-    private static final String STARTID = UUID.randomUUID().toString();
-    private static final String NAMEANDTAG = UUID.randomUUID().toString();
-    private static final String TAG1 = UUID.randomUUID().toString();
-    private static final String TAG2 = UUID.randomUUID().toString();
-    private static final String REGISTRY1 = UUID.randomUUID().toString();
-    private static final String REGISTRY2 = UUID.randomUUID().toString();
+
+    private static final String IMAGEID = "imageId-apple";
+    private static final String STARTID = "startId-turnip";
+    private static final String NAMEANDTAG = "namdAndTag-durian";
+    private static final String TAG1 = "tag1-chocko";
+    private static final String TAG2 = "tag2-rambutan";
+    private static final String REGISTRY1 = "reg1-orange";
+    private static final String REGISTRY2 = "reg2-quince";
+
+    private static final String REG1_NAMEANDTAG = REGISTRY1 + "/" + NAMEANDTAG;
+    private static final String REG1_TAG1 = REGISTRY1 + "/" + TAG1;
+    private static final String REG1_TAG2 = REGISTRY1 + "/" + TAG2;
+    private static final String REG2_NAMEANDTAG = REGISTRY2 + "/" + NAMEANDTAG;
+    private static final String REG2_TAG1 = REGISTRY2 + "/" + TAG1;
+    private static final String REG2_TAG2 = REGISTRY2 + "/" + TAG2;
 
     private TagImageMojo mojo = new TagImageMojo();
 
@@ -112,9 +120,9 @@ public class TagImageMojoTest {
         assertImageTagged(STARTID, NAMEANDTAG);
         assertImageTagged(STARTID, TAG2);
 
-        assertImageEnqueuedForPush(0, TAG1, null);
-        assertImageEnqueuedForPush(1, NAMEANDTAG, null);
-        assertImageEnqueuedForPush(2, TAG2, null);
+        assertImageEnqueuedForPush(0, STARTID, TAG1);
+        assertImageEnqueuedForPush(1, STARTID, NAMEANDTAG);
+        assertImageEnqueuedForPush(2, STARTID, TAG2);
     }
 
     @Test
@@ -126,14 +134,17 @@ public class TagImageMojoTest {
 
         assertTrue(mojo.getPluginErrors().isEmpty());
 
-        assertNImagesTagged(3);
+        assertNImagesTagged(6);
         assertImageTagged(STARTID, TAG1);
         assertImageTagged(STARTID, NAMEANDTAG);
         assertImageTagged(STARTID, TAG2);
+        assertImageTagged(STARTID, REG1_NAMEANDTAG);
+        assertImageTagged(STARTID, REG1_TAG1);
+        assertImageTagged(STARTID, REG1_TAG2);
 
-        assertImageEnqueuedForPush(0, TAG1, REGISTRY1);
-        assertImageEnqueuedForPush(1, NAMEANDTAG, REGISTRY1);
-        assertImageEnqueuedForPush(2, TAG2, REGISTRY1);
+        assertImageEnqueuedForPush(0, STARTID, REG1_TAG1);
+        assertImageEnqueuedForPush(1, STARTID, REG1_NAMEANDTAG);
+        assertImageEnqueuedForPush(2, STARTID, REG1_TAG2);
     }
 
     @Test
@@ -141,22 +152,26 @@ public class TagImageMojoTest {
         Mockito.when(mockImage.isPush()).thenReturn(true);
         Mockito.when(mockImage.getRegistry()).thenReturn(REGISTRY2);
 
+        mojo.setProviderName(FAKE_PROVIDER_KEY);
         mojo.registerBuiltImage(IMAGEID, mockImage);
 
         Mockito.when(mockTag.isPush()).thenReturn(true);
 
-        executeMojo(FAKE_PROVIDER_KEY);
+        mojo.execute();
 
         assertTrue(mojo.getPluginErrors().isEmpty());
 
-        assertNImagesTagged(3);
-        assertImageTagged(IMAGEID, TAG1);
+        assertNImagesTagged(7); // called 7 times but only 6 unique calls made
         assertImageTagged(IMAGEID, NAMEANDTAG);
+        assertImageTagged(IMAGEID, TAG1);
         assertImageTagged(IMAGEID, TAG2);
+        assertImageTagged(IMAGEID, REG2_NAMEANDTAG, 2);
+        assertImageTagged(IMAGEID, REG2_TAG1);
+        assertImageTagged(IMAGEID, REG2_TAG2);
 
-        assertImageEnqueuedForPush(0, NAMEANDTAG, REGISTRY2);
-        assertImageEnqueuedForPush(1, TAG1, REGISTRY2);
-        assertImageEnqueuedForPush(2, TAG2, REGISTRY2);
+        assertImageEnqueuedForPush(0, IMAGEID, REG2_NAMEANDTAG);
+        assertImageEnqueuedForPush(1, IMAGEID, REG2_TAG1);
+        assertImageEnqueuedForPush(2, IMAGEID, REG2_TAG2);
     }
 
     @Test
@@ -164,24 +179,29 @@ public class TagImageMojoTest {
         Mockito.when(mockImage.isPush()).thenReturn(true);
         Mockito.when(mockImage.getRegistry()).thenReturn(REGISTRY1);
 
+        mojo.setProviderName(FAKE_PROVIDER_KEY);
         mojo.registerBuiltImage(IMAGEID, mockImage);
 
         Mockito.when(mockTag.isPush()).thenReturn(true);
         Mockito.when(mockTag.getRegistry()).thenReturn(REGISTRY2);
 
-        executeMojo(FAKE_PROVIDER_KEY);
+        mojo.execute();
 
         assertTrue(mojo.getPluginErrors().isEmpty());
 
-        assertNImagesTagged(3);
+        assertNImagesTagged(7);
+        assertImageTagged(IMAGEID, REG1_NAMEANDTAG);
         assertImageTagged(IMAGEID, TAG1);
         assertImageTagged(IMAGEID, NAMEANDTAG);
         assertImageTagged(IMAGEID, TAG2);
+        assertImageTagged(IMAGEID, REG2_NAMEANDTAG);
+        assertImageTagged(IMAGEID, REG2_TAG1);
+        assertImageTagged(IMAGEID, REG2_TAG2);
 
-        assertImageEnqueuedForPush(0, NAMEANDTAG, REGISTRY1);
-        assertImageEnqueuedForPush(1, TAG1, REGISTRY2);
-        assertImageEnqueuedForPush(2, NAMEANDTAG, REGISTRY2);
-        assertImageEnqueuedForPush(3, TAG2, REGISTRY2);
+        assertImageEnqueuedForPush(0, IMAGEID, REG1_NAMEANDTAG);
+        assertImageEnqueuedForPush(1, IMAGEID, REG2_TAG1);
+        assertImageEnqueuedForPush(2, IMAGEID, REG2_NAMEANDTAG);
+        assertImageEnqueuedForPush(3, IMAGEID, REG2_TAG2);
     }
 
     @Test
@@ -199,9 +219,9 @@ public class TagImageMojoTest {
         assertImageTagged(IMAGEID, NAMEANDTAG);
         assertImageTagged(IMAGEID, TAG2);
 
-        assertImageEnqueuedForPush(0, TAG1, null);
-        assertImageEnqueuedForPush(1, NAMEANDTAG, null);
-        assertImageEnqueuedForPush(2, TAG2, null);
+        assertImageEnqueuedForPush(0, IMAGEID, TAG1);
+        assertImageEnqueuedForPush(1, IMAGEID, NAMEANDTAG);
+        assertImageEnqueuedForPush(2, IMAGEID, TAG2);
     }
 
     @Test(expected = MojoFailureException.class)
@@ -219,17 +239,21 @@ public class TagImageMojoTest {
     }
 
     private void assertImageTagged(final String imageId, final String tag) {
-        Mockito.verify(FakeDockerProvider.instance, times(1)).tagImage(imageId, tag);
+        assertImageTagged(imageId, tag, 1);
+    }
+
+    private void assertImageTagged(final String imageId, final String tag, final int numTimes) {
+        Mockito.verify(FakeDockerProvider.instance, times(numTimes)).tagImage(imageId, tag);
     }
 
     private void assertImageNotEnqueuedForPush() {
         assertTrue(mojo.getImagesToPush().isEmpty());
     }
 
-    private void assertImageEnqueuedForPush(int index, String expectedImageId, String expectedRegistry) {
+    private void assertImageEnqueuedForPush(int index, String expectedImageId, String expectedNameAndTag) {
         PushableImage actual = mojo.getImagesToPush().get(index);
         assertEquals(expectedImageId, actual.getImageId());
-        assertEquals(expectedRegistry, actual.getRegistry().orNull());
+        assertEquals(expectedNameAndTag, actual.getNameAndTag().orNull());
     }
 
     public static class FakeDockerProvider extends AbstractFakeDockerProvider {

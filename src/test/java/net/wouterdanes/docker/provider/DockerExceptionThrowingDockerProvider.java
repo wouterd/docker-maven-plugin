@@ -60,7 +60,7 @@ public class DockerExceptionThrowingDockerProvider implements DockerProvider {
     }
 
     @Override
-    public void pushImage(final String imageId, final Optional<String> registry) {
+    public void pushImage(final String imageId, final Optional<String> nameAndTag) {
         throw new DockerException("Bad stuff");
     }
 

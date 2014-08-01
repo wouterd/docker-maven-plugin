@@ -54,8 +54,8 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     }
 
     @Override
-    public void pushImage(final String imageId, final Optional<String> registry) {
-        proxy.pushImage(imageId, registry);
+    public void pushImage(final String imageId, final Optional<String> nameAndTag) {
+        proxy.pushImage(imageId, nameAndTag);
     }
 
     @Override

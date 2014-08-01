@@ -61,23 +61,11 @@ public class ImagesService extends BaseService {
                 .post(null, String.class);
     }
 
-    public String pushImage(final String imageId, final Optional<String> registry) {
+    public String pushImage(final String imageId, final Optional<String> nameAndTag) {
         try {
-            ImageDescriptor descriptor = new ImageDescriptor(imageId);
-
-            WebTarget target = getServiceEndPoint()
-                    .path(descriptor.getRepositoryAndImage())
-                    .path("push");
-
-            Optional<String> targetRegistry = registry.or(descriptor.getRegistry());
-            if (targetRegistry.isPresent()) {
-                target = target.queryParam("registry", targetRegistry.get());
-            }
-
-            Optional<String> targetTag = descriptor.getTag();
-            if (targetTag.isPresent()) {
-                target = target.queryParam("tag", targetTag.get());
-            }
+            WebTarget target = nameAndTag.isPresent() ?
+                    createPushRequestFromTag(nameAndTag.get()) :
+                    createPushRequestFromId(imageId);
 
             return target.request()
                     .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
@@ -90,13 +78,30 @@ public class ImagesService extends BaseService {
         }
     }
 
+    private WebTarget createPushRequestFromTag(final String nameAndTag) {
+        ImageDescriptor descriptor = new ImageDescriptor(nameAndTag);
+        WebTarget target = getServiceEndPoint()
+                .path(descriptor.getRegistryRepositoryAndImage())
+                .path("push");
+
+        if (descriptor.getTag().isPresent()) {
+            target = target.queryParam("tag", descriptor.getTag().get());
+        }
+
+        return target;
+    }
+
+    private WebTarget createPushRequestFromId(final String imageId) {
+        return getServiceEndPoint().path(imageId).path("push");
+    }
+
     public void tagImage(final String imageId, final String nameAndTag) {
         ImageDescriptor descriptor = new ImageDescriptor(nameAndTag);
 
         WebTarget target = getServiceEndPoint()
                 .path(imageId)
                 .path("tag")
-                .queryParam("repo", descriptor.getRepositoryAndImage());
+                .queryParam("repo", descriptor.getRegistryRepositoryAndImage());
 
         Optional<String> targetTag = descriptor.getTag();
         if (targetTag.isPresent()) {
