@@ -30,7 +30,8 @@ import net.wouterdanes.docker.remoteapi.exception.DockerException;
  * is called "stop-containers" and it's executed in the "post-integration-test" phase.
  */
 @Mojo(name = "stop-containers", threadSafe = true, defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST)
-public class StopContainerMojo extends AbstractDockerMojo {
+public class StopContainerMojo extends AbstractPreVerifyDockerMojo {
+
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
         for (String containerId : getStartedContainers()) {
@@ -63,5 +64,10 @@ public class StopContainerMojo extends AbstractDockerMojo {
                 getLog().error("Failed to remove image", e);
             }
         }
+    }
+
+    @Override
+    protected String getMojoGoalName() {
+        return "stop-containers";
     }
 }

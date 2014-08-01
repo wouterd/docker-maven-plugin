@@ -30,7 +30,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ImageTagConfiguration;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**
  * This class is responsible for tagging docking images in the install phase of the maven build. The goal is called
@@ -68,22 +67,11 @@ public class TagImageMojo extends AbstractDockerMojo {
         }
 
         for (String nameAndTag : config.getTags()) {
-            applyTagToImage(imageId, nameAndTag);
+            attachTag(imageId, nameAndTag);
             if (push) {
-                enqueueForPushing(nameAndTag, registry);
+                enqueueForPushing(imageId, Optional.fromNullable(nameAndTag), registry);
             }
         }
-    }
-
-    private void applyTagToImage(String imageId, String nameAndTag) throws MojoFailureException {
-        try {
-            getLog().info(String.format("Tagging image '%s' with tag '%s'..", imageId, nameAndTag));
-            getDockerProvider().tagImage(imageId, nameAndTag);
-        } catch (DockerException e) {
-            String message = String.format("Failed to add tag '%s' to image '%s'", imageId, nameAndTag);
-            throw new MojoFailureException(message, e);
-        }
-
     }
 
 }

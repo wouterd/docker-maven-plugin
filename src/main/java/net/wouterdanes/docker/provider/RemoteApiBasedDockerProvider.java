@@ -125,8 +125,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     }
 
     @Override
-    public void pushImage(final String imageId, final Optional<String> registry) {
-        getImagesService().pushImage(imageId, registry);
+    public void pushImage(final String imageId, final Optional<String> nameAndTag) {
+        getImagesService().pushImage(imageId, nameAndTag);
     }
 
     @Override

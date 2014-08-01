@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -37,6 +38,7 @@ import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.provider.model.PushableImage;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
@@ -94,7 +96,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
     }
 
-    protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig) {
+    protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig) throws MojoFailureException {
         BuiltImageInfo info = new BuiltImageInfo(imageId, imageConfig);
 
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
@@ -141,20 +143,39 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return Collections.unmodifiableList(list);
     }
 
-    protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig) {
-       String pushableId = imageConfig.getNameAndTag();
-       if (Strings.isNullOrEmpty(pushableId)) {
-           pushableId = imageId;
-       }
-
-       enqueueForPushing(pushableId, Optional.fromNullable(imageConfig.getRegistry()));
+    protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig) throws MojoFailureException {
+       enqueueForPushing(imageId,
+               Optional.fromNullable(imageConfig.getNameAndTag()),
+               Optional.fromNullable(imageConfig.getRegistry()));
     }
 
-    protected void enqueueForPushing(final String imageId, Optional<String> registry) {
-        getLog().info(String.format("Enqueuing image '%s' to be pushed to registry '%s'..", imageId, registry.or("<Default>")));
+    protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag, final Optional<String> registry) throws MojoFailureException {
+        if (!registry.isPresent()) {
+           enqueueForPushing(imageId, nameAndTag);
+           return;
+        }
+
+        enqueueForPushingToRegistry(imageId, nameAndTag, registry.get());
+    }
+
+    protected void enqueueForPushingToRegistry(final String imageId, final Optional<String> nameAndTag, final String registry) throws MojoFailureException {
+        Preconditions.checkArgument(nameAndTag.isPresent(), "When pushing to an explicit registry, name-and-tag must be set.");
+
+        // build extended tag by prepending registry to name and tag
+        String newNameAndTag = registry + "/" + nameAndTag.get();
+
+        // apply extended tag
+        attachTag(imageId, newNameAndTag);
+
+        // now enqueue for pushing
+        enqueueForPushing(imageId, Optional.fromNullable(newNameAndTag));
+    }
+
+    protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag) {
+        getLog().info(String.format("Enqueuing image '%s' to be pushed with tag '%s'..", imageId, nameAndTag.or("<none>")));
 
         List<PushableImage> images = obtainListFromPluginContext(PUSHABLE_IMAGES_KEY);
-        PushableImage newImage = new PushableImage(imageId, registry);
+        PushableImage newImage = new PushableImage(imageId, nameAndTag);
         if (!images.contains(newImage)) {
             images.add(newImage);
         }
@@ -163,6 +184,29 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     protected List<PushableImage> getImagesToPush() {
         List<PushableImage> list = obtainListFromPluginContext(PUSHABLE_IMAGES_KEY);
         return Collections.unmodifiableList(list);
+    }
+
+    protected void attachTag(String imageId, String nameAndTag) throws MojoFailureException {
+        try {
+            getLog().info(String.format("Tagging image '%s' with tag '%s'..", imageId, nameAndTag));
+            getDockerProvider().tagImage(imageId, nameAndTag);
+        } catch (DockerException e) {
+            String message = String.format("Failed to add tag '%s' to image '%s'", imageId, nameAndTag);
+            handleDockerException(message, e);
+        }
+    }
+
+    /**
+     * Common method for re-throwing a {@link DockerException} as a {@link MojoFailureException}
+     * with a more specific error message. Extract into a common, template method in this base class
+     * to allow pre "verify" Mojos to handle errors differently.
+     */
+    protected void handleDockerException(String message, DockerException e) throws MojoFailureException {
+        Optional<String> apiResponse = e.getApiResponse();
+        if (apiResponse.isPresent()) {
+            message += "\nApi response:\n%s" + apiResponse.get();
+        }
+        throw new MojoFailureException(message, e);
     }
 
     @SuppressWarnings("unchecked")

@@ -17,48 +17,48 @@ public class PushableImageTest {
     private static final String IMAGE1 = "red";
     private static final String IMAGE2 = "blue";
 
-    private static final String REG1 = "tutum.co";
-    private static final String REG2 = "localhost:5000";
+    private static final String TAG1 = "oldest";
+    private static final String TAG2 = "localhost:5000/fred/bluey:middlest";
 
-    private PushableImage targetWithReg;
-    private PushableImage targetWithoutReg;
+    private PushableImage targetWithTag;
+    private PushableImage targetWithoutTag;
 
     @Before
     public void setUp() throws Exception {
-        targetWithReg = make(IMAGE1, REG1);
-        targetWithoutReg = make(IMAGE1, null);
+        targetWithTag = make(IMAGE1, TAG1);
+        targetWithoutTag = make(IMAGE1, null);
     }
 
     @Test
     public void testConstruction() {
-        assertExpected(IMAGE1, Optional.fromNullable(REG1), targetWithReg);
-        assertExpected(IMAGE1, Optional.<String> absent(), targetWithoutReg);
+        assertExpected(IMAGE1, Optional.fromNullable(TAG1), targetWithTag);
+        assertExpected(IMAGE1, Optional.<String> absent(), targetWithoutTag);
     }
 
     @Test
     public void testHashCode() {
-        assertEquals(make(IMAGE1, REG1).hashCode(), targetWithReg.hashCode());
-        assertEquals(make(IMAGE1, null).hashCode(), targetWithoutReg.hashCode());
+        assertEquals(make(IMAGE1, TAG1).hashCode(), targetWithTag.hashCode());
+        assertEquals(make(IMAGE1, null).hashCode(), targetWithoutTag.hashCode());
     }
 
     @Test
     public void testEquals() {
         // trivial cases
-        assertTrue(targetWithReg.equals(targetWithReg));
-        assertFalse(targetWithReg.equals(null));
-        assertFalse(targetWithReg.equals(new Object()));
+        assertTrue(targetWithTag.equals(targetWithTag));
+        assertFalse(targetWithTag.equals(null));
+        assertFalse(targetWithTag.equals(new Object()));
 
         // when equivalent
-        assertTrue(targetWithReg.equals(make(IMAGE1, REG1)));
-        assertTrue(targetWithoutReg.equals(make(IMAGE1, null)));
+        assertTrue(targetWithTag.equals(make(IMAGE1, TAG1)));
+        assertTrue(targetWithoutTag.equals(make(IMAGE1, null)));
 
         // when not equivalent
         // - Image not same
-        assertFalse(targetWithReg.equals(make(IMAGE2, REG1)));
+        assertFalse(targetWithTag.equals(make(IMAGE2, TAG1)));
         // - Reg not same
-        assertFalse(targetWithReg.equals(make(IMAGE1, REG2)));
-        assertFalse(targetWithReg.equals(targetWithoutReg));
-        assertFalse(targetWithoutReg.equals(targetWithReg));
+        assertFalse(targetWithTag.equals(make(IMAGE1, TAG2)));
+        assertFalse(targetWithTag.equals(targetWithoutTag));
+        assertFalse(targetWithoutTag.equals(targetWithTag));
 
     }
 
@@ -69,7 +69,7 @@ public class PushableImageTest {
     private void assertExpected(String expectedImageId, Optional<String> expectedRegistry,
             PushableImage actual) {
         assertEquals(expectedImageId, actual.getImageId());
-        assertEquals(expectedRegistry, actual.getRegistry());
+        assertEquals(expectedRegistry, actual.getNameAndTag());
     }
 
 }

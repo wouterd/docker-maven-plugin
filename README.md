@@ -215,12 +215,24 @@ The configuration works as follows:
 The `push-images` goal allows you to push any marked images that were built in a prior execution of the
 `build-images` goal to a Docker image registry.
 
-If you wish to push the image to a private registry (that is, a registry other than
-https://registry.hub.docker.com/ then the host (and port number) of the registry should be explicitly
-specified in the `<registry>` parameter of the image or incorporated into the `<nameAndTag>`.
+Pushing an image to a private registry (that is, a registry other than https://registry.hub.docker.com/) can
+be specified in one of two ways.
 
-          E.g.
-          myregistry.corpdomain.net:5000/repo:tag
+1. Embedded in the `<nameAndTag>`
+
+          e.g.
+          `<nameAndTag>myregistry.corpdomain.net:5000/repo:tag</nameAndTag>`
+
+1. Separately via `<registry>` parameter of the image or incorporated into the `<nameAndTag>`.
+
+          e.g.
+          `<nameAndTag>repo:tag</nameAndTag>`
+          `<registry>myregistry.corpdomain.net</registry>`
+
+These 2 configurations behave slightly differently. In the former, the image is associated with a single
+long tag  and all references to subsequent references to that image (e.g. in `FROM` statement in a Dockerfile)
+need to reference the full string. In the latter case, 2 tags are registered, one long, one short, enabling
+access to the more concise form.
 
 If the registry is omitted, then https://registry.hub.docker.com/ is assumed.
 

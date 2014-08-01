@@ -85,9 +85,9 @@ public interface DockerProvider {
     /**
      * Pushes an image from docker to a registry.
      * @param imageId the Id of the image to push
-     * @param registry optional registry identifier
+     * @param nameAndTag optional name and tag to be associated with pushed image
      */
-    void pushImage(String imageId, Optional<String> registry);
+    void pushImage(String imageId, Optional<String> nameAndTag);
 
     /**
      * Associates an image with a new repo/tag.

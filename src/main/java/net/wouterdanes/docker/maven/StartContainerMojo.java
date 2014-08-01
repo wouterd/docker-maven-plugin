@@ -47,7 +47,7 @@ import net.wouterdanes.docker.remoteapi.exception.DockerException;
  */
 @Mojo(defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST, name = "start-containers",
         threadSafe = true, instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
-public class StartContainerMojo extends AbstractDockerMojo {
+public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
 
     @Parameter(required = true)
     private List<ContainerStartConfiguration> containers;
@@ -80,8 +80,7 @@ public class StartContainerMojo extends AbstractDockerMojo {
                 registerStartedContainer(containerId);
             } catch (DockerException e) {
                 String message = String.format("Failed to start container '%s'", configuration.getId());
-                getLog().error(message, e);
-                registerPluginError(new DockerPluginError("start-containers", message, e));
+                handleDockerException(message, e);
             }
         }
         getLog().debug("Properties after exposing ports: " + project.getProperties());
@@ -129,5 +128,10 @@ public class StartContainerMojo extends AbstractDockerMojo {
     private void addPropertyToProject(String key, String value) {
         getLog().info(String.format("Setting property '%s' to '%s'", key, value));
         project.getProperties().setProperty(key, value);
+    }
+
+    @Override
+    protected String getMojoGoalName() {
+        return "start-containers";
     }
 }

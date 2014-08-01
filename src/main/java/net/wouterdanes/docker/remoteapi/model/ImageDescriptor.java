@@ -81,6 +81,14 @@ public class ImageDescriptor {
         return tag;
     }
 
+    public String getRegistryRepositoryAndImage() {
+        StringBuilder buf = new StringBuilder();
+        appendRegistry(buf);
+        appendRepository(buf);
+        appendImage(buf);
+        return buf.toString();
+    }
+
     public String getRepositoryAndImage() {
         StringBuilder buf = new StringBuilder();
         appendRepository(buf);
@@ -94,6 +102,13 @@ public class ImageDescriptor {
         appendImage(buf);
         appendTag(buf);
         return buf.toString();
+    }
+
+    private void appendRegistry(StringBuilder buf) {
+        if (registry.isPresent()) {
+            buf.append(registry.get());
+            buf.append('/');
+        }
     }
 
     private void appendRepository(StringBuilder buf) {

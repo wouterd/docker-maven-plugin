@@ -49,6 +49,7 @@ public class BuildImageMojoTest {
     private static final String STARTID = UUID.randomUUID().toString();
     private static final String NAMEANDTAG = UUID.randomUUID().toString();
     private static final String REGISTRY = UUID.randomUUID().toString();
+    private static final String REGISTRYANDNAMEANDTAG = REGISTRY + "/" + NAMEANDTAG;
 
     private BuildImageMojo mojo = new BuildImageMojo();
 
@@ -115,7 +116,7 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         assertTrue(mojo.getPluginErrors().isEmpty());
-        assertImageEnqueuedForPush(NAMEANDTAG, Optional.<String>absent());
+        assertImageEnqueuedForPush(IMAGEID, NAMEANDTAG);
     }
 
     @Test
@@ -126,7 +127,7 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         assertTrue(mojo.getPluginErrors().isEmpty());
-        assertImageEnqueuedForPush(NAMEANDTAG, Optional.fromNullable(REGISTRY));
+        assertImageEnqueuedForPush(IMAGEID, REGISTRYANDNAMEANDTAG);
     }
 
     @Test
@@ -137,7 +138,7 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         assertTrue(mojo.getPluginErrors().isEmpty());
-        assertImageEnqueuedForPush(IMAGEID, Optional.<String>absent());
+        assertImageEnqueuedForPush(IMAGEID, null);
     }
 
     @Test(expected = MojoExecutionException.class)
@@ -149,6 +150,7 @@ public class BuildImageMojoTest {
         mojo.setImages(images);
 
         mojo.execute();
+        assertImageEnqueuedForPush(IMAGEID, null);
     }
 
     private void executeMojo(String provider) throws MojoExecutionException, MojoFailureException {
@@ -160,14 +162,14 @@ public class BuildImageMojoTest {
         assertTrue(mojo.getImagesToPush().isEmpty());
     }
 
-    private void assertImageEnqueuedForPush(String expectedImageId, Optional<String> expectedRegistry) {
+    private void assertImageEnqueuedForPush(String expectedImageId, String expectedNameAndTag) {
         Mockito.when(mockImage.isValid()).thenReturn(false);
 
         assertEquals(1, mojo.getImagesToPush().size());
 
         PushableImage actual = mojo.getImagesToPush().get(0);
         assertEquals(expectedImageId, actual.getImageId());
-        assertEquals(expectedRegistry, actual.getRegistry());
+        assertEquals(expectedNameAndTag, actual.getNameAndTag().orNull());
     }
 
     public static class FakeDockerProvider extends AbstractFakeDockerProvider {

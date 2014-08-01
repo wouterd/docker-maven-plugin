@@ -75,7 +75,17 @@
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
-                  <nameAndTag>@docker.registry@/@docker.userName@/drek:latest</nameAndTag>
+                  <nameAndTag>@docker.userName@/drek:latest</nameAndTag>
+                  <keep>true</keep>
+                  <push>true</push>
+                  <registry>@docker.registry@</registry>
+                </image>
+                <image>
+                  <id>nginxier</id>
+                  <files>
+                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
+                  </files>
+                  <nameAndTag>@docker.registry@/@docker.userName@/nginxier:latest</nameAndTag>
                   <keep>true</keep>
                   <push>true</push>
                 </image>
@@ -111,15 +121,15 @@
             </goals>
           </execution>
           <execution>
-            <id>push</id>
-            <goals>
-              <goal>push-images</goal>
-            </goals>
-          </execution>
-          <execution>
             <id>verify</id>
             <goals>
               <goal>verify</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>push</id>
+            <goals>
+              <goal>push-images</goal>
             </goals>
           </execution>
         </executions>
