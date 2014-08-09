@@ -25,16 +25,16 @@ Minimum required maven version: 3.1.1
 
 # Usage
 
-Current release version: `1.5`
+Current release version: `1.6`
 
-Current snapshot version: `1.6-SNAPSHOT`
+Current snapshot version: `1.7-SNAPSHOT`
 
 ## Example
 
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <configuration>
           <userName>goonwarrior</userName>
           <password>g0onwarr!or</password>
