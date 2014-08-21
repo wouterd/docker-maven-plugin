@@ -39,6 +39,7 @@ import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.provider.model.PushableImage;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
@@ -87,12 +88,13 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 
-    protected void registerStartedContainer(String id) {
-        List<String> startedContainers = obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
-        startedContainers.add(id);
+    protected void registerStartedContainer(String containerId, ContainerInspectionResult container) {
+        StartedContainerInfo info = new StartedContainerInfo(containerId, container);
+        List<StartedContainerInfo> startedContainers = obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
+        startedContainers.add(info);
     }
 
-    protected List<String> getStartedContainers() {
+    protected List<StartedContainerInfo> getStartedContainers() {
         return obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
     }
 

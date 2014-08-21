@@ -38,6 +38,7 @@ import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -59,8 +60,11 @@ public class StartContainerMojoTest {
 
         FakeDockerProvider.instance = mock(FakeDockerProvider.class);
 
+        ContainerInspectionResult inspectionResult = mock(ContainerInspectionResult.class);
+        when(inspectionResult.getId()).thenReturn("someId");
+
         Mockito.when(FakeDockerProvider.instance.startContainer(Matchers.any(ContainerStartConfiguration.class)))
-                .thenReturn("someId");
+                .thenReturn(inspectionResult);
         DockerProviderSupplier.registerProvider(FAKE_PROVIDER_KEY, FakeDockerProvider.class);
 
         DockerExceptionThrowingDockerProvider.class.newInstance();

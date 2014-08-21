@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
@@ -24,7 +25,7 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     protected abstract AbstractFakeDockerProvider getInstance();
 
     @Override
-    public String startContainer(final ContainerStartConfiguration configuration) {
+    public ContainerInspectionResult startContainer(final ContainerStartConfiguration configuration) {
         return proxy.startContainer(configuration);
     }
 

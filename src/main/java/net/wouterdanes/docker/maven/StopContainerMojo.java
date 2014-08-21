@@ -34,7 +34,8 @@ public class StopContainerMojo extends AbstractPreVerifyDockerMojo {
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
-        for (String containerId : getStartedContainers()) {
+        for (StartedContainerInfo container : getStartedContainers()) {
+            String containerId = container.getContainerInfo().getId();
             getLog().info(String.format("Stopping container '%s'..", containerId));
             try {
                 getDockerProvider().stopContainer(containerId);
@@ -42,7 +43,8 @@ public class StopContainerMojo extends AbstractPreVerifyDockerMojo {
                 getLog().error("Failed to stop container", e);
             }
         }
-        for (String containerId : getStartedContainers()) {
+        for (StartedContainerInfo container : getStartedContainers()) {
+            String containerId = container.getContainerInfo().getId();
             getLog().info(String.format("Deleting container '%s'..", containerId));
             try {
                 getDockerProvider().deleteContainer(containerId);

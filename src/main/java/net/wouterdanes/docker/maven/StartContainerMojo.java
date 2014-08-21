@@ -40,6 +40,7 @@ import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 
 /**
  * This class is responsible for starting docking containers in the pre-integration phase of the maven build. The goal
@@ -73,11 +74,12 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
             replaceImageWithBuiltImageIdIfInternalId(configuration);
             try {
                 getLog().info(String.format("Starting container '%s'..", configuration.getId()));
-                String containerId = provider.startContainer(configuration);
+                ContainerInspectionResult container = provider.startContainer(configuration);
+                String containerId = container.getId();
                 List<ExposedPort> exposedPorts = provider.getExposedPorts(containerId);
                 exposePortsToProject(configuration, exposedPorts);
                 getLog().info(String.format("Started container with id '%s'", containerId));
-                registerStartedContainer(containerId);
+                registerStartedContainer(configuration.getId(), container);
             } catch (DockerException e) {
                 String message = String.format("Failed to start container '%s'", configuration.getId());
                 handleDockerException(message, e);

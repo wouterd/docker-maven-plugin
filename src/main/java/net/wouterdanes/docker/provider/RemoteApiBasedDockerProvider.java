@@ -44,6 +44,7 @@ import net.wouterdanes.docker.remoteapi.ImagesService;
 import net.wouterdanes.docker.remoteapi.MiscService;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromEnvironmentSupplier;
@@ -132,7 +133,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         register(containersService, imagesService, miscService);
     }
 
-    protected String startContainer(ContainerStartConfiguration configuration, ContainerStartRequest startRequest) {
+    protected ContainerInspectionResult startContainer(ContainerStartConfiguration configuration,
+                                                       ContainerStartRequest startRequest) {
         String imageId = configuration.getImage();
         ContainerCreateRequest createRequest = new ContainerCreateRequest()
                 .fromImage(imageId);
@@ -147,7 +149,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
         containersService.startContainer(containerId, startRequest);
 
-        return containerId;
+        return containersService.inspectContainer(containerId);
     }
 
     protected ContainersService getContainersService() {
