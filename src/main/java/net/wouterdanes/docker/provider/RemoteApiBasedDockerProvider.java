@@ -82,7 +82,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         }
     }
 
-	@Override
+    @Override
     public void stopContainer(final String containerId) {
         getContainersService().killContainer(containerId);
     }
@@ -96,27 +96,6 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     public String buildImage(final ImageBuildConfiguration image) {
         byte[] bytes = getTgzArchiveForFiles(image);
         return miscService.buildImage(bytes, Optional.fromNullable(image.getNameAndTag()));
-    }
-
-    private static byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (
-                CompressorOutputStream gzipStream = new CompressorStreamFactory().createCompressorOutputStream("gz", baos);
-                ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", gzipStream)
-        ) {
-            for (File file : image.getFiles()) {
-                ArchiveEntry entry = tar.createArchiveEntry(file, file.getName());
-                tar.putArchiveEntry(entry);
-                byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-                tar.write(contents);
-                tar.closeArchiveEntry();
-            }
-            tar.flush();
-            gzipStream.flush();
-        } catch (CompressorException | ArchiveException | IOException e) {
-            throw new IllegalStateException("Unable to create output archive", e);
-        }
-        return baos.toByteArray();
     }
 
     @Override
@@ -189,6 +168,27 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     protected int getPort() {
         return port;
+    }
+
+    private static byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (
+                CompressorOutputStream gzipStream = new CompressorStreamFactory().createCompressorOutputStream("gz", baos);
+                ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", gzipStream)
+        ) {
+            for (File file : image.getFiles()) {
+                ArchiveEntry entry = tar.createArchiveEntry(file, file.getName());
+                tar.putArchiveEntry(entry);
+                byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+                tar.write(contents);
+                tar.closeArchiveEntry();
+            }
+            tar.flush();
+            gzipStream.flush();
+        } catch (CompressorException | ArchiveException | IOException e) {
+            throw new IllegalStateException("Unable to create output archive", e);
+        }
+        return baos.toByteArray();
     }
 
     private static Integer getDockerPortFromEnvironment() {
