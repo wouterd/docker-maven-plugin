@@ -32,6 +32,8 @@ public class ContainerInspectionResult {
 
     @JsonProperty("ID")
     private String id;
+    @JsonProperty("Name")
+    private String name;
     @JsonProperty("Created")
     private Calendar createdAt;
     @JsonProperty("Path")
@@ -47,6 +49,10 @@ public class ContainerInspectionResult {
 
     public String getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Calendar getCreatedAt() {

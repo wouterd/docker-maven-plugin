@@ -38,6 +38,8 @@ import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
+import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -59,8 +61,11 @@ public class StartContainerMojoTest {
 
         FakeDockerProvider.instance = mock(FakeDockerProvider.class);
 
+        ContainerInspectionResult inspectionResult = mock(ContainerInspectionResult.class);
+        when(inspectionResult.getId()).thenReturn("someId");
+
         Mockito.when(FakeDockerProvider.instance.startContainer(Matchers.any(ContainerStartConfiguration.class)))
-                .thenReturn("someId");
+                .thenReturn(inspectionResult);
         DockerProviderSupplier.registerProvider(FAKE_PROVIDER_KEY, FakeDockerProvider.class);
 
         DockerExceptionThrowingDockerProvider.class.newInstance();
@@ -162,6 +167,39 @@ public class StartContainerMojoTest {
 
         assert !mojo.getPluginErrors().isEmpty();
         verify(FakeDockerProvider.instance, never()).startContainer(any(ContainerStartConfiguration.class));
+    }
+
+    @Test
+    public void testThatMojoAddsErrorWhenContainerIsLinkedThatIsNotStartedBefore() throws Exception {
+
+        ContainerStartConfiguration container1 = new ContainerStartConfiguration()
+                .withId("container1")
+                .withLink(new ContainerLink().toContainer("container2").withAlias("db"));
+
+        ContainerStartConfiguration container2 = new ContainerStartConfiguration()
+                .withId("container2");
+
+        StartContainerMojo mojo = createMojo(Arrays.asList(container1, container2), FAKE_PROVIDER_KEY);
+
+        mojo.execute();
+
+        assert !mojo.getPluginErrors().isEmpty();
+
+    }
+
+    @Test
+    public void testThatMojoAddsErrorWhenContainerIsLinkedToNotExistingContainer() throws Exception {
+
+        ContainerStartConfiguration container1 = new ContainerStartConfiguration()
+                .withId("container1")
+                .withLink(new ContainerLink().toContainer("container2").withAlias("db"));
+
+        StartContainerMojo mojo = createMojo(container1, FAKE_PROVIDER_KEY);
+
+        mojo.execute();
+
+        assert !mojo.getPluginErrors().isEmpty();
+
     }
 
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {

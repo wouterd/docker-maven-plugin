@@ -24,6 +24,7 @@ import com.google.common.base.Optional;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
@@ -48,7 +49,7 @@ public interface DockerProvider {
      * @param configuration the configuration parameters
      * @return the ID of the started container
      */
-    String startContainer(ContainerStartConfiguration configuration);
+    ContainerInspectionResult startContainer(ContainerStartConfiguration configuration);
 
     /**
      * Stops a docker container

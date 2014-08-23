@@ -17,6 +17,7 @@
 
 package net.wouterdanes.docker.maven;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +25,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -40,6 +43,8 @@ import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
+import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 
 /**
  * This class is responsible for starting docking containers in the pre-integration phase of the maven build. The goal
@@ -65,25 +70,46 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
-        if (hasDuplicateIds()) {
+        if (hasDuplicateIds() || hasInvalidLinks()) {
             return;
         }
         DockerProvider provider = getDockerProvider();
         for (ContainerStartConfiguration configuration : containers) {
             replaceImageWithBuiltImageIdIfInternalId(configuration);
+            replaceLinkedContainerIdsWithStartedNames(configuration);
             try {
                 getLog().info(String.format("Starting container '%s'..", configuration.getId()));
-                String containerId = provider.startContainer(configuration);
+                ContainerInspectionResult container = provider.startContainer(configuration);
+                String containerId = container.getId();
                 List<ExposedPort> exposedPorts = provider.getExposedPorts(containerId);
                 exposePortsToProject(configuration, exposedPorts);
                 getLog().info(String.format("Started container with id '%s'", containerId));
-                registerStartedContainer(containerId);
+                registerStartedContainer(configuration.getId(), container);
             } catch (DockerException e) {
                 String message = String.format("Failed to start container '%s'", configuration.getId());
                 handleDockerException(message, e);
             }
         }
         getLog().debug("Properties after exposing ports: " + project.getProperties());
+    }
+
+    private boolean hasInvalidLinks() {
+        List<String> containerIds = new ArrayList<>();
+        boolean hasInvalidLinks = false;
+        for (ContainerStartConfiguration configuration : containers) {
+            List<ContainerLink> links = configuration.getLinks();
+            for (ContainerLink link : links) {
+                if (!containerIds.contains(link.getContainerId())) {
+                    String message = String.format("Container '%s' tries to link to container '%s' that is not started " +
+                            "before this container.", configuration.getId(), link.getContainerId());
+                    getLog().error(message);
+                    registerPluginError(new DockerPluginError(mojoExecution.getGoal(), message));
+                    hasInvalidLinks = true;
+                }
+            }
+            containerIds.add(configuration.getId());
+        }
+        return hasInvalidLinks;
     }
 
     private boolean hasDuplicateIds() {
@@ -114,6 +140,19 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
         Optional<BuiltImageInfo> builtImage = getBuiltImageForStartId(configuration.getImage());
         if (builtImage.isPresent()) {
             configuration.fromImage(builtImage.get().getImageId());
+        }
+    }
+
+    private void replaceLinkedContainerIdsWithStartedNames(final ContainerStartConfiguration configuration) {
+        for (ContainerLink link : configuration.getLinks()) {
+            final String containerId = link.getContainerId();
+            String name = Collections2.filter(getStartedContainers(), new Predicate<StartedContainerInfo>() {
+                @Override
+                public boolean apply(final StartedContainerInfo input) {
+                    return input.getContainerId().equals(containerId);
+                }
+            }).iterator().next().getContainerInfo().getName();
+            link.toContainer(name);
         }
     }
 
