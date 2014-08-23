@@ -17,7 +17,13 @@
 
 package net.wouterdanes.docker.provider.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.plugins.annotations.Parameter;
+
+import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 
 /**
  * This class is responsible for holding the start configuration of a docker container<br/> See <a
@@ -31,6 +37,8 @@ public class ContainerStartConfiguration {
     private String image;
     @Parameter(required = true)
     private String id;
+    @Parameter
+    private List<ContainerLink> links;
 
     /**
      * Set the image name or id to use and returns the object so you can chain from/with statements.
@@ -48,11 +56,27 @@ public class ContainerStartConfiguration {
         return this;
     }
 
+    public ContainerStartConfiguration withLinks(ContainerLink... links) {
+        if (this.links == null) {
+            this.links = new ArrayList<>(links.length);
+        }
+        Collections.addAll(this.links, links);
+        return this;
+    }
+
+    public ContainerStartConfiguration withLink(ContainerLink link) {
+        return withLinks(link);
+    }
+
     public String getImage() {
         return image;
     }
 
     public String getId() {
         return id != null ? id : image;
+    }
+
+    public List<ContainerLink> getLinks() {
+        return links != null ? Collections.unmodifiableList(links) : Collections.<ContainerLink>emptyList();
     }
 }

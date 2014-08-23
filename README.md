@@ -139,6 +139,27 @@ the host/port of docker in the following way:
 - Else it will try to parse the DOCKER_HOST system environment variable
 - Finally it will default to 127.0.0.1:4243
 
+## Linking containers
+
+Containers can be linked, similar to the `--link name:alias` parameter of the `docker run` command.
+The configuration snippet looks as follows:
+
+            <container>
+                <id>app</id>
+                <image>app</image>
+                <links>
+                    <link>
+                        <containerId>mongo</containerId>
+                        <containerAlias>mongo</containerAlias>
+                    </link>
+                </links>
+            </container>
+
+The containerId is the id specified in another `<container>` definition. It will be replaced with the container name of
+ the started container when the plugin is executed. The containerAlias is the name of the container being linked inside
+ the container that links the container. It's also the hostname of the linked container for the linking container. In
+ the case of the above XML snippet, I can now reach the mongodb instance using `mongo:27017` as the connection string.
+
 ## `build-images` goal
 The `build-images` goal allows you to build a docker image based on a list of files, one of which must be a `Dockerfile`.
 Below is an example snippet.
@@ -308,6 +329,22 @@ line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
 * [Jersey Client](https://jersey.java.net/) for a light weight API to do rest calls.
 * [Jackson](http://jackson.codehaus.org/) for parsing / creating JSON
 * [Apache Commons Compress](http://commons.apache.org/proper/commons-compress/) for creating the tar.gz archive needed to build a docker image
+
+# Building the project
+
+To build the project, you will need Maven and Java8. The plugin itself doesn't require Java 8, but some integration tests
+use Java 8. The plugin will still create java 7 byte code, no worries. :-)
+
+To build the project and run all the tests, run:
+ 
+        mvn clean verify -Prun-its
+        
+This will run the build including all integration tests. You should run this at least once before submitting a PR.
+To just run unit tests, run:
+ 
+        mvn clean verify
+        
+The latter won't require java 8.
 
 # Architecture principles
 * The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple

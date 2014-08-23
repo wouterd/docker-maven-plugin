@@ -17,6 +17,7 @@
 
 package net.wouterdanes.docker.remoteapi.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,8 @@ public class ContainerStartRequest {
     private boolean publishAllPorts = false;
     @JsonProperty("Privileged")
     private boolean privileged = false;
+    @JsonProperty("Links")
+    private List<String> links = new ArrayList<>();
 
     public ContainerStartRequest withBinds(List<String> binds) {
         this.binds = binds;
@@ -57,6 +60,18 @@ public class ContainerStartRequest {
 
     public ContainerStartRequest withAllPortsPublished() {
         this.publishAllPorts = true;
+        return this;
+    }
+
+    public ContainerStartRequest withLink(String containerName, String alias) {
+        addLink(containerName, alias);
+        return this;
+    }
+
+    public ContainerStartRequest withLinks(List<ContainerLink> links) {
+        for (ContainerLink link : links) {
+            addLink(link.getContainerId(), link.getContainerAlias());
+        }
         return this;
     }
 
@@ -83,5 +98,13 @@ public class ContainerStartRequest {
 
     public boolean isPrivileged() {
         return privileged;
+    }
+
+    public List<String> getLinks() {
+        return links;
+    }
+
+    private void addLink(final String containerName, final String alias) {
+        links.add(String.format("%s:%s", containerName, alias));
     }
 }

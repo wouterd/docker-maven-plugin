@@ -45,7 +45,10 @@ public class LocalDockerProvider extends RemoteApiBasedDockerProvider {
 
     @Override
     public ContainerInspectionResult startContainer(final ContainerStartConfiguration configuration) {
-        return super.startContainer(configuration, new ContainerStartRequest());
+        ContainerStartRequest startRequest = new ContainerStartRequest()
+                .withLinks(configuration.getLinks());
+
+        return super.startContainer(configuration, startRequest);
     }
 
     @Override
