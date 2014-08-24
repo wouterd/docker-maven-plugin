@@ -68,4 +68,9 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     public void setCredentials(Credentials credentials) {
         proxy.setCredentials(credentials);
     }
+
+    @Override
+    public String getLogs(final String containerId) {
+        return proxy.getLogs(containerId);
+    }
 }

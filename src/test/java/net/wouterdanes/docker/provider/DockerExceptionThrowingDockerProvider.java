@@ -69,4 +69,9 @@ public class DockerExceptionThrowingDockerProvider implements DockerProvider {
     public void tagImage(final String imageId, final String nameAndTag) {
         throw new DockerException("Bad stuff");
     }
+
+    @Override
+    public String getLogs(final String containerId) {
+        throw new DockerException("Bad stuff");
+    }
 }

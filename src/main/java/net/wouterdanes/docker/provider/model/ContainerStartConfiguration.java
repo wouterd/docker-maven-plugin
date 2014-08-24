@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 
 /**
@@ -33,12 +31,19 @@ import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 @SuppressWarnings("unused")
 public class ContainerStartConfiguration {
 
-    @Parameter(required = true)
     private String image;
-    @Parameter(required = true)
     private String id;
-    @Parameter
     private List<ContainerLink> links;
+
+    /**
+     * Regular expression to look for that indicates the container has started up
+     */
+    private String waitForStartup;
+
+    /**
+     * The maximum time to wait for this container to start (seconds), default is 30 sec.
+     */
+    private int startupTimeout;
 
     /**
      * Set the image name or id to use and returns the object so you can chain from/with statements.
@@ -68,6 +73,16 @@ public class ContainerStartConfiguration {
         return withLinks(link);
     }
 
+    public ContainerStartConfiguration waitForStartup(String pattern) {
+        this.waitForStartup = pattern;
+        return this;
+    }
+
+    public ContainerStartConfiguration withStartupTimeout(int timeout) {
+        this.startupTimeout = timeout;
+        return this;
+    }
+
     public String getImage() {
         return image;
     }
@@ -78,5 +93,13 @@ public class ContainerStartConfiguration {
 
     public List<ContainerLink> getLinks() {
         return links != null ? Collections.unmodifiableList(links) : Collections.<ContainerLink>emptyList();
+    }
+
+    public String getWaitForStartup() {
+        return waitForStartup;
+    }
+
+    public int getStartupTimeout() {
+        return startupTimeout != 0 ? startupTimeout : 30;
     }
 }

@@ -90,12 +90,18 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected void registerStartedContainer(String containerId, ContainerInspectionResult container) {
         StartedContainerInfo info = new StartedContainerInfo(containerId, container);
-        List<StartedContainerInfo> startedContainers = obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
-        startedContainers.add(info);
+        Map<String, StartedContainerInfo> startedContainers = obtainMapFromPluginContext(STARTED_CONTAINERS_KEY);
+        startedContainers.put(containerId, info);
     }
 
-    protected List<StartedContainerInfo> getStartedContainers() {
-        return obtainListFromPluginContext(STARTED_CONTAINERS_KEY);
+    protected Collection<StartedContainerInfo> getStartedContainers() {
+        Map<String, StartedContainerInfo> map = obtainMapFromPluginContext(STARTED_CONTAINERS_KEY);
+        return map.values();
+    }
+
+    protected Optional<StartedContainerInfo> getInfoForContainerStartId(String startId) {
+        Map<String, StartedContainerInfo> map = obtainMapFromPluginContext(STARTED_CONTAINERS_KEY);
+        return Optional.fromNullable(map.get(startId));
     }
 
     protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig) throws MojoFailureException {
@@ -122,11 +128,11 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected Credentials getCredentials() {
         if (Strings.isNullOrEmpty(userName)) {
-            getLog().info("No user name provided");
+            getLog().debug("No user name provided");
             return null;
         }
 
-        getLog().info("Using credentials: " + userName);
+        getLog().debug("Using credentials: " + userName);
         return new Credentials(userName, password, email, null);
     }
 

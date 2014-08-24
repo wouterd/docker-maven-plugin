@@ -6,7 +6,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
-import javax.ws.rs.ProcessingException
 import javax.ws.rs.client.ClientBuilder
 import javax.ws.rs.client.WebTarget
 import javax.ws.rs.core.MediaType
@@ -27,24 +26,6 @@ class ApplicationIT extends Specification {
 
     def appBase2 = System.getProperty('app.base.2')
     app2 = ClientBuilder.newClient().target(appBase2)
-
-    /*
-      Very convoluted way to check if the app has started :-)
-     */
-    for (; ;) {
-      try {
-        app1.request().get().close()
-        app2.request().get().close()
-        break;
-      } catch (ProcessingException e) {
-        if (e.getCause() instanceof ConnectException) {
-          log.info("Polling the app nodes..")
-          Thread.sleep(1000)
-          continue;
-        }
-        throw new IllegalStateException("Can't start test, app not reachable: ${e}")
-      }
-    }
 
   }
 

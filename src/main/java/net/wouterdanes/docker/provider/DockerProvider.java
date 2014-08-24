@@ -96,4 +96,11 @@ public interface DockerProvider {
      * @param nameAndTag the repo/tag to assign
      */
     void tagImage(String imageId, String nameAndTag);
+
+    /**
+     * Returns the logs of the specified container
+     * @param containerId the Id of the container
+     * @return the container's logs
+     */
+    String getLogs(String containerId);
 }
