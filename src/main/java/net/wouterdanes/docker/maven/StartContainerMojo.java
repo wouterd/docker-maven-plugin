@@ -33,7 +33,6 @@ import com.google.common.collect.Collections2;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -64,10 +63,10 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
         this.containers = containers;
     }
 
-    @Component
+    @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
-    @Component
+    @Parameter(defaultValue = "${mojoExecution}", readonly = true)
     private MojoExecution mojoExecution;
 
     @Override
