@@ -55,7 +55,7 @@ public class MiscService extends BaseService {
     }
 
     /**
-     * Builds an image based on the passed tar archive. Optionally names & tags the image
+     * Builds an image based on the passed tar archive. Optionally names &amp; tags the image
      * @param tarArchive the tar archive to use as a source for the image
      * @param name the name and optional tag of the image.
      * @return the ID of the created image

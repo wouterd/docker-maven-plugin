@@ -24,7 +24,7 @@ import java.util.List;
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 
 /**
- * This class is responsible for holding the start configuration of a docker container<br/> See <a
+ * This class is responsible for holding the start configuration of a docker container<br> See <a
  * href="http://docs.docker.io/reference/api/docker_remote_api_v1.10/#21-containers">
  * http://docs.docker.io/reference/api/docker_remote_api_v1.10/#start-a-container</a>
  */

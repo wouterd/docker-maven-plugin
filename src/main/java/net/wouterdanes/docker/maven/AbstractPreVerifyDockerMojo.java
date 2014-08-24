@@ -1,8 +1,8 @@
 package net.wouterdanes.docker.maven;
 
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-
 import com.google.common.base.Optional;
+
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
 
 /**
  * Base class for Mojos that execute prior to the "verify" phase. In these Mojos,
@@ -23,6 +23,8 @@ public abstract class AbstractPreVerifyDockerMojo extends AbstractDockerMojo {
 
     /**
      * For diagnostic purposes.
+     *
+     * @return the goal for this mojo
      */
     protected abstract String getMojoGoalName();
 

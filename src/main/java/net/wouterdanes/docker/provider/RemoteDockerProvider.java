@@ -32,7 +32,7 @@ import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
  * can be configured by setting an environment variable {@value #DOCKER_HOST_SYSTEM_ENV }, like in the client. Or you
  * can specify the host and port on the command line like such:
  * <pre>-D{@value #DOCKER_HOST_PROPERTY}=[host] -D{@value #DOCKER_PORT_PROPERTY}=[port]</pre>
- * <p/>
+ *
  * The provider defaults to {@value #TCP_PROTOCOL}://{@value #DEFAULT_DOCKER_HOST}:{@value #DEFAULT_DOCKER_PORT}
  */
 public class RemoteDockerProvider extends RemoteApiBasedDockerProvider {

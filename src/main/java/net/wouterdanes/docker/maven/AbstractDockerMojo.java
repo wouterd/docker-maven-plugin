@@ -152,15 +152,15 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig) throws MojoFailureException {
-       enqueueForPushing(imageId,
-               Optional.fromNullable(imageConfig.getNameAndTag()),
-               Optional.fromNullable(imageConfig.getRegistry()));
+        enqueueForPushing(imageId,
+                Optional.fromNullable(imageConfig.getNameAndTag()),
+                Optional.fromNullable(imageConfig.getRegistry()));
     }
 
     protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag, final Optional<String> registry) throws MojoFailureException {
         if (!registry.isPresent()) {
-           enqueueForPushing(imageId, nameAndTag);
-           return;
+            enqueueForPushing(imageId, nameAndTag);
+            return;
         }
 
         enqueueForPushingToRegistry(imageId, nameAndTag, registry.get());
@@ -205,9 +205,13 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     /**
-     * Common method for re-throwing a {@link DockerException} as a {@link MojoFailureException}
-     * with a more specific error message. Extract into a common, template method in this base class
-     * to allow pre "verify" Mojos to handle errors differently.
+     * Common method for re-throwing a {@link DockerException} as a {@link MojoFailureException} with a more specific
+     * error message. Extract into a common, template method in this base class to allow pre "verify" Mojos to handle
+     * errors differently.
+     *
+     * @param message The message for the exception
+     * @param e       The Docker Exception
+     * @throws org.apache.maven.plugin.MojoFailureException to indicate Plugin failure
      */
     protected void handleDockerException(String message, DockerException e) throws MojoFailureException {
         Optional<String> apiResponse = e.getApiResponse();
