@@ -122,6 +122,11 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
                 '}';
     }
 
+    @Override
+    public String getLogs(final String containerId) {
+        return containersService.getLogs(containerId);
+    }
+
     protected RemoteApiBasedDockerProvider(final String host, final int port) {
         this.host = host;
         this.port = port;

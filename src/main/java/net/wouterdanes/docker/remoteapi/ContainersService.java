@@ -17,6 +17,9 @@
 
 package net.wouterdanes.docker.remoteapi;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
@@ -111,5 +114,30 @@ public class ContainersService extends BaseService {
                 .get(String.class);
 
         return toObject(json, ContainerInspectionResult.class);
+    }
+
+    public String getLogs(final String containerId) {
+        byte[] bytes = getServiceEndPoint()
+                .path(containerId)
+                .path("logs")
+                .queryParam("stdout", 1)
+                .queryParam("stderr", 1)
+                .request("application/vnd.docker.raw-stream")
+                .get(byte[].class);
+
+        // To see how docker returns the logs and why it's parsed like this:
+        // http://docs.docker.com/v1.2/reference/api/docker_remote_api_v1.14/#attach-to-a-container
+        StringBuilder logs = new StringBuilder();
+        ByteBuffer bb = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
+
+        while (bb.hasRemaining()) {
+            bb.position(bb.position() + 4);
+            int frameLength = bb.getInt();
+            byte[] frame = new byte[frameLength];
+            bb.get(frame);
+            logs.append(new String(frame));
+        }
+
+        return logs.toString();
     }
 }
