@@ -30,7 +30,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 @SuppressWarnings("unused")
 public class ContainerInspectionResult {
 
-    @JsonProperty("ID")
+    @JsonProperty("Id")
     private String id;
     @JsonProperty("Name")
     private String name;

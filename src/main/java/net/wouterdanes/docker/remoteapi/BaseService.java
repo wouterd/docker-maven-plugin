@@ -25,22 +25,22 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
-import net.wouterdanes.docker.remoteapi.model.Credentials;
+import com.google.common.io.BaseEncoding;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import com.google.common.io.BaseEncoding;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
+import net.wouterdanes.docker.remoteapi.model.Credentials;
 
 /**
  * This class is responsible for holding the shared functionality of all Docker remoteapi services.
  */
 public abstract class BaseService {
 
-    public static final String TARGET_DOCKER_API_VERSION = "v1.10";
+    public static final String TARGET_DOCKER_API_VERSION = "v1.12";
     public static final String REGISTRY_AUTH_HEADER = "X-Registry-Auth";
 
     // required for "push" even if no credentials required
