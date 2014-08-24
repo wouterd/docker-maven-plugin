@@ -1,5 +1,7 @@
-# version 1.7
-- The plugin now enables you to scan the stderr & stdout of a container for a certain phrase that indicates succesful
+# version 2.0
+- The plugin now targets v1.12 of the Docker remote API, which shipped with version 1.0 of Docker. So from this version
+ on, you will need at least version 1.0 of the docker daemon.
+- The plugin now enables you to scan the stderr & stdout of a container for a certain phrase that indicates successful
     initialization of the container. This phrase can be any regular expression and it is globally matched.
 - The plugin now allows you to link containers that you start.
 
