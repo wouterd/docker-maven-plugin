@@ -28,16 +28,16 @@ A maven plugin to manage docker containers and images for integration tests.
 
 # Usage
 
-Current release version: `1.6`
+Current release version: `2.0`
 
-Current snapshot version: `2.0-SNAPSHOT`
+Current snapshot version: `2.1-SNAPSHOT`
 
 ## Example
 
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>2.0</version>
         <configuration>
           <userName>goonwarrior</userName>
           <password>g0onwarr!or</password>
