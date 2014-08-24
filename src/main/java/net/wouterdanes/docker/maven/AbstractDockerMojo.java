@@ -128,11 +128,11 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected Credentials getCredentials() {
         if (Strings.isNullOrEmpty(userName)) {
-            getLog().info("No user name provided");
+            getLog().debug("No user name provided");
             return null;
         }
 
-        getLog().info("Using credentials: " + userName);
+        getLog().debug("Using credentials: " + userName);
         return new Credentials(userName, password, email, null);
     }
 
