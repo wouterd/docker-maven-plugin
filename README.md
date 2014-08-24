@@ -160,6 +160,20 @@ The containerId is the id specified in another `<container>` definition. It will
  the container that links the container. It's also the hostname of the linked container for the linking container. In
  the case of the above XML snippet, I can now reach the mongodb instance using `mongo:27017` as the connection string.
 
+## Wait for a container to finish starting up
+
+You might want to wait for your application to finish initialization before you start running integration tests. The
+plugin allows you to do a global regular expression find on the stdout + stderr of your container to see if the 
+container has finished initialization. To check if a tomcat container has started up, you could configure the following:
+
+        <container>
+            <id>app-server</id>
+            <image>myAppServer</image>
+            <waitForStartup>Server startup in</waitForStartup>
+        </container>
+        
+The `<waitForStartup/>` tag can contain any valid java regular expression.
+
 ## `build-images` goal
 The `build-images` goal allows you to build a docker image based on a list of files, one of which must be a `Dockerfile`.
 Below is an example snippet.

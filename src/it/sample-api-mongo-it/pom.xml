@@ -182,6 +182,7 @@
                                             <containerAlias>mongo</containerAlias>
                                         </link>
                                     </links>
+                                    <waitForStartup>Ratpack started for</waitForStartup>
                                 </container>
                                 <container>
                                     <id>app2</id>
@@ -192,6 +193,7 @@
                                             <containerAlias>mongo</containerAlias>
                                         </link>
                                     </links>
+                                    <waitForStartup>Ratpack started for</waitForStartup>
                                 </container>
                             </containers>
                         </configuration>

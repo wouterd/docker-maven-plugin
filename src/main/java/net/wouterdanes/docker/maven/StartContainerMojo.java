@@ -18,9 +18,11 @@
 package net.wouterdanes.docker.maven;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -91,6 +93,44 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
             }
         }
         getLog().debug("Properties after exposing ports: " + project.getProperties());
+        waitForContainersToFinishStartup();
+    }
+
+    private void waitForContainersToFinishStartup() {
+        Collection<ContainerStartConfiguration> waiters =
+                Collections2.filter(containers, new Predicate<ContainerStartConfiguration>() {
+                    @Override
+                    public boolean apply(final ContainerStartConfiguration input) {
+                        return input.getWaitForStartup() != null;
+                    }
+                });
+        for (ContainerStartConfiguration container : waiters) {
+            Pattern pattern = Pattern.compile(container.getWaitForStartup());
+            StartedContainerInfo containerInfo = getInfoForContainerStartId(container.getId()).get();
+            String containerId = containerInfo.getContainerInfo().getId();
+            long maxWait = System.currentTimeMillis() + 1000 * container.getStartupTimeout();
+            boolean finished = false;
+            while (System.currentTimeMillis() <= maxWait) {
+                String logs = getDockerProvider().getLogs(containerId);
+                if (logs != null && pattern.matcher(logs).find()) {
+                    getLog().info(String.format("Container '%s' has completed startup", container.getId()));
+                    finished = true;
+                    break;
+                }
+                try {
+                    getLog().info(String.format("Waiting for container '%s' to finish startup (max %s sec.)",
+                            container.getId(), container.getStartupTimeout()));
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                    break;
+                }
+            }
+            if (!finished) {
+                String message = String.format("Container %s did not finish startup in time", container.getId());
+                registerPluginError(new DockerPluginError(getMojoGoalName(), message));
+                getLog().error(message);
+            }
+        }
     }
 
     private boolean hasInvalidLinks() {

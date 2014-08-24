@@ -30,7 +30,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
-import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
@@ -42,6 +43,7 @@ import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -64,7 +66,7 @@ public class StartContainerMojoTest {
         ContainerInspectionResult inspectionResult = mock(ContainerInspectionResult.class);
         when(inspectionResult.getId()).thenReturn("someId");
 
-        Mockito.when(FakeDockerProvider.instance.startContainer(Matchers.any(ContainerStartConfiguration.class)))
+        when(FakeDockerProvider.instance.startContainer(Matchers.any(ContainerStartConfiguration.class)))
                 .thenReturn(inspectionResult);
         DockerProviderSupplier.registerProvider(FAKE_PROVIDER_KEY, FakeDockerProvider.class);
 
@@ -199,6 +201,84 @@ public class StartContainerMojoTest {
         mojo.execute();
 
         assert !mojo.getPluginErrors().isEmpty();
+
+    }
+
+    @Test
+    public void testThatMojoAsksForLogsAndDoesNotLogAnErrorWhenLogsIndicateServerStarted() throws Exception {
+
+        ContainerStartConfiguration container = new ContainerStartConfiguration()
+                .fromImage("some-image")
+                .waitForStartup("hello world!")
+                .withId("some-container")
+                .withStartupTimeout(1);
+
+        when(FakeDockerProvider.instance.getLogs("someId")).thenReturn("Oh hello world!");
+
+        StartContainerMojo mojo = createMojo(container);
+
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance, atLeastOnce()).getLogs("someId");
+        assert mojo.getPluginErrors().isEmpty();
+
+    }
+
+    @Test
+    public void testThatMojoAddsErrorWhenContainerDoesNotFinishStartupInTime() throws Exception {
+
+        ContainerStartConfiguration container = new ContainerStartConfiguration()
+                .fromImage("some-image")
+                .waitForStartup("hello world!")
+                .withId("some-container")
+                .withStartupTimeout(1);
+
+        when(FakeDockerProvider.instance.getLogs("someId")).thenReturn("Oh dear, something went wrong!");
+
+        StartContainerMojo mojo = createMojo(container);
+
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance, atLeastOnce()).getLogs("someId");
+        assert !mojo.getPluginErrors().isEmpty();
+
+    }
+
+    @Test
+    public void testThatMojoWaitsLongEnoughForTheStartupToFinish() throws Exception {
+
+        ContainerStartConfiguration container = new ContainerStartConfiguration()
+                .fromImage("some-image")
+                .waitForStartup("hello world!")
+                .withId("some-container")
+                .withStartupTimeout(2);
+
+        final ThreadLocal<Long> startTime = new ThreadLocal<>();
+
+        when(FakeDockerProvider.instance.startContainer(container)).then(new Answer<ContainerInspectionResult>() {
+            @Override
+            public ContainerInspectionResult answer(final InvocationOnMock invocation) throws Throwable {
+                startTime.set(System.currentTimeMillis());
+                ContainerInspectionResult inspectionResult = mock(ContainerInspectionResult.class);
+                when(inspectionResult.getId()).thenReturn("someId");
+                return inspectionResult;
+            }
+        });
+
+        when(FakeDockerProvider.instance.getLogs("someId")).then(new Answer<Object>() {
+            @Override
+            public Object answer(final InvocationOnMock invocation) throws Throwable {
+                boolean logsAvailable = startTime.get() != null && startTime.get() + 1000 <= System.currentTimeMillis();
+                return logsAvailable ? "Well... hello world!" : null;
+            }
+        });
+
+        StartContainerMojo mojo = createMojo(container);
+
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance, atLeastOnce()).getLogs("someId");
+        assert mojo.getPluginErrors().isEmpty();
 
     }
 
