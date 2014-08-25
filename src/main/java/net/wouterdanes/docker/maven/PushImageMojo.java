@@ -37,15 +37,25 @@ public class PushImageMojo extends AbstractDockerMojo {
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
+        ensureThatAllPushableImagesHaveAName();
         for (PushableImage image : getImagesToPush()) {
             getLog().info(String.format("Pushing image '%s' with tag '%s'",
                     image.getImageId(), image.getNameAndTag().or("<Unspecified>")));
             try {
-                getDockerProvider().pushImage(image.getImageId(), image.getNameAndTag());
+                getDockerProvider().pushImage(image.getNameAndTag().get());
             } catch (DockerException e) {
                 String message = String.format("Cannot push image '%s' with tag '%s'",
                         image.getImageId(), image.getNameAndTag().or("<Unspecified>"));
                 handleDockerException(message, e);
+            }
+        }
+    }
+
+    private void ensureThatAllPushableImagesHaveAName() throws MojoFailureException {
+        for (PushableImage image : getImagesToPush()) {
+            if (!image.getNameAndTag().isPresent()) {
+                throw new MojoFailureException(String.format("Image '%s' needs to be pushed but doesn't have a name.",
+                        image.getImageId()));
             }
         }
     }

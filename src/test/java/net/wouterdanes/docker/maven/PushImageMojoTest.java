@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import com.google.common.base.Optional;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,15 +59,12 @@ public class PushImageMojoTest {
 
     }
 
-    @Test
-    public void testThatImagesThatAreMarkedForPushingArePushed() throws Exception {
+    @Test(expected = MojoFailureException.class)
+    public void testThatImagesThatHaveNoNameCauseAnError() throws Exception {
 
         mojo.enqueueForPushing("some-image-id", Optional.<String>absent());
         mojo.enqueueForPushing("another-image-id", new ImageBuildConfiguration());
         mojo.execute();
-
-        verify(FakeDockerProvider.instance).pushImage("some-image-id", Optional.<String>absent());
-        verify(FakeDockerProvider.instance).pushImage("another-image-id", Optional.<String>absent());
 
     }
 
@@ -75,8 +73,7 @@ public class PushImageMojoTest {
 
         mojo.execute();
 
-        verify(FakeDockerProvider.instance, never())
-                .pushImage(Matchers.<String>any(), Matchers.<Optional<String>>any());
+        verify(FakeDockerProvider.instance, never()).pushImage(Matchers.<String>any());
 
     }
 

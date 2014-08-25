@@ -61,11 +61,9 @@ public class ImagesService extends BaseService {
                 .post(null, String.class);
     }
 
-    public String pushImage(final String imageId, final Optional<String> nameAndTag) {
+    public String pushImage(String nameAndTag) {
         try {
-            WebTarget target = nameAndTag.isPresent() ?
-                    createPushRequestFromTag(nameAndTag.get()) :
-                    createPushRequestFromId(imageId);
+            WebTarget target = createPushRequestFromTag(nameAndTag);
 
             return target.request()
                     .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
@@ -73,7 +71,7 @@ public class ImagesService extends BaseService {
                     .post(null, String.class);
 
         } catch (WebApplicationException e) {
-            throw makeImageTargetingException(imageId, e);
+            throw makeImageTargetingException(nameAndTag, e);
 
         }
     }
@@ -89,10 +87,6 @@ public class ImagesService extends BaseService {
         }
 
         return target;
-    }
-
-    private WebTarget createPushRequestFromId(final String imageId) {
-        return getServiceEndPoint().path(imageId).path("push");
     }
 
     public void tagImage(final String imageId, final String nameAndTag) {

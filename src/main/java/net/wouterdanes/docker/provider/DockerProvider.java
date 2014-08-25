@@ -19,8 +19,6 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
-
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -85,10 +83,9 @@ public interface DockerProvider {
 
     /**
      * Pushes an image from docker to a registry.
-     * @param imageId the Id of the image to push
      * @param nameAndTag optional name and tag to be associated with pushed image
      */
-    void pushImage(String imageId, Optional<String> nameAndTag);
+    void pushImage(String nameAndTag);
 
     /**
      * Associates an image with a new repo/tag.
