@@ -78,8 +78,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <docker.host />
-    <docker.port />
+    <docker.host/>
+    <docker.port/>
   </properties>
 
   <dependencies>
@@ -117,7 +117,7 @@
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>2.7</version>
+      <version>2.11</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
@@ -141,6 +141,12 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <version>1.9.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-json-jackson</artifactId>
+      <version>2.11</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -206,6 +212,33 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>net.wouterdanes.docker</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>2.0</version>
+            <executions>
+              <execution>
+                <id>start-containers</id>
+                <goals>
+                  <goal>start-containers</goal>
+                </goals>
+                <configuration>
+                  <containers>
+                    <container>
+                      <id>registry</id>
+                      <image>registry:0.8.0</image>
+                    </container>
+                  </containers>
+                </configuration>
+              </execution>
+              <execution>
+                <id>stop-containers</id>
+                <goals>
+                  <goal>stop-containers</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
             <version>1.8</version>
@@ -228,12 +261,43 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <ignoreFailures>true</ignoreFailures>
                   <properties>
                     <docker.host>${docker.host}</docker.host>
                     <docker.port>${docker.port}</docker.port>
                     <docker.provider>${docker.provider}</docker.provider>
+                    <docker.registry>${docker.containers.registry.ports.5000/tcp.host}:${docker.containers.registry.ports.5000/tcp.port}</docker.registry>
                   </properties>
                 </configuration>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.17</version>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>integration-test</goal>
+                </goals>
+                <configuration>
+                  <systemProperties>
+                    <docker.registry>http://${docker.containers.registry.ports.5000/tcp.host}:${docker.containers.registry.ports.5000/tcp.port}</docker.registry>
+                  </systemProperties>
+                </configuration>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>
