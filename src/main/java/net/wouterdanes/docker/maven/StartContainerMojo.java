@@ -105,7 +105,11 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
                 });
         for (ContainerStartConfiguration container : waiters) {
             Pattern pattern = Pattern.compile(container.getWaitForStartup());
-            StartedContainerInfo containerInfo = getInfoForContainerStartId(container.getId()).get();
+            Optional<StartedContainerInfo> startedContainerInfo = getInfoForContainerStartId(container.getId());
+            if (!startedContainerInfo.isPresent()) {
+                continue;
+            }
+            StartedContainerInfo containerInfo = startedContainerInfo.get();
             String containerId = containerInfo.getContainerInfo().getId();
             long maxWait = System.currentTimeMillis() + 1000 * container.getStartupTimeout();
             boolean finished = false;
