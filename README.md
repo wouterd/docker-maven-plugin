@@ -370,9 +370,7 @@ The latter won't require java 8.
 * Multiple "docker providers" need to be supported and pluggable
 
 # Future functionality
-- [ ] Linking containers
 - [ ] Commit containers instead of cleaning them up when the integration tests have failed
-- [ ] Create some kind of "wait for stuff to initialize" step: for example, Tomcat starting up.
 - [ ] Add support for linux sockets for "local docker" provider
 - [ ] Add support for Tutum.co
 - [ ] Create a feature complete docker remote api for Java
