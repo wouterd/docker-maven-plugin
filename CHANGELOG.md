@@ -1,3 +1,9 @@
+# version 2.1
+- Fixed a bug in `start-container` goal that crashed the plugin if a container had `waitForStartup` set, but failed to
+    start
+- `push-images` goal no longer allows you to try to push an image without a name.
+- DEV: the build now starts a docker registry in docker so you can integration test against a registry too. 
+
 # version 2.0
 - The plugin now targets v1.12 of the Docker remote API, which shipped with version 1.0 of Docker. So from this version
  on, you will need at least version 1.0 of the docker daemon.

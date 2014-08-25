@@ -55,13 +55,6 @@
         <groupId>@project.groupId@</groupId>
         <artifactId>@project.artifactId@</artifactId>
         <version>@project.version@</version>
-        <configuration>
-          <!-- Currently skipped owing to requirements for build environment to define sensitive property values e.g. docker.password -->
-          <skip>true</skip>
-          <userName>@docker.userName@</userName>
-          <email>@docker.email@</email>
-          <password>@docker.password@</password>
-        </configuration>
         <executions>
           <execution>
             <id>build</id>
@@ -75,17 +68,17 @@
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
-                  <nameAndTag>@docker.userName@/drek:latest</nameAndTag>
+                  <nameAndTag>drek:latest</nameAndTag>
                   <keep>true</keep>
                   <push>true</push>
-                  <registry>@docker.registry@</registry>
+                  <registry>${docker.registry}</registry>
                 </image>
                 <image>
                   <id>nginxier</id>
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
-                  <nameAndTag>@docker.registry@/@docker.userName@/nginxier:latest</nameAndTag>
+                  <nameAndTag>${docker.registry}/nginxier:latest</nameAndTag>
                   <keep>true</keep>
                   <push>true</push>
                 </image>
@@ -96,14 +89,6 @@
             <id>start</id>
             <configuration>
               <containers>
-                <container>
-                  <id>Debian</id>
-                  <image>debian:wheezy</image>
-                </container>
-                <container>
-                  <id>BusyBox</id>
-                  <image>busybox</image>
-                </container>
                 <container>
                   <id>cache</id>
                   <image>nginx</image>

@@ -21,14 +21,6 @@
         <groupId>@project.groupId@</groupId>
         <artifactId>@project.artifactId@</artifactId>
         <version>@project.version@</version>
-        <configuration>
-          <!-- Currently skipped owing to requirements for build environment to
-            define sensitive property values e.g. docker.password -->
-          <skip>true</skip>
-          <userName>@docker.userName@</userName>
-          <email>@docker.email@</email>
-          <password>@docker.password@</password>
-        </configuration>
         <executions>
           <execution>
             <id>build</id>
@@ -42,10 +34,10 @@
                   <files>
                     <file>${project.basedir}/src/test/resources/Dockerfile</file>
                   </files>
-                  <nameAndTag>@docker.userName@/dross:snapshot</nameAndTag>
+                  <nameAndTag>dross:snapshot</nameAndTag>
                   <keep>true</keep>
                   <push>true</push>
-                  <registry>@docker.registry@</registry>
+                  <registry>${docker.registry}</registry>
                 </image>
               </images>
             </configuration>
@@ -60,8 +52,8 @@
                 <image>
                   <id>nginx</id>
                   <tags>
-                    <tag>@docker.userName@/dross:release</tag>
-                    <tag>@docker.userName@/dross:4.1</tag>
+                    <tag>dross:release</tag>
+                    <tag>dross:4.1</tag>
                   </tags>
                   <push>true</push>
                 </image>
