@@ -3,7 +3,7 @@ docker-maven-plugin
 
 [![Build Status](https://travis-ci.org/wouterd/docker-maven-plugin.svg?branch=master)](https://travis-ci.org/wouterd/docker-maven-plugin)
 
-A maven plugin to manage docker containers and images for integration tests.
+A maven plugin to create, test and publish docker containers and images for maven projects. Can also be used to integration test your application using docker containers.
 
 # About this document
 As the documentation evolves with different plugin versions, be sure that before you read on that:
