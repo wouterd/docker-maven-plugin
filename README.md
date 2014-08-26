@@ -327,11 +327,6 @@ Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-onl
 also exposes port 4243 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
 interface. Else, the published ports won't be mapped to the right IP.
 
-# Docker version
-The docker remote API implementation is based on the 1.10 docker api version. The plugin should work with docker 1.10 and
-up. It could also work with lower versions of docker, but it won't, because I specifically target the 1.10 API to prevent
-strange errors from occurring.
-
 # Docker providers
 Currently the plugin supports two types of docker "providers", which both connect to docker via the remote API
 (HTTP REST), unix sockets are not yet supported:
