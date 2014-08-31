@@ -31,6 +31,8 @@ import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 @SuppressWarnings("unused")
 public class ContainerStartConfiguration {
 
+    public static final int DEFAULT_STARTUP_TIMEOUT = 5 * 60;
+
     private String image;
     private String id;
     private List<ContainerLink> links;
@@ -100,6 +102,6 @@ public class ContainerStartConfiguration {
     }
 
     public int getStartupTimeout() {
-        return startupTimeout != 0 ? startupTimeout : 30;
+        return startupTimeout != 0 ? startupTimeout : DEFAULT_STARTUP_TIMEOUT;
     }
 }
