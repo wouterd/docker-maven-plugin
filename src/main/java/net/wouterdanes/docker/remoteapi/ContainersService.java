@@ -35,8 +35,8 @@ import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
 
 /**
  * This class is responsible for talking to the Docker Remote API "containers" endpoint.<br> See <a
- * href="http://docs.docker.io/reference/api/docker_remote_api_v1.10/#21-containers">
- * http://docs.docker.io/reference/api/docker_remote_api_v1.10/#21-containers</a>
+ * href="http://docs.docker.io/reference/api/docker_remote_api_v1.12/#21-containers">
+ * http://docs.docker.io/reference/api/docker_remote_api_v1.12/#21-containers</a>
  */
 public class ContainersService extends BaseService {
 
