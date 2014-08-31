@@ -172,6 +172,7 @@
                                 <container>
                                     <id>mongo</id>
                                     <image>mongo:2.6</image>
+                                    <waitForStartup>waiting for connections on port 27017</waitForStartup>
                                 </container>
                                 <container>
                                     <id>app</id>
