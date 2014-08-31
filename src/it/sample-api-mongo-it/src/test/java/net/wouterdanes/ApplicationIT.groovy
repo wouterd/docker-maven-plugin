@@ -31,7 +31,7 @@ class ApplicationIT extends Specification {
 
   def "Posts can be added"() {
 
-    given:
+    when:
     def message = new JsonBuilder([
       body: 'TEST BODY'
     ])
@@ -39,8 +39,8 @@ class ApplicationIT extends Specification {
             .request().buildPost(entity(message.toString(), MediaType.APPLICATION_JSON_TYPE))
             .invoke()
 
-    expect:
-    assert response.status == 201
+    then:
+    response.status == 201
 
     cleanup:
     response.close()
@@ -49,11 +49,11 @@ class ApplicationIT extends Specification {
 
   def "Posts can be looked up"() {
 
-    given:
+    when:
     def response = app1.path('posts').request(MediaType.APPLICATION_JSON_TYPE).get()
 
-    expect:
-    assert response.status == 404 || response.status == 200
+    then:
+    response.status == 404 || response.status == 200
 
     cleanup:
     response.close()
@@ -62,7 +62,7 @@ class ApplicationIT extends Specification {
 
   def "The last post posted is the first post returned from another node"() {
 
-    given:
+    when:
     def messageBody = UUID.randomUUID().toString()
 
     def message = new JsonBuilder([
@@ -78,7 +78,7 @@ class ApplicationIT extends Specification {
 
     def json = new JsonSlurper().parseText(result)
 
-    expect:
+    then:
     json[0].message.body == messageBody
 
   }
