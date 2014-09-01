@@ -123,6 +123,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     protected DockerProvider getDockerProvider() {
         DockerProvider provider = new DockerProviderSupplier(providerName).get();
         provider.setCredentials(getCredentials());
+        provider.setLogger(getLog());
         return provider;
     }
 

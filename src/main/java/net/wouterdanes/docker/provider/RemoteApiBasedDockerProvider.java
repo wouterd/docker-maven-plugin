@@ -35,6 +35,7 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.maven.plugin.logging.Log;
 
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -63,6 +64,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     private final Set<BaseService> services;
 
+    private Log log;
+
     public static final int DEFAULT_DOCKER_PORT = 4243;
     public static final String DEFAULT_DOCKER_HOST = "127.0.0.1";
     public static final String DOCKER_HOST_SYSTEM_ENV = "DOCKER_HOST";
@@ -70,7 +73,6 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     public static final String DOCKER_PORT_PROPERTY = "docker.port";
 
     public static final String TCP_PROTOCOL = "tcp";
-
 
     public RemoteApiBasedDockerProvider() {
         this(getDockerHostFromEnvironment(), getDockerPortFromEnvironment());
@@ -127,6 +129,11 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         return containersService.getLogs(containerId);
     }
 
+    @Override
+    public void setLogger(final Log logger) {
+        this.log = logger;
+    }
+
     protected RemoteApiBasedDockerProvider(final String host, final int port) {
         this.host = host;
         this.port = port;
@@ -148,6 +155,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         try {
             containerId = containersService.createContainer(createRequest);
         } catch (ImageNotFoundException e) {
+            log.info(String.format("Pulling image %s...", imageId));
             imagesService.pullImage(imageId);
             containerId = containersService.createContainer(createRequest);
         }
@@ -209,5 +217,4 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
                 .or(DockerHostFromEnvironmentSupplier.INSTANCE.get())
                 .or(DEFAULT_DOCKER_HOST);
     }
-
 }

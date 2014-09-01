@@ -2,6 +2,8 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
+import org.apache.maven.plugin.logging.Log;
+
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -26,50 +28,64 @@ public class DockerExceptionThrowingDockerProvider implements DockerProvider {
 
     @Override
     public void setCredentials(final Credentials credentials) {
+        // NOOP
     }
 
     @Override
     public ContainerInspectionResult startContainer(final ContainerStartConfiguration configuration) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
+        return null;
     }
 
     @Override
     public void stopContainer(final String containerId) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
     }
 
     @Override
     public void deleteContainer(final String containerId) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
     }
 
     @Override
     public List<ExposedPort> getExposedPorts(final String containerId) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
+        return null;
     }
 
     @Override
     public String buildImage(final ImageBuildConfiguration image) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
+        return null;
     }
 
     @Override
     public void removeImage(final String imageId) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
     }
 
     @Override
     public void pushImage(final String nameAndTag) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
     }
 
     @Override
     public void tagImage(final String imageId, final String nameAndTag) {
-        throw new DockerException("Bad stuff");
+        throwBadException();
     }
 
     @Override
     public String getLogs(final String containerId) {
+        throwBadException();
+        return null;
+    }
+
+    @Override
+    public void setLogger(final Log logger) {
+        // NOOP
+    }
+
+    private static void throwBadException() {
         throw new DockerException("Bad stuff");
     }
 }

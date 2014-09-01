@@ -19,6 +19,8 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
+import org.apache.maven.plugin.logging.Log;
+
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -100,4 +102,10 @@ public interface DockerProvider {
      * @return the container's logs
      */
     String getLogs(String containerId);
+
+    /**
+     * Sets the logger to use.
+     * @param logger the Maven logger to use
+     */
+    void setLogger(Log logger);
 }

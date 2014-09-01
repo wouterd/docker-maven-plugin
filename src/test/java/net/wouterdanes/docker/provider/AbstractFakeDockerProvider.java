@@ -2,6 +2,8 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
+import org.apache.maven.plugin.logging.Log;
+
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -70,5 +72,10 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     @Override
     public String getLogs(final String containerId) {
         return proxy.getLogs(containerId);
+    }
+
+    @Override
+    public void setLogger(final Log logger) {
+        proxy.setLogger(logger);
     }
 }
