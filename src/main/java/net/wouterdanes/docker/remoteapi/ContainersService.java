@@ -86,15 +86,15 @@ public class ContainersService extends BaseService {
     }
 
     public void deleteContainer(String id) {
-//        Response response = getServiceEndPoint()
-//                .path(id)
-//                .request()
-//                .delete();
-//
-//        Response.StatusType statusInfo = response.getStatusInfo();
-//        response.close();
-//
-//        checkContainerTargetingResponse(id, statusInfo);
+        Response response = getServiceEndPoint()
+                .path(id)
+                .request()
+                .delete();
+
+        Response.StatusType statusInfo = response.getStatusInfo();
+        response.close();
+
+        checkContainerTargetingResponse(id, statusInfo);
     }
 
     private static void checkContainerTargetingResponse(final String id, final Response.StatusType statusInfo) {
