@@ -19,7 +19,9 @@ package net.wouterdanes.docker.provider.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 
@@ -36,7 +38,8 @@ public class ContainerStartConfiguration {
     private String image;
     private String id;
     private List<ContainerLink> links;
-
+    private Map<String, String> env;
+    
     /**
      * Regular expression to look for that indicates the container has started up
      */
@@ -85,6 +88,11 @@ public class ContainerStartConfiguration {
         return this;
     }
 
+    public ContainerStartConfiguration withEnv(Map<String, String> env) {
+    	this.env = env;
+    	return this;
+    }
+    
     public String getImage() {
         return image;
     }
@@ -97,6 +105,10 @@ public class ContainerStartConfiguration {
         return links != null ? Collections.unmodifiableList(links) : Collections.<ContainerLink>emptyList();
     }
 
+    public Map<String, String> getEnv() {
+    	return env != null ? Collections.unmodifiableMap(env) : new HashMap<String, String>();
+    }
+    
     public String getWaitForStartup() {
         return waitForStartup;
     }

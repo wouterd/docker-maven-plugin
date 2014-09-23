@@ -20,6 +20,7 @@ package net.wouterdanes.docker.maven;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -280,6 +282,26 @@ public class StartContainerMojoTest {
         verify(FakeDockerProvider.instance, atLeastOnce()).getLogs("someId");
         assert mojo.getPluginErrors().isEmpty();
 
+    }
+
+    @Test
+    public void testThatMojoStartsAContainerOnTheProviderWithEnvironmentVariables() throws Exception {
+    	Map<String, String> env = new HashMap<String, String>();
+    	env.put("TEST_KEY", "test value");
+    	
+        ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()
+        	.withEnv(env);
+        StartContainerMojo mojo = createMojo(startConfiguration);
+
+        mojo.execute();
+        
+        ArgumentCaptor<ContainerStartConfiguration> captor = ArgumentCaptor.forClass(ContainerStartConfiguration.class);
+        verify(FakeDockerProvider.instance).startContainer(captor.capture());
+
+        assert mojo.getPluginErrors().isEmpty();
+        ContainerStartConfiguration passedValue = captor.getValue();
+        assertNotNull(passedValue.getEnv());
+        assertEquals("test value", passedValue.getEnv().get("TEST_KEY"));
     }
 
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {

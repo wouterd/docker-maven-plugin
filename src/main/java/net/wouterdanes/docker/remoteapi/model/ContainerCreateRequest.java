@@ -20,6 +20,7 @@ package net.wouterdanes.docker.remoteapi.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -40,7 +41,9 @@ public class ContainerCreateRequest {
     private List<String> cmd;
     @JsonProperty("Image")
     private String image;
-
+    @JsonProperty("Env")
+    private List<String> env;
+    
     public String getHostname() {
         return hostname;
     }
@@ -61,6 +64,16 @@ public class ContainerCreateRequest {
         return image;
     }
 
+    public ContainerCreateRequest withEnv(Map<String, String> env) {
+    	if (env != null && env.size() > 0) {
+	    	this.env = new ArrayList<String>();
+	    	for (Map.Entry<String, String> entry : env.entrySet()) {
+	    		this.env.add(String.format("%s=%s", entry.getKey(), entry.getValue()));
+	    	}
+    	}
+    	return this;
+    }
+    
     public ContainerCreateRequest withHostname(String hostname) {
         this.hostname = hostname;
         return this;

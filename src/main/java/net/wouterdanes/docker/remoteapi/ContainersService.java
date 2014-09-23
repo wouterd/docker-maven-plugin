@@ -60,7 +60,7 @@ public class ContainersService extends BaseService {
     }
 
     public void startContainer(String id, ContainerStartRequest configuration) {
-        Response response = getServiceEndPoint()
+          Response response = getServiceEndPoint()
                 .path(id)
                 .path("/start")
                 .request()

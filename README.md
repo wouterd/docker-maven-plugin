@@ -151,6 +151,18 @@ the host/port of docker in the following way:
 - Else it will try to parse the DOCKER_HOST system environment variable
 - Finally it will default to 127.0.0.1:4243
 
+## Environment Variables
+
+Environment variables can be passed to containers using the following configuration syntax:
+
+            <container>
+                <id>app</id>
+                <image>app</image>
+                <env>
+                    <VARIABLE_NAME>variable value<VARIABLE_NAME>
+                <env>
+            </container>
+
 ## Linking containers
 
 Containers can be linked, similar to the `--link name:alias` parameter of the `docker run` command.
