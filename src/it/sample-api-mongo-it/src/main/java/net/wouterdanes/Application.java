@@ -1,24 +1,17 @@
 package net.wouterdanes;
 
-import java.util.Date;
-import java.util.stream.StreamSupport;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import com.mongodb.util.JSON;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ratpack.guice.Guice;
 import ratpack.handling.ChainAction;
 import ratpack.handling.Handler;
 import ratpack.launch.HandlerFactory;
 import ratpack.launch.LaunchConfig;
+
+import java.util.Date;
+import java.util.stream.StreamSupport;
 
 /**
  * Main entrypoint for this application
@@ -26,6 +19,7 @@ import ratpack.launch.LaunchConfig;
 public class Application implements HandlerFactory {
 
   private static final Logger log = LoggerFactory.getLogger(Application.class);
+  private static final String ENV_APP_MESSAGE = "APP_MESSAGE";
 
   @Override
   public Handler create(final LaunchConfig launchConfig) throws Exception {
@@ -43,6 +37,8 @@ public class Application implements HandlerFactory {
 
     @Override
     protected void execute() throws Exception {
+
+      get("message", ctx -> ctx.render(System.getenv(ENV_APP_MESSAGE)));
 
       prefix("posts", (Handler) ctx -> ctx.byMethod(posts -> {
             posts.post(context -> {

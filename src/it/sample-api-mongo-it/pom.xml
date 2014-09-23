@@ -183,6 +183,9 @@
                                             <containerAlias>mongo</containerAlias>
                                         </link>
                                     </links>
+                                    <env>
+                                        <APP_MESSAGE>Hello, world!</APP_MESSAGE>
+                                    </env>
                                     <waitForStartup>Ratpack started for</waitForStartup>
                                 </container>
                                 <container>
@@ -194,6 +197,9 @@
                                             <containerAlias>mongo</containerAlias>
                                         </link>
                                     </links>
+                                    <env>
+                                        <APP_MESSAGE>I am, so I message</APP_MESSAGE>
+                                    </env>
                                     <waitForStartup>Ratpack started for</waitForStartup>
                                 </container>
                             </containers>

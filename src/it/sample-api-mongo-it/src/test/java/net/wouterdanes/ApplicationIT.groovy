@@ -33,11 +33,11 @@ class ApplicationIT extends Specification {
 
     when:
     def message = new JsonBuilder([
-      body: 'TEST BODY'
+        body: 'TEST BODY'
     ])
     def response = app1.path('posts')
-            .request().buildPost(entity(message.toString(), MediaType.APPLICATION_JSON_TYPE))
-            .invoke()
+        .request().buildPost(entity(message.toString(), MediaType.APPLICATION_JSON_TYPE))
+        .invoke()
 
     then:
     response.status == 201
@@ -66,7 +66,7 @@ class ApplicationIT extends Specification {
     def messageBody = UUID.randomUUID().toString()
 
     def message = new JsonBuilder([
-      body: messageBody
+        body: messageBody
     ]).toString()
 
     def payload = entity(message, MediaType.APPLICATION_JSON_TYPE)
@@ -80,6 +80,18 @@ class ApplicationIT extends Specification {
 
     then:
     json[0].message.body == messageBody
+
+  }
+
+  def "The message service returns the APP_MESSAGE enviroment variable"() {
+
+    when:
+    def app1Response = app1.path('message').request().get(String)
+    def app2Response = app2.path('message').request().get(String)
+
+    then:
+    app1Response == 'Hello, world!'
+    app2Response == 'I am, so I message'
 
   }
 }
