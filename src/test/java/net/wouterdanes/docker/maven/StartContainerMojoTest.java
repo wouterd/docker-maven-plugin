@@ -48,6 +48,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -281,6 +282,40 @@ public class StartContainerMojoTest {
 
         verify(FakeDockerProvider.instance, atLeastOnce()).getLogs("someId");
         assert mojo.getPluginErrors().isEmpty();
+
+    }
+
+    @Test
+    public void testThatContainerWaitsForLinkedContainerToStart() throws Exception {
+
+        ContainerStartConfiguration linked = new ContainerStartConfiguration()
+                .withId("linked")
+                .waitForStartup("there");
+
+        final ContainerStartConfiguration parent = new ContainerStartConfiguration()
+                .withId("parent")
+                .withLink(new ContainerLink()
+                                .toContainer("linked")
+                                .withAlias("database")
+                );
+
+        when(FakeDockerProvider.instance.getLogs("linked")).thenReturn("", "", "there");
+
+        ContainerInspectionResult linkedContainerInspectionResult = mock(ContainerInspectionResult.class);
+        when(linkedContainerInspectionResult.getId()).thenReturn("linked");
+        when(FakeDockerProvider.instance.startContainer(linked)).thenReturn(linkedContainerInspectionResult);
+
+        when(FakeDockerProvider.instance.startContainer(parent)).then(new Answer<Object>() {
+            @Override
+            public Object answer(final InvocationOnMock invocation) throws Throwable {
+                verify(FakeDockerProvider.instance, times(3)).getLogs("linked");
+                return new ContainerInspectionResult();
+            }
+        });
+
+        StartContainerMojo mojo = createMojo(Arrays.asList(linked, parent), FAKE_PROVIDER_KEY);
+
+        mojo.execute();
 
     }
 

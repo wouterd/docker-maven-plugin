@@ -76,6 +76,13 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
         }
         DockerProvider provider = getDockerProvider();
         for (ContainerStartConfiguration configuration : containers) {
+            for (ContainerLink link : configuration.getLinks()) {
+                String linkedContainerId = link.getContainerId();
+                ContainerStartConfiguration startConfiguration = getContainerStartConfiguration(linkedContainerId);
+                if (startConfiguration.getWaitForStartup() != null) {
+                    waitForContainerToFinishStartup(startConfiguration);
+                }
+            }
             replaceImageWithBuiltImageIdIfInternalId(configuration);
             replaceLinkedContainerIdsWithStartedNames(configuration);
             try {
@@ -95,6 +102,15 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
         waitForContainersToFinishStartup();
     }
 
+    private ContainerStartConfiguration getContainerStartConfiguration(String id) {
+        for (ContainerStartConfiguration configuration : containers) {
+            if (configuration.getId().equals(id)) {
+                return configuration;
+            }
+        }
+        throw new IllegalArgumentException(String.format("No container with ID '%s'", id));
+    }
+
     private void waitForContainersToFinishStartup() {
         Collection<ContainerStartConfiguration> waiters =
                 Collections2.filter(containers, new Predicate<ContainerStartConfiguration>() {
@@ -104,35 +120,39 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
                     }
                 });
         for (ContainerStartConfiguration container : waiters) {
-            Pattern pattern = Pattern.compile(container.getWaitForStartup());
-            Optional<StartedContainerInfo> startedContainerInfo = getInfoForContainerStartId(container.getId());
-            if (!startedContainerInfo.isPresent()) {
-                continue;
+            waitForContainerToFinishStartup(container);
+        }
+    }
+
+    private void waitForContainerToFinishStartup(final ContainerStartConfiguration container) {
+        Pattern pattern = Pattern.compile(container.getWaitForStartup());
+        Optional<StartedContainerInfo> startedContainerInfo = getInfoForContainerStartId(container.getId());
+        if (!startedContainerInfo.isPresent()) {
+            return;
+        }
+        StartedContainerInfo containerInfo = startedContainerInfo.get();
+        String containerId = containerInfo.getContainerInfo().getId();
+        long maxWait = System.currentTimeMillis() + 1000 * container.getStartupTimeout();
+        boolean finished = false;
+        while (System.currentTimeMillis() <= maxWait) {
+            String logs = getDockerProvider().getLogs(containerId);
+            if (logs != null && pattern.matcher(logs).find()) {
+                getLog().info(String.format("Container '%s' has completed startup", container.getId()));
+                finished = true;
+                break;
             }
-            StartedContainerInfo containerInfo = startedContainerInfo.get();
-            String containerId = containerInfo.getContainerInfo().getId();
-            long maxWait = System.currentTimeMillis() + 1000 * container.getStartupTimeout();
-            boolean finished = false;
-            while (System.currentTimeMillis() <= maxWait) {
-                String logs = getDockerProvider().getLogs(containerId);
-                if (logs != null && pattern.matcher(logs).find()) {
-                    getLog().info(String.format("Container '%s' has completed startup", container.getId()));
-                    finished = true;
-                    break;
-                }
-                try {
-                    getLog().info(String.format("Waiting for container '%s' to finish startup (max %s sec.)",
-                            container.getId(), container.getStartupTimeout()));
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored) {
-                    break;
-                }
+            try {
+                getLog().info(String.format("Waiting for container '%s' to finish startup (max %s sec.)",
+                        container.getId(), container.getStartupTimeout()));
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+                break;
             }
-            if (!finished) {
-                String message = String.format("Container %s did not finish startup in time", container.getId());
-                registerPluginError(new DockerPluginError(getMojoGoalName(), message));
-                getLog().error(message);
-            }
+        }
+        if (!finished) {
+            String message = String.format("Container %s did not finish startup in time", container.getId());
+            registerPluginError(new DockerPluginError(getMojoGoalName(), message));
+            getLog().error(message);
         }
     }
 
