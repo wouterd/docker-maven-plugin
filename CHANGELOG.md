@@ -4,6 +4,7 @@
 - `push-images` goal no longer allows you to try to push an image without a name.
 - DEV: the build now starts a docker registry in docker so you can integration test against a registry too.
 - A container now waits with starting up before linked containers have finished starting up.
+- Environment variables can now be specified for a starting container (thanks Scott Stevelinck!)
 
 # version 2.0
 - The plugin now targets v1.12 of the Docker remote API, which shipped with version 1.0 of Docker. So from this version
