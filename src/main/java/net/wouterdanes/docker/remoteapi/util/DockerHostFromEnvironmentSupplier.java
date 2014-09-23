@@ -14,7 +14,7 @@ import net.wouterdanes.docker.provider.RemoteDockerProvider;
 public final class DockerHostFromEnvironmentSupplier extends DockerEnvironmentSupplier
         implements Supplier<Optional<String>> {
 
-    public static DockerHostFromEnvironmentSupplier INSTANCE = new DockerHostFromEnvironmentSupplier();
+    public static final DockerHostFromEnvironmentSupplier INSTANCE = new DockerHostFromEnvironmentSupplier();
 
     private DockerHostFromEnvironmentSupplier() {    }
 

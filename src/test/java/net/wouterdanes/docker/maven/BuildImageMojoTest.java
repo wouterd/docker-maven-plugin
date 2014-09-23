@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import com.google.common.base.Optional;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.After;
@@ -116,7 +114,7 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         assertTrue(mojo.getPluginErrors().isEmpty());
-        assertImageEnqueuedForPush(IMAGEID, NAMEANDTAG);
+        assertImageEnqueuedForPush(NAMEANDTAG);
     }
 
     @Test
@@ -127,7 +125,7 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         assertTrue(mojo.getPluginErrors().isEmpty());
-        assertImageEnqueuedForPush(IMAGEID, REGISTRYANDNAMEANDTAG);
+        assertImageEnqueuedForPush(REGISTRYANDNAMEANDTAG);
     }
 
     @Test
@@ -138,7 +136,7 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         assertTrue(mojo.getPluginErrors().isEmpty());
-        assertImageEnqueuedForPush(IMAGEID, null);
+        assertImageEnqueuedForPush(null);
     }
 
     @Test(expected = MojoExecutionException.class)
@@ -150,7 +148,7 @@ public class BuildImageMojoTest {
         mojo.setImages(images);
 
         mojo.execute();
-        assertImageEnqueuedForPush(IMAGEID, null);
+        assertImageEnqueuedForPush(null);
     }
 
     private void executeMojo(String provider) throws MojoExecutionException, MojoFailureException {
@@ -162,13 +160,13 @@ public class BuildImageMojoTest {
         assertTrue(mojo.getImagesToPush().isEmpty());
     }
 
-    private void assertImageEnqueuedForPush(String expectedImageId, String expectedNameAndTag) {
+    private void assertImageEnqueuedForPush(String expectedNameAndTag) {
         Mockito.when(mockImage.isValid()).thenReturn(false);
 
         assertEquals(1, mojo.getImagesToPush().size());
 
         PushableImage actual = mojo.getImagesToPush().get(0);
-        assertEquals(expectedImageId, actual.getImageId());
+        assertEquals(BuildImageMojoTest.IMAGEID, actual.getImageId());
         assertEquals(expectedNameAndTag, actual.getNameAndTag().orNull());
     }
 

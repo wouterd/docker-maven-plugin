@@ -40,11 +40,12 @@ import net.wouterdanes.docker.remoteapi.model.Credentials;
  */
 public abstract class BaseService {
 
-    public static final String TARGET_DOCKER_API_VERSION = "v1.12";
     public static final String REGISTRY_AUTH_HEADER = "X-Registry-Auth";
 
     // required for "push" even if no credentials required
     private static final String REGISTRY_AUTH_NULL_VALUE = "null";
+
+    private static final String TARGET_DOCKER_API_VERSION = "v1.12";
 
     private final ObjectMapper objectMapper;
     private final WebTarget serviceEndPoint;

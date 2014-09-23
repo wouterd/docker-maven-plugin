@@ -19,6 +19,7 @@ package net.wouterdanes.docker.remoteapi.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -64,9 +65,13 @@ public class ContainerCreateRequest {
         return image;
     }
 
+    public List<String> getEnv() {
+        return env != null ? Collections.unmodifiableList(env) : Collections.<String>emptyList();
+    }
+
     public ContainerCreateRequest withEnv(Map<String, String> env) {
     	if (env != null && env.size() > 0) {
-	    	this.env = new ArrayList<String>();
+	    	this.env = new ArrayList<>();
 	    	for (Map.Entry<String, String> entry : env.entrySet()) {
 	    		this.env.add(String.format("%s=%s", entry.getKey(), entry.getValue()));
 	    	}

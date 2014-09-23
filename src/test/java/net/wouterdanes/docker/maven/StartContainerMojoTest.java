@@ -321,7 +321,7 @@ public class StartContainerMojoTest {
 
     @Test
     public void testThatMojoStartsAContainerOnTheProviderWithEnvironmentVariables() throws Exception {
-    	Map<String, String> env = new HashMap<String, String>();
+    	Map<String, String> env = new HashMap<>();
     	env.put("TEST_KEY", "test value");
     	
         ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()

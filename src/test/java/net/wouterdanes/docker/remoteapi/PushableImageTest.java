@@ -1,16 +1,16 @@
 package net.wouterdanes.docker.remoteapi;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import net.wouterdanes.docker.provider.model.PushableImage;
+import com.google.common.base.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Optional;
+import net.wouterdanes.docker.provider.model.PushableImage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class PushableImageTest {
 
@@ -31,8 +31,8 @@ public class PushableImageTest {
 
     @Test
     public void testConstruction() {
-        assertExpected(IMAGE1, Optional.fromNullable(TAG1), targetWithTag);
-        assertExpected(IMAGE1, Optional.<String> absent(), targetWithoutTag);
+        assertExpected(Optional.fromNullable(TAG1), targetWithTag);
+        assertExpected(Optional.<String> absent(), targetWithoutTag);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class PushableImageTest {
     public void testEquals() {
         // trivial cases
         assertTrue(targetWithTag.equals(targetWithTag));
-        assertFalse(targetWithTag.equals(null));
+        assertNotNull(targetWithTag);
         assertFalse(targetWithTag.equals(new Object()));
 
         // when equivalent
@@ -66,9 +66,9 @@ public class PushableImageTest {
         return new PushableImage(imageId, Optional.fromNullable(registry));
     }
 
-    private void assertExpected(String expectedImageId, Optional<String> expectedRegistry,
-            PushableImage actual) {
-        assertEquals(expectedImageId, actual.getImageId());
+    private void assertExpected(Optional<String> expectedRegistry,
+                                PushableImage actual) {
+        assertEquals(PushableImageTest.IMAGE1, actual.getImageId());
         assertEquals(expectedRegistry, actual.getNameAndTag());
     }
 
