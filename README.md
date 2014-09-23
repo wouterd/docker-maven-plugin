@@ -9,7 +9,7 @@ A maven plugin to create, test and publish docker containers and images for mave
 As the documentation evolves with different plugin versions, be sure that before you read on that:
 - You check that you are watching the right tag
 - Switch to the right tag to read the right documentation.
- 
+
 The README of the master branch will cover the current development version and not cover the current released version.
 
 # Minimum versions required
@@ -46,7 +46,7 @@ Current snapshot version: `2.1-SNAPSHOT`
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>2.0</version>
+        <version>2.1</version>
         <configuration>
           <userName>goonwarrior</userName>
           <password>g0onwarr!or</password>
@@ -187,7 +187,7 @@ The containerId is the id specified in another `<container>` definition. It will
 ## Wait for a container to finish starting up
 
 You might want to wait for your application to finish initialization before you start running integration tests. The
-plugin allows you to do a global regular expression find on the stdout + stderr of your container to see if the 
+plugin allows you to do a global regular expression find on the stdout + stderr of your container to see if the
 container has finished initialization. To check if a tomcat container has started up, you could configure the following:
 
         <container>
@@ -195,7 +195,7 @@ container has finished initialization. To check if a tomcat container has starte
             <image>myAppServer</image>
             <waitForStartup>Server startup in</waitForStartup>
         </container>
-        
+
 The `<waitForStartup/>` tag can contain any valid java regular expression.
 
 ## `build-images` goal
@@ -369,14 +369,14 @@ To build the project, you will need Maven and Java8. The plugin itself doesn't r
 use Java 8. The plugin will still create java 7 byte code, no worries. :-)
 
 To build the project and run all the tests, run:
- 
+
         mvn clean verify -Prun-its
-        
+
 This will run the build including all integration tests. You should run this at least once before submitting a PR.
 To just run unit tests, run:
- 
+
         mvn clean verify
-        
+
 The latter won't require java 8.
 
 # Architecture principles
