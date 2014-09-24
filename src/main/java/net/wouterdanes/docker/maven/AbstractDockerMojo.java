@@ -214,12 +214,12 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
      * @param e       The Docker Exception
      * @throws org.apache.maven.plugin.MojoFailureException to indicate Plugin failure
      */
-    protected void handleDockerException(String message, DockerException e) throws MojoFailureException {
+    protected void handleDockerException(final String message, DockerException e) throws MojoFailureException {
         Optional<String> apiResponse = e.getApiResponse();
-        if (apiResponse.isPresent()) {
-            message += "\nApi response:\n%s" + apiResponse.get();
-        }
-        throw new MojoFailureException(message, e);
+        String exceptionMessage = apiResponse.isPresent() ?
+                (message + "\nApi response:\n" + apiResponse.get()) :
+                message;
+        throw new MojoFailureException(exceptionMessage, e);
     }
 
     @SuppressWarnings("unchecked")

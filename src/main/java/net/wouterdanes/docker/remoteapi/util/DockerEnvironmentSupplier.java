@@ -10,9 +10,13 @@ public abstract class DockerEnvironmentSupplier {
 
     protected Optional<URI> getDockerUriFromEnvironment() {
         String envDockerHost = System.getenv(RemoteDockerProvider.DOCKER_HOST_SYSTEM_ENV);
+        if (envDockerHost == null) {
+            return Optional.absent();
+        }
         try {
-            return Optional.of(URI.create(envDockerHost));
-        } catch (NullPointerException | IllegalArgumentException ignored) {
+            URI uri = URI.create(envDockerHost);
+            return Optional.of(uri);
+        } catch (IllegalArgumentException ignored) {
             return Optional.absent();
         }
     }

@@ -18,6 +18,6 @@ public final class DockerPortFromPropertySupplier implements Supplier<Optional<I
     @Override
     public Optional<Integer> get() {
         Optional<String> port = Optional.fromNullable(System.getProperty(RemoteDockerProvider.DOCKER_PORT_PROPERTY));
-        return port.isPresent() ? Optional.of(new Integer(port.get())) : Optional.<Integer>absent();
+        return port.isPresent() ? Optional.of(Integer.valueOf(port.get())) : Optional.<Integer>absent();
     }
 }

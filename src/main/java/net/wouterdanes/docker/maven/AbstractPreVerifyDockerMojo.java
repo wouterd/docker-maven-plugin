@@ -16,7 +16,7 @@ public abstract class AbstractPreVerifyDockerMojo extends AbstractDockerMojo {
         getLog().error(message, e);
         Optional<String> apiResponse = e.getApiResponse();
         if (apiResponse.isPresent()) {
-            getLog().info(String.format("Api response:\n%s", apiResponse.get()));
+            getLog().info(String.format("Api response:%n%s", apiResponse.get()));
         }
         registerPluginError(new DockerPluginError(getMojoGoalName(), message, e));
     }

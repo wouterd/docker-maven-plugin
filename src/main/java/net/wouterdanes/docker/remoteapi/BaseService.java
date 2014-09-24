@@ -18,6 +18,7 @@
 package net.wouterdanes.docker.remoteapi;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
@@ -77,7 +78,7 @@ public abstract class BaseService {
         if (credentials == null) {
             return REGISTRY_AUTH_NULL_VALUE;
         }
-        return BaseEncoding.base64().encode(toJson(credentials).getBytes());
+        return BaseEncoding.base64().encode(toJson(credentials).getBytes(Charset.forName("UTF-8")));
     }
 
     protected String toJson(Object obj) {

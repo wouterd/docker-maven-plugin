@@ -19,6 +19,7 @@ package net.wouterdanes.docker.remoteapi;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
@@ -135,7 +136,7 @@ public class ContainersService extends BaseService {
             int frameLength = bb.getInt();
             byte[] frame = new byte[frameLength];
             bb.get(frame);
-            logs.append(new String(frame));
+            logs.append(new String(frame, Charset.forName("UTF-8")));
         }
 
         return logs.toString();
