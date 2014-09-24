@@ -19,7 +19,6 @@ package net.wouterdanes.docker.provider.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ import net.wouterdanes.docker.remoteapi.model.ContainerLink;
  * href="http://docs.docker.io/reference/api/docker_remote_api_v1.10/#21-containers">
  * http://docs.docker.io/reference/api/docker_remote_api_v1.10/#start-a-container</a>
  */
-@SuppressWarnings("unused")
 public class ContainerStartConfiguration {
 
     public static final int DEFAULT_STARTUP_TIMEOUT = 5 * 60;
@@ -106,7 +104,7 @@ public class ContainerStartConfiguration {
     }
 
     public Map<String, String> getEnv() {
-    	return env != null ? Collections.unmodifiableMap(env) : new HashMap<String, String>();
+    	return env != null ? Collections.unmodifiableMap(env) : Collections.<String, String>emptyMap();
     }
     
     public String getWaitForStartup() {
