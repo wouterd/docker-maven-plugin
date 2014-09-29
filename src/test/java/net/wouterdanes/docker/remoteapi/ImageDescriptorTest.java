@@ -64,13 +64,20 @@ public class ImageDescriptorTest {
                 "index_01-reg.tutum.co:5000/wouter/ubuntu:precise", "index_01-reg.tutum.co:5000", "wouter", "ubuntu", "precise",
                 "index_01-reg.tutum.co:5000/wouter/ubuntu",  "wouter/ubuntu", "wouter/ubuntu:precise");
 
+        // check for image names with "." and "-"
+        assertDescriptor("localhost:5000/library/ubuntu-precise", "localhost:5000/library/ubuntu-precise",
+                "localhost:5000", "library", "ubuntu-precise", null, "localhost:5000/library/ubuntu-precise",
+                "library/ubuntu-precise", "library/ubuntu-precise");
+        assertDescriptor("localhost:5000/library/ubuntu.precise", "localhost:5000/library/ubuntu.precise",
+                "localhost:5000", "library", "ubuntu.precise", null, "localhost:5000/library/ubuntu.precise",
+                "library/ubuntu.precise", "library/ubuntu.precise");
+
         // check for tags "." and "-" in them
         assertDescriptor("ubuntu:14.04", "ubuntu:14.04", null, null, "ubuntu", "14.04",
                 "ubuntu", "ubuntu", "ubuntu:14.04");
         assertDescriptor("ubuntu:mark-2", "ubuntu:mark-2", null, null, "ubuntu", "mark-2",
                 "ubuntu", "ubuntu", "ubuntu:mark-2");
     }
-
 
     private static void assertDescriptor(String qualifier,
             String id, String registry, String repository,
