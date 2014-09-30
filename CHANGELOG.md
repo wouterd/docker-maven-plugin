@@ -1,5 +1,5 @@
-# version 2.2
-- Image names can now contain hyphens and dots and get properly pushed.
+# version 2.1.1
+- Bug fix: Image names can now contain hyphens and dots and get properly pushed. (thanks Erno Tukia!)
 
 # version 2.1
 - Fixed a bug in `start-container` goal that crashed the plugin if a container had `waitForStartup` set, but failed to
