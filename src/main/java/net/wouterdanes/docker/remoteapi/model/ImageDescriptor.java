@@ -31,7 +31,8 @@ public class ImageDescriptor {
 
     private static final Pattern IMAGE_QUALIFIER = Pattern.compile("^"
             + "((?<registry>[\\w\\.\\-]+(:\\d+)?)/)??" // registry
-            + "((?<repository>[\\w]+)/)?(?<image>[\\w]+)" // repository/image
+            + "((?<repository>[\\w]+)/)?" // repository
+            + "(?<image>[\\w\\.\\-]+)" // image
             + "(:(?<tag>[\\w\\.\\-]+))?" // tag
             + "$");
 
