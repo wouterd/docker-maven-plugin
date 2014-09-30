@@ -43,19 +43,10 @@ public class ImagesService extends BaseService {
         WebTarget target = getServiceEndPoint()
                 .path("create");
 
-        if (descriptor.getRepository().isPresent()) {
-        	target = target.queryParam("fromImage", 
-        			String.format("%s/%s", descriptor.getRepository().get(), descriptor.getImage()));
-        } else {
-        	target = target.queryParam("fromImage", descriptor.getImage());
-        }
+        target = target.queryParam("fromImage", descriptor.getRegistryRepositoryAndImage());
 
         if (descriptor.getTag().isPresent()) {
             target = target.queryParam("tag", descriptor.getTag().get());
-        }
-
-        if (descriptor.getRegistry().isPresent()) {
-            target = target.queryParam("registry", descriptor.getRegistry().get());
         }
 
         return target.request()
