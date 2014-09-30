@@ -149,7 +149,7 @@ The plugin will connect to a docker instance over HTTP, linux socket support wil
 the host/port of docker in the following way:
 - It will grab host and port from docker.host and docker.port set by -Ddocker.host and -Ddocker.port on the command line
 - Else it will try to parse the DOCKER_HOST system environment variable
-- Finally it will default to 127.0.0.1:4243
+- Finally it will default to 127.0.0.1:2375
 
 ## Environment Variables
 
@@ -315,7 +315,7 @@ The releases of this plugin are deployed to maven central, the SNAPSHOT versions
       </pluginRepository>
 
 ## Enabling the Remote Api on the Docker Daemon
-Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 4243 (default) that only listens to the local interface, add this to your daemon startup: `-H tcp://127.0.0.1:4243`
+Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 2375 (default) that only listens to the local interface, add this to your daemon startup: `-H tcp://127.0.0.1:2375`
 
 ## Skipping execution of the plugin or phases
 To skip execution of the plugin, you can set the docker.skip property to true. This can be useful when you want to skip
@@ -336,7 +336,7 @@ Adding the following profile to your pom.xml will skip the whole plugin when the
 
 # Boot2docker-cli
 Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-only network and a "public network". The VM
-also exposes port 4243 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
+also exposes port 2375 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
 interface. Else, the published ports won't be mapped to the right IP.
 
 # Docker providers
