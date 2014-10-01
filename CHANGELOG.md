@@ -1,3 +1,6 @@
+# version 2.2
+- Changed the default port for the http interface to the IANA port for docker: 2375.
+
 # version 2.1.1
 - Bug fix: Image names can now contain hyphens and dots and get properly pushed. (thanks Erno Tukia!)
 
