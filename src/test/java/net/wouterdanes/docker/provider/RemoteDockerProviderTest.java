@@ -47,7 +47,7 @@ public class RemoteDockerProviderTest {
     public void testThatEnvironmentVariableOrDefaultIsPickedUp() throws Exception {
 
         String expectedHost = "127.0.0.1";
-        int expectedPort = 4243;
+        int expectedPort = 2375;
 
         // Can't really mock this easily, so i went with parsing my own system env here
         // TODO: Add PowerMock

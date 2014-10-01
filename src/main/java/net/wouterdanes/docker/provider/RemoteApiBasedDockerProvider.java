@@ -66,7 +66,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     private Log log;
 
-    private static final int DEFAULT_DOCKER_PORT = 4243;
+    private static final int DEFAULT_DOCKER_PORT = 2375;
     private static final String DEFAULT_DOCKER_HOST = "127.0.0.1";
     public static final String DOCKER_HOST_SYSTEM_ENV = "DOCKER_HOST";
     public static final String DOCKER_HOST_PROPERTY = "docker.host";
