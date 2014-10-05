@@ -1,5 +1,5 @@
 # version 2.2
-- Changed the default port for the http interface to the IANA port for docker: 2375.
+- Changed the default port for the http interface to the IANA port for docker: 2375. (thanks Erno Tukia!)
 - Fixed pulling images from a private repository. (thanks Erno Tukia!)
 
 # version 2.1.1
