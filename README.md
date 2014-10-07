@@ -37,9 +37,9 @@ The README of the master branch will cover the current development version and n
 
 # Usage
 
-Current release version: `2.1.1`
+Current release version: `2.2`
 
-Current snapshot version: `2.2-SNAPSHOT`
+Current snapshot version: `2.3-SNAPSHOT`
 
 ## Example
 
