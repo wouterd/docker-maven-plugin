@@ -14,6 +14,10 @@ The README of the master branch will cover the current development version and n
 
 # Minimum versions required
 
+__NOTE: Boot2docker 1.3 comes with SSL encryption by default. The plugin doesn't support SSL encryption yet. So for the
+plugin to work, you need to reconfigure boot2docker and disable SSL encryption. Should be safe enough for local 
+development.__
+
 - Minimum required maven version: 3.1.1
 - Minimum required docker daemon version: 1.0 (Remote API v1.12)
 
