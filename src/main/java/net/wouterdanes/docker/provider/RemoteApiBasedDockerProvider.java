@@ -137,7 +137,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     protected RemoteApiBasedDockerProvider(final String host, final int port) {
         this.host = host;
         this.port = port;
-        String dockerApiRoot = String.format("http://%s:%s", host, port);
+        String dockerApiRoot = String.format("%s:%s", host, port);
         containersService = new ContainersService(dockerApiRoot);
         imagesService = new ImagesService(dockerApiRoot);
         miscService = new MiscService(dockerApiRoot);
