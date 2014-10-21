@@ -17,8 +17,14 @@
 
 package net.wouterdanes.docker.remoteapi;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.Security;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
@@ -28,6 +34,7 @@ import javax.ws.rs.core.Response.Status.Family;
 
 import com.google.common.io.BaseEncoding;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -35,6 +42,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
+import net.wouterdanes.docker.remoteapi.util.HttpsHelper;
 
 /**
  * This class is responsible for holding the shared functionality of all Docker remoteapi services.
@@ -47,6 +55,7 @@ public abstract class BaseService {
     private static final String REGISTRY_AUTH_NULL_VALUE = "null";
 
     private static final String TARGET_DOCKER_API_VERSION = "v1.12";
+    private static final String ENV_DOCKER_TLS_VERIFY = "DOCKER_TLS_VERIFY";
 
     private final ObjectMapper objectMapper;
     private final WebTarget serviceEndPoint;
@@ -60,8 +69,7 @@ public abstract class BaseService {
         DeserializationConfig deserializationConfig = objectMapper.getDeserializationConfig()
                 .without(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
         objectMapper.setDeserializationConfig(deserializationConfig);
-        serviceEndPoint = ClientBuilder.newClient()
-                .target(dockerApiRoot)
+        serviceEndPoint = createDockerTarget(dockerApiRoot)
                 .path(TARGET_DOCKER_API_VERSION)
                 .path(endPointPath);
     }
@@ -118,6 +126,50 @@ public abstract class BaseService {
                 return new ImageNotFoundException(id, cause);
             default:
                 return new DockerException(statusInfo.getReasonPhrase(), cause);
+        }
+    }
+
+    private static WebTarget createDockerTarget(final String dockerApiRoot) {
+        String encrypted = System.getenv(ENV_DOCKER_TLS_VERIFY);
+        if (!"1".equals(encrypted)) {
+            return ClientBuilder.newClient()
+                    .target("http://" + dockerApiRoot);
+        }
+
+        Security.addProvider(new BouncyCastleProvider());
+
+        String certPath = System.getenv("DOCKER_CERT_PATH");
+        if (certPath == null) {
+            certPath = System.getProperty("USER_HOME") + File.separator + ".docker";
+        }
+
+        ensureThatCertificatesExist(certPath);
+
+        KeyStore keyStore;
+        KeyStore trustStore;
+        try {
+            keyStore = HttpsHelper.createKeyStore(certPath);
+            trustStore = HttpsHelper.createTrustStore(certPath);
+        } catch (Exception e) {
+            throw new DockerException("Can't load docker certificates", e);
+        }
+
+        return ClientBuilder.newBuilder()
+                .keyStore(keyStore, HttpsHelper.KEYSTORE_PWD)
+                .trustStore(trustStore)
+                .build()
+                .target("https://" + dockerApiRoot);
+    }
+
+    private static void ensureThatCertificatesExist(final String certPath) {
+        String[] files = {"ca.pem", "cert.pem", "key.pem"};
+        for (String file : files) {
+            Path path = Paths.get(certPath, file);
+            boolean exists = Files.exists(path);
+            if (!exists) {
+                throw new DockerException(String.format("%s not found in cert path (%s), make sure that ca.pem, " +
+                        "cert.pem and key.pem are available there.", file, certPath));
+            }
         }
     }
 }
