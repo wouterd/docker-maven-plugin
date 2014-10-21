@@ -20,6 +20,9 @@ package net.wouterdanes.docker.remoteapi;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.Security;
 
@@ -127,18 +130,20 @@ public abstract class BaseService {
     }
 
     private static WebTarget createDockerTarget(final String dockerApiRoot) {
-        Security.addProvider(new BouncyCastleProvider());
-
         String encrypted = System.getenv(ENV_DOCKER_TLS_VERIFY);
         if (!"1".equals(encrypted)) {
             return ClientBuilder.newClient()
                     .target("http://" + dockerApiRoot);
         }
 
+        Security.addProvider(new BouncyCastleProvider());
+
         String certPath = System.getenv("DOCKER_CERT_PATH");
         if (certPath == null) {
             certPath = System.getProperty("USER_HOME") + File.separator + ".docker";
         }
+
+        ensureThatCertificatesExist(certPath);
 
         KeyStore keyStore;
         KeyStore trustStore;
@@ -154,5 +159,17 @@ public abstract class BaseService {
                 .trustStore(trustStore)
                 .build()
                 .target("https://" + dockerApiRoot);
+    }
+
+    private static void ensureThatCertificatesExist(final String certPath) {
+        String[] files = {"ca.pem", "cert.pem", "key.pem"};
+        for (String file : files) {
+            Path path = Paths.get(certPath, file);
+            boolean exists = Files.exists(path);
+            if (!exists) {
+                throw new DockerException(String.format("%s not found in cert path (%s), make sure that ca.pem, " +
+                        "cert.pem and key.pem are available there.", file, certPath));
+            }
+        }
     }
 }
