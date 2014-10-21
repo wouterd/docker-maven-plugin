@@ -1,3 +1,6 @@
+# version 2.3
+- Docker 1.3: Added support for HTTPS encryption, fixing connection with Boot2docker 1.3.
+
 # version 2.2
 - Changed the default port for the http interface to the IANA port for docker: 2375. (thanks Erno Tukia!)
 - Fixed pulling images from a private repository. (thanks Erno Tukia!)
