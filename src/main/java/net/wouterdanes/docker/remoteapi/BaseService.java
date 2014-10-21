@@ -155,7 +155,7 @@ public abstract class BaseService {
         }
 
         return ClientBuilder.newBuilder()
-                .keyStore(keyStore, "changeit")
+                .keyStore(keyStore, HttpsHelper.KEYSTORE_PWD)
                 .trustStore(trustStore)
                 .build()
                 .target("https://" + dockerApiRoot);

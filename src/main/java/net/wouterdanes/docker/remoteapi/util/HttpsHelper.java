@@ -18,6 +18,7 @@ import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.UUID;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -28,6 +29,8 @@ import org.bouncycastle.openssl.PEMParser;
  * Helper methods to parse and load Docker certificate files for encrypted https connection to the docker daemon
  */
 public final class HttpsHelper {
+
+    public static final String KEYSTORE_PWD = UUID.randomUUID().toString();
 
     private HttpsHelper() {}
 
@@ -40,7 +43,7 @@ public final class HttpsHelper {
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(null);
 
-        keyStore.setKeyEntry("docker", keyPair.getPrivate(), "changeit".toCharArray(), new Certificate[]{privCert});
+        keyStore.setKeyEntry("docker", keyPair.getPrivate(), KEYSTORE_PWD.toCharArray(), new Certificate[]{privCert});
         return keyStore;
     }
 
