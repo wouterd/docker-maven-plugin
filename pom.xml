@@ -219,7 +219,7 @@
           <plugin>
             <groupId>net.wouterdanes.docker</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>2.3-SNAPSHOT</version>
+            <version>2.3</version>
             <executions>
               <execution>
                 <id>start-containers</id>
