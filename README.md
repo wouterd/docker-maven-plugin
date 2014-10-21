@@ -14,10 +14,6 @@ The README of the master branch will cover the current development version and n
 
 # Minimum versions required
 
-__NOTE: Boot2docker 1.3 comes with SSL encryption by default. The plugin doesn't support SSL encryption yet. So for the
-plugin to work, you need to reconfigure boot2docker and disable SSL encryption. Should be safe enough for local 
-development.__
-
 - Minimum required maven version: 3.1.1
 - Minimum required docker daemon version: 1.0 (Remote API v1.12)
 
@@ -319,7 +315,10 @@ The releases of this plugin are deployed to maven central, the SNAPSHOT versions
       </pluginRepository>
 
 ## Enabling the Remote Api on the Docker Daemon
-Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 2375 (default) that only listens to the local interface, add this to your daemon startup: `-H tcp://127.0.0.1:2375`
+Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST 
+API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon 
+startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 2375 (default) 
+that only listens to the local interface, add this to your daemon startup: `-H tcp://127.0.0.1:2375`
 
 ## Skipping execution of the plugin or phases
 To skip execution of the plugin, you can set the docker.skip property to true. This can be useful when you want to skip
@@ -338,11 +337,6 @@ Adding the following profile to your pom.xml will skip the whole plugin when the
             </properties>
         </profile>
 
-# Boot2docker-cli
-Boot2docker-cli exposes two interfaces on the boot2docker VM. There's a host-only network and a "public network". The VM
-also exposes port 2375 on localhost for the docker API. You should specify the IP of `eth1`, the host-only network
-interface. Else, the published ports won't be mapped to the right IP.
-
 # Docker providers
 Currently the plugin supports two types of docker "providers", which both connect to docker via the remote API
 (HTTP REST), unix sockets are not yet supported:
@@ -359,6 +353,17 @@ consumers of your containers need to connect on the "real port" and cannot conne
 
 You can specify the docker provider using the system property `docker.provider`, either in the pom or via the command
 line using -D, for example: `mvn clean verify -Prun-its -Ddocker.provider=local`
+
+## HTTPS support
+As per Docker 1.3, the docker daemon can be protected with SSL encryption. For this to work, the client needs to have
+some certificates and a private key. These by default reside in ~/.docker. Boot2docker now by default since version 1.3
+enables SSL encryption. The plugin supports this. As long as you can reach the daemon by doing `docker ps` on the command
+line, the plugin should pick up the right environment variables. The environment variables that control this behavior are:
+
+* `DOCKER_HOST` specifies where docker lives, for example: `tcp://192.168.59.103:2376`.
+* `DOCKER_TLS_VERIFY` specifies whether SSL encryption is on, the value `1` denotes that SSL encryption is enabled.
+* `DOCKER_CERT_PATH` points to the folder containing the needed `ca.pem`, `cert.pem` and `key.pem`. If not specified, 
+    this defaults to `~/.docker`.
 
 # Dependencies:
 
