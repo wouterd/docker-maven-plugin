@@ -1,6 +1,7 @@
 package net.wouterdanes.docker;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import net.wouterdanes.docker.provider.DockerProvider;
@@ -8,6 +9,7 @@ import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 
+@Ignore
 public class VerifyHostnameSetIT {
 
     @Test

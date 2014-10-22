@@ -65,9 +65,7 @@
               <images>
                 <image>
                   <id>nginx</id>
-                  <files>
-                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
-                  </files>
+	              <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
                   <nameAndTag>nginx-name:tahahag</nameAndTag>
                   <keep>true</keep>
                 </image>

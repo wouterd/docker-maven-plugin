@@ -154,10 +154,12 @@
                             <images>
                                 <image>
                                     <id>app</id>
-                                    <files>
-                                        <file>${project.basedir}/src/main/docker/Dockerfile</file>
-                                        <file>${project.build.directory}/discuss-jar-with-dependencies.jar</file>
-                                    </files>
+	                                <dockerFile>${project.basedir}/src/main/docker/Dockerfile</dockerFile>
+                                    <artifacts>
+	                                    <artifact>
+                                            <file>${project.build.directory}/discuss-jar-with-dependencies.jar</file>
+	                                    </artifact>
+                                    </artifacts>
                                 </image>
                             </images>
                         </configuration>

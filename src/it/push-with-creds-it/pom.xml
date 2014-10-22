@@ -65,9 +65,7 @@
               <images>
                 <image>
                   <id>nginx</id>
-                  <files>
-                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
-                  </files>
+                  <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
                   <nameAndTag>drek:latest</nameAndTag>
                   <keep>true</keep>
                   <push>true</push>
@@ -75,9 +73,7 @@
                 </image>
                 <image>
                   <id>nginxier</id>
-                  <files>
-                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
-                  </files>
+	              <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
                   <nameAndTag>${docker.registry}/nginxier:latest</nameAndTag>
                   <keep>true</keep>
                   <push>true</push>
