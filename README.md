@@ -82,6 +82,7 @@ Current snapshot version: `2.4-SNAPSHOT`
                 <container>
                   <id>BusyBox</id>
                   <image>busybox</image>
+                  <hostname>busyhost</hostname>
                 </container>
                 <container>
                   <id>cache</id>
@@ -161,6 +162,16 @@ Environment variables can be passed to containers using the following configurat
                 <env>
                     <VARIABLE_NAME>variable value<VARIABLE_NAME>
                 <env>
+            </container>
+
+## Setting the hostname
+
+The hostname can be set by adding a <hostname> element to a container configuration.
+
+            <container>
+                <id>app</id>
+                <iamge>app</image>
+                <hostname>appserver1</hostname>
             </container>
 
 ## Linking containers

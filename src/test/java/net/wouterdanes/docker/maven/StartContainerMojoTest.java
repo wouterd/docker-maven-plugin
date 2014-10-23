@@ -339,6 +339,22 @@ public class StartContainerMojoTest {
         assertEquals("test value", passedValue.getEnv().get("TEST_KEY"));
     }
 
+    @Test
+    public void testThatConfiguredHostnameGetsPassedToDocker() throws Exception {
+        ContainerStartConfiguration configuration = new ContainerStartConfiguration().withHostname("test-hostname");
+        StartContainerMojo mojo = createMojo(configuration);
+
+        mojo.execute();
+
+        ArgumentCaptor<ContainerStartConfiguration> captor = ArgumentCaptor.forClass(ContainerStartConfiguration.class);
+        verify(FakeDockerProvider.instance).startContainer(captor.capture());
+
+        assert mojo.getPluginErrors().isEmpty();
+
+        ContainerStartConfiguration passedValue = captor.getValue();
+        assertEquals("test-hostname", passedValue.getHostname());
+    }
+
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {
         return createMojo(startConfiguration, FAKE_PROVIDER_KEY);
     }
