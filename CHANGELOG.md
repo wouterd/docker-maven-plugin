@@ -1,3 +1,6 @@
+# version 2.4
+- Added the ability to set the hostname of a container
+
 # version 2.3
 - Docker 1.3: Added support for HTTPS encryption, fixing connection with Boot2docker 1.3.
 

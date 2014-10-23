@@ -49,6 +49,11 @@ public class ContainerStartConfiguration {
     private int startupTimeout;
 
     /**
+     * Hostname to give to this container
+     */
+    private String hostname;
+
+    /**
      * Set the image name or id to use and returns the object so you can chain from/with statements.
      *
      * @param image the image name or id
@@ -90,6 +95,11 @@ public class ContainerStartConfiguration {
     	this.env = env;
     	return this;
     }
+
+    public ContainerStartConfiguration withHostname(String hostname) {
+        this.hostname = hostname;
+        return this;
+    }
     
     public String getImage() {
         return image;
@@ -105,6 +115,10 @@ public class ContainerStartConfiguration {
 
     public Map<String, String> getEnv() {
     	return env != null ? Collections.unmodifiableMap(env) : Collections.<String, String>emptyMap();
+    }
+
+    public String getHostname() {
+        return hostname;
     }
     
     public String getWaitForStartup() {
