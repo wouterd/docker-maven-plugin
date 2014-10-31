@@ -213,11 +213,20 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 		if(!file.exists() || !file.canRead()) {
 			throw new FileNotFoundException(String.format("Cannot read file %s. Are you sure it exists?", file.getAbsolutePath()));
 		}
-		ArchiveEntry entry = tar.createArchiveEntry(file, fileNameAndPath);
-		tar.putArchiveEntry(entry);
-		byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-		tar.write(contents);
-		tar.closeArchiveEntry();
+		if(file.isDirectory()){
+			for (File fileInDirectory : file.listFiles()){
+				if (!fileNameAndPath.endsWith("/")){
+					fileNameAndPath = fileNameAndPath + "/";
+				}
+				addToTar(tar, fileInDirectory, fileNameAndPath + fileInDirectory.getName());
+			}
+		}else{
+			ArchiveEntry entry = tar.createArchiveEntry(file, fileNameAndPath);
+			tar.putArchiveEntry(entry);
+			byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+			tar.write(contents);
+			tar.closeArchiveEntry();
+		}
 	}
 
 	private static Integer getDockerPortFromEnvironment() {
