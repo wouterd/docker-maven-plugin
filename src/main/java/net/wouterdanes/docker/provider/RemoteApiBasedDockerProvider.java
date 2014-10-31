@@ -190,8 +190,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     private static byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    try (
-			    CompressorOutputStream gzipStream = new CompressorStreamFactory().createCompressorOutputStream("gz", baos);
-			    ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", gzipStream)
+
+			    ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", baos)
 	    ) {
 		    addToTar(tar, image.getDockerFile(), "Dockerfile");
 
@@ -202,8 +202,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 		    }
 
 		    tar.flush();
-		    gzipStream.flush();
-	    } catch (CompressorException | ArchiveException | IOException e) {
+		    baos.flush();
+	    } catch (ArchiveException | IOException e) {
 		    throw new IllegalStateException("Unable to create output archive", e);
 	    }
 	    return baos.toByteArray();
