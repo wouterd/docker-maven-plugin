@@ -223,8 +223,12 @@ Below is an example snippet.
                   <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
                   <artifacts>
                     <artifact>
-                      <file>${project.basedir}/src/test/resources/httpd.conf</file>
-                      <dest>etc/httpd</dest>
+                      <file>${project.basedir}/src/test/resources/nginx.conf</file>
+                      <dest>etc/nginx/nginx.conf</dest>
+                    </artifact>
+                    <artifact>
+                      <file>${project.basedir}/src/test/resources/sites-available/</file>
+                      <dest>etc/nginx/sites-available/</dest>
                     </artifact>
                   </artifacts>
                   <keep>true</keep>
