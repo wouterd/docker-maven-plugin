@@ -62,7 +62,7 @@ Current snapshot version: `3.0-SNAPSHOT`
               <images>
                 <image>
                   <id>nginx</id>
-                  <dockerfile>${project.basedir}/src/test/resources/Dockerfile</dockerfile>
+                  <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
                   <keep>true</keep>
                   <nameAndTag>goonwarrior/my-nginx:1.0-SNAPSHOT</nameAndTag>
                 </image>
@@ -220,7 +220,7 @@ Below is an example snippet.
               <images>
                 <image>
                   <id>nginx</id>
-                  <dockerfile>${project.basedir}/src/test/resources/Dockerfile</dockerfile>
+                  <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
                   <artifacts>
                     <artifact>
                       <file>${project.basedir}/src/test/resources/httpd.conf</file>
@@ -240,7 +240,7 @@ The configuration works as follows:
 - `<images>` contains a list of images to build as `<image>` elements
 - `<id>` for an image specifies the ID you want to use to reference this image in the plugin, for example when starting
     a container based on a built image.
-  `<dockerfile>` specifies which file to use a the Dockerfile
+  `<dockerFile>` specifies which file to use a the Dockerfile
 - `<artifacts>` contains a list of files to add to the container as `<artifact>` elements. For each `<artifact>` element
     you can specify:
     - `file`: pointing to the file to add to the tar ball sent to the docker daemon
