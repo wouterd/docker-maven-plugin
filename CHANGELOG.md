@@ -1,7 +1,7 @@
 # version 3.0
 - Docker images are now constructed somewhat differently. You have you specify the Dockerfile as a special entry. Files
     in the Dockerfile are now called artifacts and you can specify where in the tar they will be placed. It's now possible to
-    point to whole folders and have those added to the tar ball in the build phase. Just put the path to the folder in     
+    point to whole folders and have those added to the tar ball in the build phase. Just put the path to the folder in 
     `<file>` tags.
 - Added the ability to set the hostname of a container
 
