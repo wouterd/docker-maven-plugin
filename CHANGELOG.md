@@ -1,8 +1,6 @@
 # version 3.0
 - Docker images are now constructed somewhat differently. You have you specify the Dockerfile as a special entry. Files
     in the Dockerfile are now called artifacts and you can specify where in the tar they will be placed.
-
-# version 2.4
 - Added the ability to set the hostname of a container
 
 # version 2.3
