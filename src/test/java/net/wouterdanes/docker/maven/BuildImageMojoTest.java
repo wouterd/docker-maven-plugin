@@ -17,12 +17,11 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
+import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
+import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
+import net.wouterdanes.docker.provider.DockerProviderSupplier;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.provider.model.PushableImage;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.After;
@@ -30,11 +29,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
-import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
-import net.wouterdanes.docker.provider.DockerProviderSupplier;
-import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-import net.wouterdanes.docker.provider.model.PushableImage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -67,7 +67,6 @@ public class BuildImageMojoTest {
         mockImage = Mockito.mock(ImageBuildConfiguration.class);
         Mockito.when(mockImage.getId()).thenReturn(STARTID);
         Mockito.when(mockImage.getNameAndTag()).thenReturn(NAMEANDTAG);
-        Mockito.when(mockImage.isValid()).thenReturn(true);
 
         List<ImageBuildConfiguration> images = Collections.singletonList(mockImage);
 
@@ -77,16 +76,6 @@ public class BuildImageMojoTest {
     @After
     public void tearDown() throws Exception {
         DockerProviderSupplier.removeProvider(FAKE_PROVIDER_KEY);
-    }
-
-    @Test(expected = MojoExecutionException.class)
-    public void testThatTheMojoFailsIfAnInvalidImageExists() throws Exception {
-        Mockito.when(mockImage.isValid()).thenReturn(false);
-
-        executeMojo(FAKE_PROVIDER_KEY);
-
-        assertTrue(mojo.getPluginErrors().isEmpty());
-        assertImageNotEnqueuedForPush();
     }
 
     @Test
@@ -161,8 +150,6 @@ public class BuildImageMojoTest {
     }
 
     private void assertImageEnqueuedForPush(String expectedNameAndTag) {
-        Mockito.when(mockImage.isValid()).thenReturn(false);
-
         assertEquals(1, mojo.getImagesToPush().size());
 
         PushableImage actual = mojo.getImagesToPush().get(0);

@@ -17,10 +17,8 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
@@ -28,8 +26,9 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class is responsible for building docker images specified in the POM file. It runs by default during the
@@ -85,10 +84,6 @@ public class BuildImageMojo extends AbstractPreVerifyDockerMojo {
                         image.getId()));
             }
             ids.add(image.getId());
-            if (!image.isValid()) {
-                throw new MojoExecutionException(String.format("Image '%s' not valid, did you specify a Dockerfile?",
-                        image.getId()));
-            }
         }
     }
 

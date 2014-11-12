@@ -19,6 +19,7 @@ package net.wouterdanes.docker.provider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,11 +33,9 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.maven.plugin.logging.Log;
 
+import net.wouterdanes.docker.provider.model.Artifact;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.BaseService;
@@ -190,22 +189,45 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     private static byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (
-                CompressorOutputStream gzipStream = new CompressorStreamFactory().createCompressorOutputStream("gz", baos);
-                ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", gzipStream)
+                ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", baos)
         ) {
-            for (File file : image.getFiles()) {
-                ArchiveEntry entry = tar.createArchiveEntry(file, file.getName());
-                tar.putArchiveEntry(entry);
-                byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-                tar.write(contents);
-                tar.closeArchiveEntry();
+            addToTar(tar, image.getDockerFile(), "Dockerfile");
+
+            if (image.getArtifacts() != null) {
+                for (Artifact artifact : image.getArtifacts()) {
+                    File file = artifact.getFile();
+                    String pathinTar = artifact.getDest().or(file.getName());
+                    addToTar(tar, file, pathinTar);
+                }
             }
+
             tar.flush();
-            gzipStream.flush();
-        } catch (CompressorException | ArchiveException | IOException e) {
+            baos.flush();
+        } catch (ArchiveException | IOException e) {
             throw new IllegalStateException("Unable to create output archive", e);
         }
         return baos.toByteArray();
+    }
+
+    private static void addToTar(ArchiveOutputStream tar, File file, String fileNameAndPath) throws IOException {
+        if (!file.exists() || !file.canRead()) {
+            throw new FileNotFoundException(String.format("Cannot read file %s. Are you sure it exists?",
+                    file.getAbsolutePath()));
+        }
+        if (file.isDirectory()) {
+            for (File fileInDirectory : file.listFiles()) {
+                if (!fileNameAndPath.endsWith("/")) {
+                    fileNameAndPath = fileNameAndPath + "/";
+                }
+                addToTar(tar, fileInDirectory, fileNameAndPath + fileInDirectory.getName());
+            }
+        } else {
+            ArchiveEntry entry = tar.createArchiveEntry(file, fileNameAndPath);
+            tar.putArchiveEntry(entry);
+            byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+            tar.write(contents);
+            tar.closeArchiveEntry();
+        }
     }
 
     private static Integer getDockerPortFromEnvironment() {

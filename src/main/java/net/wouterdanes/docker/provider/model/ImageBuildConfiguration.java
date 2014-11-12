@@ -17,10 +17,10 @@
 
 package net.wouterdanes.docker.provider.model;
 
+import org.apache.maven.plugins.annotations.Parameter;
+
 import java.io.File;
 import java.util.List;
-
-import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * This class is responsible for holding the configuration of a single docker image to be built by the
@@ -29,7 +29,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class ImageBuildConfiguration {
 
     @Parameter(required = true)
-    private List<File> files;
+    private File dockerFile;
 
     @Parameter(required = true)
     private String id;
@@ -46,13 +46,8 @@ public class ImageBuildConfiguration {
     @Parameter
     private String registry;
 
-    public List<File> getFiles() {
-        return files;
-    }
-
-    public void setFiles(final List<File> files) {
-        this.files = files;
-    }
+	@Parameter
+	private List<Artifact> artifacts;
 
     public String getId() {
         return id;
@@ -94,16 +89,19 @@ public class ImageBuildConfiguration {
         this.registry = registry;
     }
 
-    /**
-     * Checks if this is a valid configuration, every image build package should have a Dockerfile included.
-     * @return <code>true</code> if this configuration can be built, <code>false</code> otherwise.
-     */
-    public boolean isValid() {
-        for (File file : files) {
-            if (file.getName().equals("Dockerfile")) {
-                return true;
-            }
-        }
-        return false;
-    }
+	public List<Artifact> getArtifacts() {
+		return artifacts;
+	}
+
+	public void setArtifacts(List<Artifact> artifacts) {
+		this.artifacts = artifacts;
+	}
+
+	public File getDockerFile() {
+		return dockerFile;
+	}
+
+	public void setDockerFile(File dockerFile) {
+		this.dockerFile = dockerFile;
+	}
 }

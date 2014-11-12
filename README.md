@@ -39,14 +39,14 @@ The README of the master branch will cover the current development version and n
 
 Current release version: `2.3`
 
-Current snapshot version: `2.4-SNAPSHOT`
+Current snapshot version: `3.0-SNAPSHOT`
 
 ## Example
 
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>2.1.1</version>
+        <version>3.0</version>
         <configuration>
           <userName>goonwarrior</userName>
           <password>g0onwarr!or</password>
@@ -62,9 +62,7 @@ Current snapshot version: `2.4-SNAPSHOT`
               <images>
                 <image>
                   <id>nginx</id>
-                  <files>
-                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
-                  </files>
+                  <dockerfile>${project.basedir}/src/test/resources/Dockerfile</dockerfile>
                   <keep>true</keep>
                   <nameAndTag>goonwarrior/my-nginx:1.0-SNAPSHOT</nameAndTag>
                 </image>
@@ -222,9 +220,13 @@ Below is an example snippet.
               <images>
                 <image>
                   <id>nginx</id>
-                  <files>
-                    <file>${project.basedir}/src/test/resources/Dockerfile</file>
-                  </files>
+                  <dockerfile>${project.basedir}/src/test/resources/Dockerfile</dockerfile>
+                  <artifacts>
+                    <artifact>
+                      <file>${project.basedir}/src/test/resources/httpd.conf</file>
+                      <dest>etc/httpd</dest>
+                    </artifact>
+                  </artifacts>
                   <keep>true</keep>
                   <push>true</push>
                   <registry>mydocker-registry.corp.com:5000</registry>
@@ -238,7 +240,11 @@ The configuration works as follows:
 - `<images>` contains a list of images to build as `<image>` elements
 - `<id>` for an image specifies the ID you want to use to reference this image in the plugin, for example when starting
     a container based on a built image.
-- `<files>` contains a list of files to add to the container as `<file>` elements
+  `<dockerfile>` specifies which file to use a the Dockerfile
+- `<artifacts>` contains a list of files to add to the container as `<artifact>` elements. For each `<artifact>` element
+    you can specify:
+    - `file`: pointing to the file to add to the tar ball sent to the docker daemon
+    - `dest`: path in the tar ball where you want the file, you can refer to it using the same path in an ADD statement.
 - `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing
     the maven build. If false, the image will be deleted as part of the `stop-containers` goal.
 - `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It can be in one of the
