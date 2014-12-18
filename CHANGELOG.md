@@ -1,3 +1,6 @@
+# version 3.0.1
+- Development: Fixed the VerifyHostnameSetIT which generated a NPE because of a non-existent logger.
+
 # version 3.0
 - Docker images are now constructed somewhat differently. You have you specify the Dockerfile as a special entry. Files
     in the Dockerfile are now called artifacts and you can specify where in the tar they will be placed. It's now possible to
