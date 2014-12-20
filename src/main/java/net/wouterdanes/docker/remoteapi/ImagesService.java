@@ -88,7 +88,8 @@ public class ImagesService extends BaseService {
         WebTarget target = getServiceEndPoint()
                 .path(imageId)
                 .path("tag")
-                .queryParam("repo", descriptor.getRegistryRepositoryAndImage());
+                .queryParam("repo", descriptor.getRegistryRepositoryAndImage())
+                .queryParam("force", 1);
 
         Optional<String> targetTag = descriptor.getTag();
         if (targetTag.isPresent()) {
