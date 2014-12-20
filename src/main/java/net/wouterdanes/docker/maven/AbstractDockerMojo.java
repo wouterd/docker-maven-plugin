@@ -200,7 +200,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
             getLog().info(String.format("Tagging image '%s' with tag '%s'..", imageId, nameAndTag));
             getDockerProvider().tagImage(imageId, nameAndTag);
         } catch (DockerException e) {
-            String message = String.format("Failed to add tag '%s' to image '%s'", imageId, nameAndTag);
+            String message = String.format("Failed to add tag '%s' to image '%s'", nameAndTag, imageId);
             handleDockerException(message, e);
         }
     }
