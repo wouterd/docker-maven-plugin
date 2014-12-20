@@ -1,5 +1,7 @@
 # version 3.0.1
 - Development: Fixed the VerifyHostnameSetIT which generated a NPE because of a non-existent logger.
+- Tagging is now "forced", untagging a previous image with the same tag.
+- Fixed the exception message when tagging an image fails.
 
 # version 3.0
 - Docker images are now constructed somewhat differently. You have you specify the Dockerfile as a special entry. Files
