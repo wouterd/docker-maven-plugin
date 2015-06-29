@@ -37,16 +37,16 @@ The README of the master branch will cover the current development version and n
 
 # Usage
 
-Current release version: `3.0`
+Current release version: `3.0.1`
 
-Current snapshot version: `3.1-SNAPSHOT`
+Current snapshot version: `3.0.2-SNAPSHOT`
 
 ## Example
 
       <plugin>
         <groupId>net.wouterdanes.docker</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>3.0</version>
+        <version>3.0.1</version>
         <configuration>
           <userName>goonwarrior</userName>
           <password>g0onwarr!or</password>
