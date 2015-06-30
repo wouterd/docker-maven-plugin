@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 
+import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -47,6 +48,11 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     @Override
     public String buildImage(final ImageBuildConfiguration image) {
         return proxy.buildImage(image);
+    }
+
+    @Override
+    public String commitContainer(ContainerCommitConfiguration configuration) {
+        return proxy.commitContainer(configuration);
     }
 
     @Override

@@ -36,6 +36,7 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.maven.plugin.logging.Log;
 
 import net.wouterdanes.docker.provider.model.Artifact;
+import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.BaseService;
@@ -98,6 +99,17 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     public String buildImage(final ImageBuildConfiguration image) {
         byte[] bytes = getTgzArchiveForFiles(image);
         return miscService.buildImage(bytes, Optional.fromNullable(image.getNameAndTag()));
+    }
+
+    @Override
+    public String commitContainer(final ContainerCommitConfiguration configuration) {
+        return miscService.commitContainer(
+                configuration.getId(),
+                Optional.fromNullable(configuration.getRepo()),
+                Optional.fromNullable(configuration.getTag()),
+                Optional.fromNullable(configuration.getComment()),
+                Optional.fromNullable(configuration.getAuthor())
+        );
     }
 
     @Override

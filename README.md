@@ -25,6 +25,7 @@ The README of the master branch will cover the current development version and n
       - Available in a repository
 - Wait for a container to initialize by checking for a phrase in the stderr/stdout of the container
 - Link containers (same as docker run --link)
+- Commit the state of a running container to a new image
 - Shut down containers in the post-integration-test phase that were started in the pre-integration-test phase
 - Supply information to the project during the integration-test phase about:
       - Images that were built
@@ -90,6 +91,22 @@ Current snapshot version: `3.1-SNAPSHOT`
             </configuration>
             <goals>
               <goal>start-containers</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>commit</id>
+            <configuration>
+              <containers>
+                <container>
+                  <id>debian:wheezy</id>
+                  <repo>goonwarrior/my-debian-wheezy</repo>
+                  <tag>1.0</tag>
+                  <push>true</push>
+                </container>
+              </containers>
+            </configuration>
+            <goals>
+              <goal>commit-container</goal>
             </goals>
           </execution>
           <execution>
