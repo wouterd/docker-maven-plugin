@@ -17,13 +17,20 @@
 
 package net.wouterdanes.docker.remoteapi;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.google.common.base.Optional;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonStreamParser;
 
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
@@ -56,24 +63,58 @@ public class MiscService extends BaseService {
 
     /**
      * Builds an image based on the passed tar archive. Optionally names &amp; tags the image
+     *
      * @param tarArchive the tar archive to use as a source for the image
-     * @param name the name and optional tag of the image.
+     * @param name       the name and optional tag of the image.
      * @return the ID of the created image
      */
     public String buildImage(byte[] tarArchive, Optional<String> name) {
-        String jsonStream = getServiceEndPoint()
+        Response response = getServiceEndPoint()
                 .path("/build")
                 .queryParam("q", true)
                 .queryParam("t", name.orNull())
                 .queryParam("forcerm")
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .post(Entity.entity(tarArchive, "application/tar"), String.class);
+                .post(Entity.entity(tarArchive, "application/tar"));
 
-        Matcher matcher = BUILD_IMAGE_ID_EXTRACTION_PATTERN.matcher(jsonStream);
-        if (!matcher.matches()) {
-            throw new DockerException("Can't obtain ID from build output stream.", jsonStream);
+        InputStream inputStream = (InputStream) response.getEntity();
+
+        String imageId = parseSteamForImageId(inputStream);
+
+        if (imageId == null) {
+            throw new DockerException("Can't obtain ID from build output stream.");
         }
-        return matcher.group(1);
+
+        return imageId;
+    }
+
+    private static String parseSteamForImageId(final InputStream inputStream) {
+        InputStreamReader isr = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(isr);
+
+        JsonStreamParser parser = new JsonStreamParser(reader);
+
+        String imageId = null;
+
+        while (parser.hasNext()) {
+            JsonElement element = parser.next();
+            JsonObject object = element.getAsJsonObject();
+            if (object.has("stream")) {
+                String text = object.get("stream").getAsString();
+                System.out.print(text);
+                Matcher matcher = BUILD_IMAGE_ID_EXTRACTION_PATTERN.matcher(text);
+                if (matcher.matches()) {
+                    imageId = matcher.group(1);
+                }
+            }
+            if (object.has("status")) {
+                System.out.println(object.get("status").getAsString());
+            }
+            if (object.has("error")) {
+                System.err.println("ERROR: " + object.get("error").getAsString());
+            }
+        }
+        return imageId;
     }
 
 }
