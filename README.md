@@ -39,7 +39,7 @@ The README of the master branch will cover the current development version and n
 
 Current release version: `3.1.0`
 
-Current snapshot version: `3.2.0-SNAPSHOT`
+Current snapshot version: `4.0.0-SNAPSHOT`
 
 ## Example
 

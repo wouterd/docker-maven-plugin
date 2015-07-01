@@ -17,19 +17,15 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
+import net.wouterdanes.docker.provider.DockerProvider;
+import net.wouterdanes.docker.provider.model.BuiltImageInfo;
+import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedPort;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
+import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -39,13 +35,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-import net.wouterdanes.docker.provider.DockerProvider;
-import net.wouterdanes.docker.provider.model.BuiltImageInfo;
-import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
-import net.wouterdanes.docker.provider.model.ExposedPort;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
-import net.wouterdanes.docker.remoteapi.model.ContainerLink;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * This class is responsible for starting docking containers in the pre-integration phase of the maven build. The goal
@@ -113,15 +105,8 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
 
     private void waitForContainersToFinishStartup() {
         Collection<ContainerStartConfiguration> waiters =
-                Collections2.filter(containers, new Predicate<ContainerStartConfiguration>() {
-                    @Override
-                    public boolean apply(final ContainerStartConfiguration input) {
-                        return input.getWaitForStartup() != null;
-                    }
-                });
-        for (ContainerStartConfiguration container : waiters) {
-            waitForContainerToFinishStartup(container);
-        }
+                Collections2.filter(containers, input -> input.getWaitForStartup() != null);
+        waiters.forEach(this::waitForContainerToFinishStartup);
     }
 
     private void waitForContainerToFinishStartup(final ContainerStartConfiguration container) {
@@ -209,12 +194,8 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
     private void replaceLinkedContainerIdsWithStartedNames(final ContainerStartConfiguration configuration) {
         for (ContainerLink link : configuration.getLinks()) {
             final String containerId = link.getContainerId();
-            String name = Collections2.filter(getStartedContainers(), new Predicate<StartedContainerInfo>() {
-                @Override
-                public boolean apply(final StartedContainerInfo input) {
-                    return input.getContainerId().equals(containerId);
-                }
-            }).iterator().next().getContainerInfo().getName();
+            String name = Collections2.filter(getStartedContainers(), input -> input.getContainerId().equals(containerId))
+                    .iterator().next().getContainerInfo().getName();
             link.toContainer(name);
         }
     }
