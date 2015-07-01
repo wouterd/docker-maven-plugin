@@ -395,8 +395,7 @@ line, the plugin should pick up the right environment variables. The environment
 
 # Building the project
 
-To build the project, you will need Maven and Java8. The plugin itself doesn't require Java 8, but some integration tests
-use Java 8. The plugin will still create java 7 byte code, no worries. :-)
+To build the project, you will need Maven and Java8.
 
 To build the project and run all the tests, run:
 
@@ -406,8 +405,6 @@ This will run the build including all integration tests. You should run this at 
 To just run unit tests, run:
 
         mvn clean verify
-
-The latter won't require java 8.
 
 # Architecture principles
 * The plugin needs to work in CI server environments, so it needs to make sure there are no port collisions and multiple
