@@ -1,14 +1,17 @@
 package net.wouterdanes.docker;
 
+import org.apache.maven.plugin.logging.Log;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.Mockito;
+
 import net.wouterdanes.docker.provider.DockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
-import org.apache.maven.plugin.logging.Log;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
 
+@Ignore
 public class VerifyHostnameSetIT {
 
     @Test

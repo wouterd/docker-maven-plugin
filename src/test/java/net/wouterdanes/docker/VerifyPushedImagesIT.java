@@ -11,11 +11,13 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * This Integration Test checks the registry to see if all images are pushed by the IT POMs.
  */
+@Ignore
 public class VerifyPushedImagesIT {
 
     private WebTarget repositories;

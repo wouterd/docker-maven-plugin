@@ -1,3 +1,6 @@
+# version 3.1.0
+- Now outputs the daemon responses while building an image. 
+
 # version 3.0.1
 - Development: Fixed the VerifyHostnameSetIT which generated a NPE because of a non-existent logger.
 - Tagging is now "forced", untagging a previous image with the same tag.
