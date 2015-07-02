@@ -52,6 +52,7 @@ public class ImagesService extends BaseService {
         }
 
         return target.request()
+                .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .post(null, String.class);
     }
