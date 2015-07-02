@@ -17,15 +17,14 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This {@link org.apache.maven.plugin.Mojo} checks for any errors in the Docker Maven Plugin during the previous build
@@ -39,11 +38,10 @@ public class VerifyMojo extends AbstractDockerMojo {
 
         List<DockerPluginError> errors = getPluginErrors();
         if (!errors.isEmpty()) {
+            List<String> erroneousGoals = errors.stream()
+                    .map(DockerPluginError::getPluginGoal)
+                    .collect(Collectors.toList());
 
-            Set<String> erroneousGoals = new HashSet<>();
-            for (DockerPluginError error : errors) {
-                erroneousGoals.add(error.getPluginGoal());
-            }
             StringBuilder sb = new StringBuilder("The following plugin goals had errors: \n");
             for (String goal : erroneousGoals) {
                 sb.append(" - ").append(goal).append('\n');

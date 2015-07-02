@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 install:
   - uname -a
 script: mvn clean verify
@@ -7,3 +9,4 @@ env:
   global:
   - secure: Lft4JvZkRsoKrSIhLKTie45uycZZ5ixmugR5hVlX9qjpugLswIUCrWmiV2KvjNf4dwKTWoVOvphMpxzZbIU6+QK91MTH81Gt5kLYFifQDPLL49gal1ahIfUKJIJUFOC2wJjVY7ZC2lQrNVLU78IQGdidshZNIRS43ugyBPfxXjM=
   - secure: HGyAWb8PhDMuPUrFz/YHk+zpeR8aOJ74s9Q4+vZ5bKq1aoETXI+bdf3Ne6p4Ud2jwIPUSxTPCEMUVbaUowDyFzeNiHOCj9i08oL01A+sGLuv5eQi5FgiwLgW6t1tTDbdbISgRT/tWjh7b5Ze2K4SQRnjNwdvWcoxgSJtaBzT/hs=
+sudo: false
