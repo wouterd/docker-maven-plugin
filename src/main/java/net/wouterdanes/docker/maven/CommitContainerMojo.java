@@ -33,28 +33,35 @@ public class CommitContainerMojo extends AbstractPreVerifyDockerMojo {
             return;
         }
         for (ContainerCommitConfiguration container : containers) {
-            String containerId = container.getId();
-            Optional<StartedContainerInfo> containerInfo = getInfoForContainerStartId(containerId);
-            if (containerInfo.isPresent()) {
-                try {
-                    String startedContainerId = containerInfo.get().getContainerInfo().getId();
-                    container.setId(startedContainerId);
-                    String imageId = getDockerProvider().commitContainer(container);
+            commitContainer(container);
+        }
+    }
 
-                    getLog().info(String.format("Image '%s' created from container '%s'", imageId, container.getId()));
+    protected void commitContainer(ContainerCommitConfiguration container) throws MojoFailureException {
+        String containerId = container.getId();
+        Optional<StartedContainerInfo> containerInfo = getInfoForContainerStartId(containerId);
+        if (containerInfo.isPresent()) {
+            try {
+                //replace container name by its actual id.
+                String startedContainerId = containerInfo.get().getContainerInfo().getId();
+                container.setId(startedContainerId);
 
-                    //Register the resulting image so it can be pushed
-                    ImageBuildConfiguration imageBuildConfiguration = new ImageBuildConfiguration();
-                    imageBuildConfiguration.setId(containerId);
-                    imageBuildConfiguration.setNameAndTag(container.getRepo() + ":" + container.getTag());
-                    imageBuildConfiguration.setPush(container.isPush());
-                    registerBuiltImage(imageId, imageBuildConfiguration);
+                String imageId = getDockerProvider().commitContainer(container);
+                getLog().info(String.format("Image '%s' created from container '%s'", imageId, container.getId()));
 
-                } catch (DockerException e) {
-                    String errorMessage = String.format("Image '%s:%s' could not be created from container '%s'", container.getRepo(), container.getTag(), container.getId());
-                    handleDockerException(errorMessage, e);
-                }
+                //Register the resulting image so it can be pushed
+                ImageBuildConfiguration imageBuildConfiguration = new ImageBuildConfiguration();
+                imageBuildConfiguration.setId(containerId);
+                imageBuildConfiguration.setNameAndTag(container.getRepo() + ":" + container.getTag());
+                imageBuildConfiguration.setPush(container.isPush());
+                registerBuiltImage(imageId, imageBuildConfiguration);
+
+            } catch (DockerException e) {
+                String errorMessage = String.format("Image '%s:%s' could not be created from container '%s'", container.getRepo(), container.getTag(), container.getId());
+                handleDockerException(errorMessage, e);
             }
+        } else {
+            getLog().warn(String.format("No container found for id '%s'", containerId));
         }
     }
 
