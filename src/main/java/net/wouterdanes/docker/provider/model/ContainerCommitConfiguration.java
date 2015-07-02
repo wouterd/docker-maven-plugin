@@ -68,4 +68,16 @@ public class ContainerCommitConfiguration {
     public void setPush(boolean push) {
         this.push = push;
     }
+
+    @Override
+    public String toString() {
+        return "ContainerCommitConfiguration{" +
+                "id='" + id + '\'' +
+                ", repo='" + repo + '\'' +
+                ", tag='" + tag + '\'' +
+                ", comment='" + comment + '\'' +
+                ", author='" + author + '\'' +
+                ", push=" + push +
+                '}';
+    }
 }
