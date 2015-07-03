@@ -169,8 +169,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
             containerId = containersService.createContainer(createRequest);
         } catch (ImageNotFoundException e) {
             log.info(String.format("Pulling image %s...", imageId));
-            String result = imagesService.pullImage(imageId);
-            System.out.println(result);
+            imagesService.pullImage(imageId);
             containerId = containersService.createContainer(createRequest);
         }
 
