@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 
-import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -77,13 +76,6 @@ public interface DockerProvider {
      * @return the id of the new Docker Image
      */
     String buildImage(ImageBuildConfiguration image);
-
-    /**
-     * Create a new image from a container's changes
-     * @param configuration the configuration parameters
-     * @return the ID of the created image
-     */
-    String commitContainer(ContainerCommitConfiguration configuration);
 
     /**
      * Removes an image from docker

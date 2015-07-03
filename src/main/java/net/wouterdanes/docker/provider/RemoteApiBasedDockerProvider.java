@@ -36,7 +36,6 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.maven.plugin.logging.Log;
 
 import net.wouterdanes.docker.provider.model.Artifact;
-import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.BaseService;
@@ -102,17 +101,6 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     }
 
     @Override
-    public String commitContainer(final ContainerCommitConfiguration configuration) {
-        return miscService.commitContainer(
-                configuration.getId(),
-                Optional.fromNullable(configuration.getRepo()),
-                Optional.fromNullable(configuration.getTag()),
-                Optional.fromNullable(configuration.getComment()),
-                Optional.fromNullable(configuration.getAuthor())
-        );
-    }
-
-    @Override
     public void removeImage(final String imageId) {
         getImagesService().deleteImage(imageId);
     }
@@ -169,8 +157,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
             containerId = containersService.createContainer(createRequest);
         } catch (ImageNotFoundException e) {
             log.info(String.format("Pulling image %s...", imageId));
-            String result = imagesService.pullImage(imageId);
-            System.out.println(result);
+            imagesService.pullImage(imageId);
             containerId = containersService.createContainer(createRequest);
         }
 

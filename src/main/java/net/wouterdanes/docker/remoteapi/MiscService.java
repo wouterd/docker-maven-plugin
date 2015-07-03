@@ -23,9 +23,7 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -34,11 +32,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonStreamParser;
 
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.model.ContainerCommitResponse;
-import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
-
 import com.google.common.base.Optional;
+
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
 
 /**
  * The class act as an interface to the "root" Remote Docker API with some "misc" service end points.
@@ -64,41 +61,6 @@ public class MiscService extends BaseService {
                 .get(String.class);
 
         return toObject(json, DockerVersionInfo.class);
-    }
-
-    /**
-     * Create a new image from a container's changes
-     *
-     * @param container source container
-     * @param repo repository
-     * @param tag tag
-     * @param comment commit message
-     * @param author author (e.g., "John Hannibal Smith <hannibal@a-team.com>")
-     *
-     * @return the ID of the created image
-     */
-    public String commitContainer(
-            String container,
-            Optional<String> repo,
-            Optional<String> tag,
-            Optional<String> comment,
-            Optional<String> author) {
-
-        WebTarget request = getServiceEndPoint()
-                .path("/commit")
-                .queryParam("container", container)
-                .queryParam("repo", repo.orNull())
-                .queryParam("tag", tag.orNull())
-                .queryParam("comment", comment.orNull())
-                .queryParam("author", author.orNull());
-
-        String json = request
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .method(HttpMethod.POST, String.class);
-
-        ContainerCommitResponse result = toObject(json, ContainerCommitResponse.class);
-
-        return result.getId();
     }
 
     /**
