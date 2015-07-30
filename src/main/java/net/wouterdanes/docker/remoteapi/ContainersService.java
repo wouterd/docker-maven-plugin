@@ -73,10 +73,11 @@ public class ContainersService extends BaseService {
         checkContainerTargetingResponse(id, statusInfo);
     }
 
-    public void killContainer(String id) {
+    public void stopContainer(String id) {
         Response response = getServiceEndPoint()
                 .path(id)
-                .path("/kill")
+                .path("/stop")
+                .queryParam("t", 10)
                 .request()
                 .method(HttpMethod.POST);
 
