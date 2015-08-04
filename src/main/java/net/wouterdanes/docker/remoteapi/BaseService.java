@@ -17,6 +17,20 @@
 
 package net.wouterdanes.docker.remoteapi;
 
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
+import net.wouterdanes.docker.remoteapi.model.Credentials;
+import net.wouterdanes.docker.remoteapi.util.HttpsHelper;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -25,24 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.Security;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status.Family;
-
-import com.google.common.io.BaseEncoding;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
-import net.wouterdanes.docker.remoteapi.model.Credentials;
-import net.wouterdanes.docker.remoteapi.util.HttpsHelper;
+import java.util.Base64;
 
 /**
  * This class is responsible for holding the shared functionality of all Docker remoteapi services.
@@ -86,7 +83,7 @@ public abstract class BaseService {
         if (credentials == null) {
             return REGISTRY_AUTH_NULL_VALUE;
         }
-        return BaseEncoding.base64().encode(toJson(credentials).getBytes(Charset.forName("UTF-8")));
+        return Base64.getEncoder().encodeToString(toJson(credentials).getBytes(Charset.forName("UTF-8")));
     }
 
     protected String toJson(Object obj) {

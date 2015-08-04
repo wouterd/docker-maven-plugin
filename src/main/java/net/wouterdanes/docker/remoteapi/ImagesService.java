@@ -17,13 +17,13 @@
 
 package net.wouterdanes.docker.remoteapi;
 
-import com.google.common.base.Optional;
 import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 /**
  * This class is responsible for talking to the Docker Remote API "images" endpoint.<br> See <a

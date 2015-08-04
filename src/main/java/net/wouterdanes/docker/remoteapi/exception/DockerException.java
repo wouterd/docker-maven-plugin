@@ -17,11 +17,11 @@
 
 package net.wouterdanes.docker.remoteapi.exception;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public class DockerException extends RuntimeException {
 
-    private Optional<String> apiResponse = Optional.absent();
+    private Optional<String> apiResponse = Optional.empty();
 
     public DockerException(final String message, final Throwable cause) {
         super(message, cause);

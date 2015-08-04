@@ -96,6 +96,12 @@
       <artifactId>maven-plugin-api</artifactId>
       <version>${maven.required.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -114,12 +120,6 @@
       <artifactId>plexus-utils</artifactId>
       <version>3.0.8</version>
     </dependency>
-    <!-- For Optional and Functional Programming -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>16.0.1</version>
-    </dependency>
     <!-- For Doing REST calls and translating to/from Json -->
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
@@ -135,6 +135,11 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.3.2</version>
     </dependency>
     <!-- library to read .pem certs & keys for encrypted ssl connection to docker daemon -->
     <dependency>

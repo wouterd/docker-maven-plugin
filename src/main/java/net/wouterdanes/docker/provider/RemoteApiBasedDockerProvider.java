@@ -17,24 +17,6 @@
 
 package net.wouterdanes.docker.provider;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.google.common.base.Optional;
-
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.maven.plugin.logging.Log;
-
 import net.wouterdanes.docker.provider.model.Artifact;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -51,6 +33,22 @@ import net.wouterdanes.docker.remoteapi.util.DockerHostFromEnvironmentSupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerHostFromPropertySupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerPortFromEnvironmentSupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerPortFromPropertySupplier;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.maven.plugin.logging.Log;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
@@ -97,7 +95,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     @Override
     public String buildImage(final ImageBuildConfiguration image) {
         byte[] bytes = getTgzArchiveForFiles(image);
-        return miscService.buildImage(bytes, Optional.fromNullable(image.getNameAndTag()));
+        return miscService.buildImage(bytes, Optional.ofNullable(image.getNameAndTag()));
     }
 
     @Override
@@ -196,7 +194,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
             if (image.getArtifacts() != null) {
                 for (Artifact artifact : image.getArtifacts()) {
                     File file = artifact.getFile();
-                    String pathinTar = artifact.getDest().or(file.getName());
+                    String pathinTar = artifact.getDest().orElse(file.getName());
                     addToTar(tar, file, pathinTar);
                 }
             }
@@ -232,13 +230,15 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     private static Integer getDockerPortFromEnvironment() {
         return DockerPortFromPropertySupplier.INSTANCE.get()
-                .or(DockerPortFromEnvironmentSupplier.INSTANCE.get())
-                .or(DEFAULT_DOCKER_PORT);
+                .orElse(DockerPortFromEnvironmentSupplier.INSTANCE.get()
+                                .orElse(DEFAULT_DOCKER_PORT)
+                );
     }
 
     private static String getDockerHostFromEnvironment() {
         return DockerHostFromPropertySupplier.INSTANCE.get()
-                .or(DockerHostFromEnvironmentSupplier.INSTANCE.get())
-                .or(DEFAULT_DOCKER_HOST);
+                .orElse(DockerHostFromEnvironmentSupplier.INSTANCE.get()
+                                .orElse(DEFAULT_DOCKER_HOST)
+                );
     }
 }

@@ -17,12 +17,12 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
+import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
+import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
+import net.wouterdanes.docker.provider.DockerProviderSupplier;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.provider.model.ImageTagConfiguration;
+import net.wouterdanes.docker.provider.model.PushableImage;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.After;
@@ -30,12 +30,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
-import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
-import net.wouterdanes.docker.provider.DockerProviderSupplier;
-import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-import net.wouterdanes.docker.provider.model.ImageTagConfiguration;
-import net.wouterdanes.docker.provider.model.PushableImage;
+import java.util.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -253,7 +249,7 @@ public class TagImageMojoTest {
     private void assertImageEnqueuedForPush(int index, String expectedImageId, String expectedNameAndTag) {
         PushableImage actual = mojo.getImagesToPush().get(index);
         assertEquals(expectedImageId, actual.getImageId());
-        assertEquals(expectedNameAndTag, actual.getNameAndTag().orNull());
+        assertEquals(expectedNameAndTag, actual.getNameAndTag().orElse(null));
     }
 
     public static class FakeDockerProvider extends AbstractFakeDockerProvider {

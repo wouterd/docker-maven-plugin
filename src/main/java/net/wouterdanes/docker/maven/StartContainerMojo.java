@@ -17,8 +17,6 @@
 
 package net.wouterdanes.docker.maven;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Collections2;
 import net.wouterdanes.docker.provider.DockerProvider;
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
@@ -95,18 +93,16 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
     }
 
     private ContainerStartConfiguration getContainerStartConfiguration(String id) {
-        for (ContainerStartConfiguration configuration : containers) {
-            if (configuration.getId().equals(id)) {
-                return configuration;
-            }
-        }
-        throw new IllegalArgumentException(String.format("No container with ID '%s'", id));
+        return containers.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("No container with ID '%s'", id)));
     }
 
     private void waitForContainersToFinishStartup() {
-        Collection<ContainerStartConfiguration> waiters =
-                Collections2.filter(containers, input -> input.getWaitForStartup() != null);
-        waiters.forEach(this::waitForContainerToFinishStartup);
+        containers.stream()
+                .filter(input -> input.getWaitForStartup() != null)
+                .forEach(this::waitForContainerToFinishStartup);
     }
 
     private void waitForContainerToFinishStartup(final ContainerStartConfiguration container) {
@@ -176,12 +172,12 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
     }
 
     private void exposePortsToProject(ContainerStartConfiguration configuration, List<ExposedPort> exposedPorts) {
-        for (ExposedPort exposedPort : exposedPorts) {
+        exposedPorts.parallelStream().forEach(port -> {
             String prefix = String.format("docker.containers.%s.ports.%s.",
-                    configuration.getId(), exposedPort.getContainerPort());
-            addPropertyToProject(prefix + "host", exposedPort.getHost());
-            addPropertyToProject(prefix + "port", String.valueOf(exposedPort.getExternalPort()));
-        }
+                    configuration.getId(), port.getContainerPort());
+            addPropertyToProject(prefix + "host", port.getHost());
+            addPropertyToProject(prefix + "port", String.valueOf(port.getExternalPort()));
+        });
     }
 
     private void replaceImageWithBuiltImageIdIfInternalId(ContainerStartConfiguration configuration) {
@@ -194,8 +190,11 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
     private void replaceLinkedContainerIdsWithStartedNames(final ContainerStartConfiguration configuration) {
         for (ContainerLink link : configuration.getLinks()) {
             final String containerId = link.getContainerId();
-            String name = Collections2.filter(getStartedContainers(), input -> input.getContainerId().equals(containerId))
-                    .iterator().next().getContainerInfo().getName();
+            String name = getStartedContainers().stream()
+                    .filter(input -> input.getContainerId().equals(containerId))
+                    .findFirst()
+                    .get().getContainerInfo().getName();
+
             link.toContainer(name);
         }
     }

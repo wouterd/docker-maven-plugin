@@ -1,16 +1,12 @@
 package net.wouterdanes.docker.remoteapi;
 
-
-import com.google.common.base.Optional;
-
+import net.wouterdanes.docker.provider.model.PushableImage;
 import org.junit.Before;
 import org.junit.Test;
 
-import net.wouterdanes.docker.provider.model.PushableImage;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
 
 public class PushableImageTest {
 
@@ -31,8 +27,8 @@ public class PushableImageTest {
 
     @Test
     public void testConstruction() {
-        assertExpected(Optional.fromNullable(TAG1), targetWithTag);
-        assertExpected(Optional.<String> absent(), targetWithoutTag);
+        assertExpected(Optional.ofNullable(TAG1), targetWithTag);
+        assertExpected(Optional.empty(), targetWithoutTag);
     }
 
     @Test
@@ -63,7 +59,7 @@ public class PushableImageTest {
     }
 
     private PushableImage make(String imageId, String registry) {
-        return new PushableImage(imageId, Optional.fromNullable(registry));
+        return new PushableImage(imageId, Optional.ofNullable(registry));
     }
 
     private void assertExpected(Optional<String> expectedRegistry,

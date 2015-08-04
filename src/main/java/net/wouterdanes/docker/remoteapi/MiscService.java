@@ -17,23 +17,21 @@
 
 package net.wouterdanes.docker.remoteapi;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonStreamParser;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.google.common.base.Optional;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonStreamParser;
-
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The class act as an interface to the "root" Remote Docker API with some "misc" service end points.
@@ -72,7 +70,7 @@ public class MiscService extends BaseService {
         Response response = getServiceEndPoint()
                 .path("/build")
                 .queryParam("q", true)
-                .queryParam("t", name.orNull())
+                .queryParam("t", name.orElse(null))
                 .queryParam("forcerm")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.entity(tarArchive, "application/tar"));

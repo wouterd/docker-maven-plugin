@@ -1,9 +1,9 @@
 package net.wouterdanes.docker.remoteapi.util;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Supplier;
-
 import net.wouterdanes.docker.provider.RemoteDockerProvider;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Supplies the docker host from the system property
@@ -17,7 +17,7 @@ public final class DockerPortFromPropertySupplier implements Supplier<Optional<I
 
     @Override
     public Optional<Integer> get() {
-        Optional<String> port = Optional.fromNullable(System.getProperty(RemoteDockerProvider.DOCKER_PORT_PROPERTY));
-        return port.isPresent() ? Optional.of(Integer.valueOf(port.get())) : Optional.<Integer>absent();
+        Optional<String> port = Optional.ofNullable(System.getProperty(RemoteDockerProvider.DOCKER_PORT_PROPERTY));
+        return port.isPresent() ? Optional.of(Integer.valueOf(port.get())) : Optional.empty();
     }
 }

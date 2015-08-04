@@ -18,21 +18,20 @@
 package net.wouterdanes.docker.maven;
 
 
+import net.wouterdanes.docker.provider.model.PushableImage;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import net.wouterdanes.docker.provider.model.PushableImage;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-
 /**
  * This class is responsible for pushing docking images in the deploy phase of the maven build. The goal
  * is called "push-images"
  */
 @Mojo(defaultPhase = LifecyclePhase.DEPLOY, name = "push-images", threadSafe = true,
-		instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
+        instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
 public class PushImageMojo extends AbstractDockerMojo {
 
     @Override
@@ -40,12 +39,12 @@ public class PushImageMojo extends AbstractDockerMojo {
         ensureThatAllPushableImagesHaveAName();
         for (PushableImage image : getImagesToPush()) {
             getLog().info(String.format("Pushing image '%s' with tag '%s'",
-                    image.getImageId(), image.getNameAndTag().or("<Unspecified>")));
+                    image.getImageId(), image.getNameAndTag().orElse("<Unspecified>")));
             try {
                 getDockerProvider().pushImage(image.getNameAndTag().get());
             } catch (DockerException e) {
                 String message = String.format("Cannot push image '%s' with tag '%s'",
-                        image.getImageId(), image.getNameAndTag().or("<Unspecified>"));
+                        image.getImageId(), image.getNameAndTag().orElse("<Unspecified>"));
                 handleDockerException(message, e);
             }
         }

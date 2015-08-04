@@ -17,12 +17,11 @@
 
 package net.wouterdanes.docker.remoteapi.model;
 
+import org.apache.commons.lang3.Validate;
+
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 /**
  * Creates an image descriptor based on a passed image id or qualifier in the form ([registry]/[repo]/[image]:[tag])
@@ -43,22 +42,22 @@ public class ImageDescriptor {
     private final Optional<String> tag;
 
     public ImageDescriptor(String id) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(id), "Id was null or empty");
+        Validate.notBlank(id, "Id was null or empty");
 
         this.id = id;
 
         Matcher matcher = IMAGE_QUALIFIER.matcher(id);
         if (matcher.matches()) {
             // because Optional.orNull(x) cannot handle null values of x
-            this.registry = Optional.fromNullable(matcher.group("registry"));
-            this.repository = Optional.fromNullable(matcher.group("repository"));
+            this.registry = Optional.ofNullable(matcher.group("registry"));
+            this.repository = Optional.ofNullable(matcher.group("repository"));
             this.image = matcher.group("image");
-            this.tag = Optional.fromNullable(matcher.group("tag"));
+            this.tag = Optional.ofNullable(matcher.group("tag"));
         } else {
-            this.registry = Optional.absent();
-            this.repository = Optional.absent();
+            this.registry = Optional.empty();
+            this.repository = Optional.empty();
             this.image = id;
-            this.tag = Optional.absent();
+            this.tag = Optional.empty();
         }
     }
 
@@ -133,13 +132,12 @@ public class ImageDescriptor {
     @Override
     public String toString() {
         return "ImageDescriptor[id=" + id
-                + ", registry=" + registry.orNull()
-                + ", repository=" + repository.orNull()
+                + ", registry=" + registry.orElse("<empty>")
+                + ", repository=" + repository.orElse("<empty>")
                 + ", image=" + image
-                + ", tag=" + tag.orNull()
+                + ", tag=" + tag.orElse("<empty>")
                 + "]";
     }
-
 
 
 }

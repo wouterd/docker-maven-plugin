@@ -17,23 +17,20 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.HashMap;
-import java.util.UUID;
-
-import com.google.common.base.Optional;
-
+import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
+import net.wouterdanes.docker.provider.DockerProviderSupplier;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
-import net.wouterdanes.docker.provider.DockerProviderSupplier;
-import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
 
 public class PushImageMojoTest {
 
@@ -62,7 +59,7 @@ public class PushImageMojoTest {
     @Test(expected = MojoFailureException.class)
     public void testThatImagesThatHaveNoNameCauseAnError() throws Exception {
 
-        mojo.enqueueForPushing("some-image-id", Optional.<String>absent());
+        mojo.enqueueForPushing("some-image-id", Optional.empty());
         mojo.enqueueForPushing("another-image-id", new ImageBuildConfiguration());
         mojo.execute();
 

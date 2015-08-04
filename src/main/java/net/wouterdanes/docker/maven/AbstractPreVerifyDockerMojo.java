@@ -1,8 +1,8 @@
 package net.wouterdanes.docker.maven;
 
-import com.google.common.base.Optional;
-
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
+
+import java.util.Optional;
 
 /**
  * Base class for Mojos that execute prior to the "verify" phase. In these Mojos,

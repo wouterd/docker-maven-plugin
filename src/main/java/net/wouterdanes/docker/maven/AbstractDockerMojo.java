@@ -17,22 +17,6 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import net.wouterdanes.docker.provider.DockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
@@ -41,6 +25,13 @@ import net.wouterdanes.docker.provider.model.PushableImage;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Parameter;
+
+import java.util.*;
 
 /**
  * Base class for all Mojos with shared functionality
@@ -101,7 +92,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected Optional<StartedContainerInfo> getInfoForContainerStartId(String startId) {
         Map<String, StartedContainerInfo> map = obtainMapFromPluginContext(STARTED_CONTAINERS_KEY);
-        return Optional.fromNullable(map.get(startId));
+        return Optional.ofNullable(map.get(startId));
     }
 
     protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig) throws MojoFailureException {
@@ -128,7 +119,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected Credentials getCredentials() {
-        if (Strings.isNullOrEmpty(userName)) {
+        if (StringUtils.isBlank(userName)) {
             getLog().debug("No user name provided");
             return null;
         }
@@ -139,7 +130,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected Optional<BuiltImageInfo> getBuiltImageForStartId(final String imageId) {
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
-        return Optional.fromNullable(builtImages.get(imageId));
+        return Optional.ofNullable(builtImages.get(imageId));
     }
 
     protected void registerPluginError(DockerPluginError error) {
@@ -154,8 +145,8 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig) throws MojoFailureException {
         enqueueForPushing(imageId,
-                Optional.fromNullable(imageConfig.getNameAndTag()),
-                Optional.fromNullable(imageConfig.getRegistry()));
+                Optional.ofNullable(imageConfig.getNameAndTag()),
+                Optional.ofNullable(imageConfig.getRegistry()));
     }
 
     protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag, final Optional<String> registry) throws MojoFailureException {
@@ -168,7 +159,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected void enqueueForPushingToRegistry(final String imageId, final Optional<String> nameAndTag, final String registry) throws MojoFailureException {
-        Preconditions.checkArgument(nameAndTag.isPresent(), "When pushing to an explicit registry, name-and-tag must be set.");
+        Objects.requireNonNull(nameAndTag.orElse(null), "When pushing to an explicit registry, name-and-tag must be set.");
 
         // build extended tag by prepending registry to name and tag
         String newNameAndTag = registry + "/" + nameAndTag.get();
@@ -177,11 +168,11 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         attachTag(imageId, newNameAndTag);
 
         // now enqueue for pushing
-        enqueueForPushing(imageId, Optional.fromNullable(newNameAndTag));
+        enqueueForPushing(imageId, Optional.ofNullable(newNameAndTag));
     }
 
     protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag) {
-        getLog().info(String.format("Enqueuing image '%s' to be pushed with tag '%s'..", imageId, nameAndTag.or("<none>")));
+        getLog().info(String.format("Enqueuing image '%s' to be pushed with tag '%s'..", imageId, nameAndTag.orElse("<none>")));
 
         List<PushableImage> images = obtainListFromPluginContext(PUSHABLE_IMAGES_KEY);
         PushableImage newImage = new PushableImage(imageId, nameAndTag);

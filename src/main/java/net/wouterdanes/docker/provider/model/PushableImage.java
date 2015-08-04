@@ -18,10 +18,10 @@
 package net.wouterdanes.docker.provider.model;
 
 import java.util.Objects;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import static org.apache.commons.lang3.Validate.notBlank;
+import static org.apache.commons.lang3.Validate.notNull;
 
 /**
  * Holds information about an image (or tag thereof) to be pushed at a later stage.
@@ -32,8 +32,8 @@ public class PushableImage {
     private final Optional<String> nameAndTag;
 
     public PushableImage(final String imageId, final Optional<String> nameAndTag) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(imageId), "Image id was null or empty");
-        Preconditions.checkNotNull(nameAndTag, "Name and tag was null or empty");
+        notBlank(imageId, "Image id was null or empty");
+        notNull(nameAndTag.orElse(""), "Name and tag was null or empty");
 
         this.imageId = imageId;
         this.nameAndTag = nameAndTag;
@@ -70,7 +70,7 @@ public class PushableImage {
     public String toString() {
         return "PushableImage["
                 + "imageId=" + imageId
-                + ", nameAndTag=" + nameAndTag.or("<Unspecified>")
+                + ", nameAndTag=" + nameAndTag.orElse("<Unspecified>")
                 + "]";
     }
 

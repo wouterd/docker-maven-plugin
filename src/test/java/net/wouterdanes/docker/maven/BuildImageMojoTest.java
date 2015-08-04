@@ -29,15 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 
 public class BuildImageMojoTest {
@@ -154,7 +148,7 @@ public class BuildImageMojoTest {
 
         PushableImage actual = mojo.getImagesToPush().get(0);
         assertEquals(BuildImageMojoTest.IMAGEID, actual.getImageId());
-        assertEquals(expectedNameAndTag, actual.getNameAndTag().orNull());
+        assertEquals(expectedNameAndTag, actual.getNameAndTag().orElse(null));
     }
 
     public static class FakeDockerProvider extends AbstractFakeDockerProvider {

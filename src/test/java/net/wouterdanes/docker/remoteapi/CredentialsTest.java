@@ -17,18 +17,16 @@
 
 package net.wouterdanes.docker.remoteapi;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
+import net.wouterdanes.docker.remoteapi.model.Credentials;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.io.BaseEncoding;
+import java.io.IOException;
+import java.util.Base64;
 
-import net.wouterdanes.docker.remoteapi.model.Credentials;
+import static org.junit.Assert.assertEquals;
 
 public class CredentialsTest {
 
@@ -41,7 +39,8 @@ public class CredentialsTest {
 
     @Before
     public void setUp() {
-        miscService = new BaseService("don't care", "doesn't matter") {};
+        miscService = new BaseService("don't care", "doesn't matter") {
+        };
     }
 
     @Test
@@ -80,7 +79,7 @@ public class CredentialsTest {
 
     protected DecodedAuthHeader decodeAuthHeader(String encodedValue) {
         try {
-            byte[] jsonBytes = BaseEncoding.base64().decode(encodedValue);
+            byte[] jsonBytes = Base64.getDecoder().decode(encodedValue);
             JsonNode node = new ObjectMapper().readTree(jsonBytes);
             return new DecodedAuthHeader(node);
         } catch (IOException e) {

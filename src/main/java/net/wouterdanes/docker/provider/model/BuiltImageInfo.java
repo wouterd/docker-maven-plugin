@@ -17,7 +17,7 @@
 
 package net.wouterdanes.docker.provider.model;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * This class holds information about an image that was built so that it can be references in the start goal and
@@ -33,7 +33,7 @@ public class BuiltImageInfo {
     public BuiltImageInfo(final String imageId, ImageBuildConfiguration imageConfig) {
         this.imageId = imageId;
         this.startId = imageConfig.getId();
-        this.registry = Optional.fromNullable(imageConfig.getRegistry());
+        this.registry = Optional.ofNullable(imageConfig.getRegistry());
         this.keepAfterStopping = imageConfig.isKeep() || imageConfig.isPush();
     }
 

@@ -19,8 +19,8 @@ package net.wouterdanes.docker.remoteapi.model;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.Validate.notBlank;
 
 public class Credentials {
 
@@ -36,14 +36,14 @@ public class Credentials {
     private final String serverAddress;
 
     public Credentials(String userName, String password, String email, String serverAddress) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(userName), "Username was null or empty");
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(password), "Password was null or empty");
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(email), "Emails was null or empty");
+        notBlank(userName, "Username was null or empty");
+        notBlank(password, "Password was null or empty");
+        notBlank(email, "Emails was null or empty");
 
         this.userName = userName;
         this.password = password;
         this.email = email;
-        this.serverAddress = (Strings.isNullOrEmpty(serverAddress) ? DEFAULT_SERVER_NAME  : serverAddress);
+        this.serverAddress = ofNullable(serverAddress).orElse(DEFAULT_SERVER_NAME);
     }
 
     public String getUserName() {

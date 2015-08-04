@@ -19,12 +19,12 @@ package net.wouterdanes.docker.provider;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.base.Supplier;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * This class creates a docker provider based on the passed name when the get() method is called. Used in for example
- * {@link com.google.common.base.Optional#or(com.google.common.base.Supplier)}
+ * {@link Optional#orElseGet(Supplier)}}
  */
 public class DockerProviderSupplier implements Supplier<DockerProvider> {
 

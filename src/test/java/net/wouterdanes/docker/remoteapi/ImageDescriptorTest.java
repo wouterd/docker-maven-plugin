@@ -84,10 +84,10 @@ public class ImageDescriptorTest {
             String image, String tag, String registryRepoAndImage, String repoAndImage, String repoImageAndTag) {
         ImageDescriptor descriptor = new ImageDescriptor(qualifier);
         assertEquals("Id should be correct", id, descriptor.getId());
-        assertEquals("Registry should be correct", registry, descriptor.getRegistry().orNull());
-        assertEquals("Repository should be correct", repository, descriptor.getRepository().orNull());
+        assertEquals("Registry should be correct", registry, descriptor.getRegistry().orElse(null));
+        assertEquals("Repository should be correct", repository, descriptor.getRepository().orElse(null));
         assertEquals("Image should be correct", image, descriptor.getImage());
-        assertEquals("Tag should be correct", tag, descriptor.getTag().orNull());
+        assertEquals("Tag should be correct", tag, descriptor.getTag().orElse(null));
         assertEquals("Repository+Image should be correct", repoAndImage, descriptor.getRepositoryAndImage());
         assertEquals("Repository+Image+Tag should be correct", repoImageAndTag, descriptor.getRepositoryImageAndTag());
         assertEquals("Registry, Repository+Image should be correct", registryRepoAndImage, descriptor.getRegistryRepositoryAndImage());

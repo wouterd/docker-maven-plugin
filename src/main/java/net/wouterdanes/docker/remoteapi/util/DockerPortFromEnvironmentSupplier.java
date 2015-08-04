@@ -1,11 +1,10 @@
 package net.wouterdanes.docker.remoteapi.util;
 
-import java.net.URI;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Supplier;
-
 import net.wouterdanes.docker.provider.RemoteDockerProvider;
+
+import java.net.URI;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Supplies the docker port from the environment variable
@@ -22,10 +21,10 @@ public final class DockerPortFromEnvironmentSupplier extends DockerEnvironmentSu
     public Optional<Integer> get() {
         Optional<URI> dockerUriFromEnvironment = getDockerUriFromEnvironment();
         if (!dockerUriFromEnvironment.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         URI dockerUrl = dockerUriFromEnvironment.get();
         boolean isTcpSocket = RemoteDockerProvider.TCP_PROTOCOL.equalsIgnoreCase(dockerUrl.getScheme());
-        return isTcpSocket ? Optional.fromNullable(dockerUrl.getPort()) : Optional.<Integer>absent();
+        return isTcpSocket ? Optional.ofNullable(dockerUrl.getPort()) : Optional.empty();
     }
 }

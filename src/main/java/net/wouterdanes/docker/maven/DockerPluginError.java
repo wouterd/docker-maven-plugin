@@ -1,8 +1,8 @@
 package net.wouterdanes.docker.maven;
 
-import com.google.common.base.Optional;
-
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
+
+import java.util.Optional;
 
 /**
  * This class holds plugin execution errors that are tested for in the verify goal of this plugin.
@@ -19,7 +19,7 @@ public class DockerPluginError {
     }
 
     public DockerPluginError(final String pluginGoal, final String message) {
-        this(pluginGoal, message, Optional.<DockerException>absent());
+        this(pluginGoal, message, Optional.<DockerException>empty());
     }
 
     public DockerPluginError(final String pluginGoal, final String message, final Optional<DockerException> exception) {

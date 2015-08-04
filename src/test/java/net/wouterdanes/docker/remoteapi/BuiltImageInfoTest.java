@@ -1,13 +1,12 @@
 package net.wouterdanes.docker.remoteapi;
 
-import static org.junit.Assert.assertEquals;
-
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-
 import org.junit.Test;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
 
 public class BuiltImageInfoTest {
 
@@ -21,8 +20,8 @@ public class BuiltImageInfoTest {
     private static final String STARTID = "start";
     private static final String REGISTRYID = "registry";
 
-    private static final Optional<String> NON_NULL_REGISTRY = Optional.fromNullable(REGISTRYID);
-    private static final Optional<String> NULL_REGISTRY = Optional.absent();
+    private static final Optional<String> NON_NULL_REGISTRY = Optional.ofNullable(REGISTRYID);
+    private static final Optional<String> NULL_REGISTRY = Optional.empty();
 
     @Test
     public void testConstruction() {
@@ -48,8 +47,8 @@ public class BuiltImageInfoTest {
     }
 
     private void assertExpected(Optional<String> expectedRegistry,
-            boolean expectedKeep,
-            BuiltImageInfo actual) {
+                                boolean expectedKeep,
+                                BuiltImageInfo actual) {
         assertEquals(IMAGEID, actual.getImageId());
         assertEquals(STARTID, actual.getStartId());
         assertEquals(expectedRegistry, actual.getRegistry());

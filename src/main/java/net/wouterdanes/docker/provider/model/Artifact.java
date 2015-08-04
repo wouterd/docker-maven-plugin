@@ -1,10 +1,9 @@
 package net.wouterdanes.docker.provider.model;
 
-import java.io.File;
-
-import com.google.common.base.Optional;
-
 import org.apache.maven.plugins.annotations.Parameter;
+
+import java.io.File;
+import java.util.Optional;
 
 public class Artifact {
     @Parameter(required = true)
@@ -14,7 +13,7 @@ public class Artifact {
     private String dest;
 
     public Optional<String> getDest() {
-        return Optional.fromNullable(dest);
+        return Optional.ofNullable(dest);
     }
 
     public void setDest(String dest) {

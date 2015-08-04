@@ -17,10 +17,8 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.List;
-
-import com.google.common.base.Optional;
-
+import net.wouterdanes.docker.provider.model.BuiltImageInfo;
+import net.wouterdanes.docker.provider.model.ImageTagConfiguration;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
@@ -28,8 +26,10 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import net.wouterdanes.docker.provider.model.BuiltImageInfo;
-import net.wouterdanes.docker.provider.model.ImageTagConfiguration;
+import java.util.List;
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 /**
  * This class is responsible for tagging docking images in the install phase of the maven build. The goal is called
@@ -58,18 +58,18 @@ public class TagImageMojo extends AbstractDockerMojo {
     private void applyTagsToImage(ImageTagConfiguration config) throws MojoFailureException {
         String imageId = config.getId();
         boolean push = config.isPush();
-        Optional<String> registry = Optional.fromNullable(config.getRegistry());
+        Optional<String> registry = Optional.ofNullable(config.getRegistry());
 
         Optional<BuiltImageInfo> builtInfo = getBuiltImageForStartId(imageId);
         if (builtInfo.isPresent()) {
             imageId = builtInfo.get().getImageId();
-            registry = registry.or(builtInfo.get().getRegistry());
+            registry = ofNullable(registry.orElse(builtInfo.get().getRegistry().orElse(null)));
         }
 
         for (String nameAndTag : config.getTags()) {
             attachTag(imageId, nameAndTag);
             if (push) {
-                enqueueForPushing(imageId, Optional.fromNullable(nameAndTag), registry);
+                enqueueForPushing(imageId, Optional.ofNullable(nameAndTag), registry);
             }
         }
     }
