@@ -17,14 +17,13 @@
 
 package net.wouterdanes.docker.remoteapi;
 
+import com.google.common.base.Optional;
+import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.google.common.base.Optional;
-
-import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
 
 /**
  * This class is responsible for talking to the Docker Remote API "images" endpoint.<br> See <a
@@ -35,6 +34,17 @@ public class ImagesService extends BaseService {
 
     public ImagesService(String dockerApiRoot) {
         super(dockerApiRoot, "/images");
+    }
+
+    public void deleteImage(final String imageId) {
+        try {
+            getServiceEndPoint()
+                    .path(imageId)
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .delete(String.class);
+        } catch (WebApplicationException e) {
+            throw makeImageTargetingException("Cannot remove image", e);
+        }
     }
 
     public String pullImage(final String image) {
@@ -70,19 +80,6 @@ public class ImagesService extends BaseService {
         }
     }
 
-    private WebTarget createPushRequestFromTag(final String nameAndTag) {
-        ImageDescriptor descriptor = new ImageDescriptor(nameAndTag);
-        WebTarget target = getServiceEndPoint()
-                .path(descriptor.getRegistryRepositoryAndImage())
-                .path("push");
-
-        if (descriptor.getTag().isPresent()) {
-            target = target.queryParam("tag", descriptor.getTag().get());
-        }
-
-        return target;
-    }
-
     public void tagImage(final String imageId, final String nameAndTag) {
         ImageDescriptor descriptor = new ImageDescriptor(nameAndTag);
 
@@ -108,14 +105,16 @@ public class ImagesService extends BaseService {
         checkImageTargetingResponse(imageId, statusInfo);
     }
 
-    public void deleteImage(final String imageId) {
-        try {
-            getServiceEndPoint()
-                    .path(imageId)
-                    .request(MediaType.APPLICATION_JSON_TYPE)
-                    .delete(String.class);
-        } catch (WebApplicationException e) {
-            throw makeImageTargetingException("Cannot remove image", e);
+    private WebTarget createPushRequestFromTag(final String nameAndTag) {
+        ImageDescriptor descriptor = new ImageDescriptor(nameAndTag);
+        WebTarget target = getServiceEndPoint()
+                .path(descriptor.getRegistryRepositoryAndImage())
+                .path("push");
+
+        if (descriptor.getTag().isPresent()) {
+            target = target.queryParam("tag", descriptor.getTag().get());
         }
+
+        return target;
     }
 }

@@ -59,6 +59,53 @@ public class ContainersService extends BaseService {
         return createResponse.getId();
     }
 
+    public void deleteContainer(String id) {
+        Response response = getServiceEndPoint()
+                .path(id)
+                .request()
+                .delete();
+
+        Response.StatusType statusInfo = response.getStatusInfo();
+        response.close();
+
+        checkContainerTargetingResponse(id, statusInfo);
+    }
+
+    public String getLogs(final String containerId) {
+        byte[] bytes = getServiceEndPoint()
+                .path(containerId)
+                .path("logs")
+                .queryParam("stdout", 1)
+                .queryParam("stderr", 1)
+                .request("application/vnd.docker.raw-stream")
+                .get(byte[].class);
+
+        // To see how docker returns the logs and why it's parsed like this:
+        // http://docs.docker.com/v1.2/reference/api/docker_remote_api_v1.14/#attach-to-a-container
+        StringBuilder logs = new StringBuilder();
+        ByteBuffer bb = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
+
+        while (bb.hasRemaining()) {
+            bb.position(bb.position() + 4);
+            int frameLength = bb.getInt();
+            byte[] frame = new byte[frameLength];
+            bb.get(frame);
+            logs.append(new String(frame, Charset.forName("UTF-8")));
+        }
+
+        return logs.toString();
+    }
+
+    public ContainerInspectionResult inspectContainer(final String containerId) {
+        String json = getServiceEndPoint()
+                .path(containerId)
+                .path("json")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get(String.class);
+
+        return toObject(json, ContainerInspectionResult.class);
+    }
+
     public void killContainer(String id) {
         Response response = getServiceEndPoint()
                 .path(id)
@@ -99,18 +146,6 @@ public class ContainersService extends BaseService {
         checkContainerTargetingResponse(id, statusInfo);
     }
 
-    public void deleteContainer(String id) {
-        Response response = getServiceEndPoint()
-                .path(id)
-                .request()
-                .delete();
-
-        Response.StatusType statusInfo = response.getStatusInfo();
-        response.close();
-
-        checkContainerTargetingResponse(id, statusInfo);
-    }
-
     private static void checkContainerTargetingResponse(final String id, final Response.StatusType statusInfo) {
         switch (statusInfo.getStatusCode()) {
             case 404:
@@ -118,40 +153,5 @@ public class ContainersService extends BaseService {
             case 500:
                 throw new DockerException(statusInfo.getReasonPhrase());
         }
-    }
-
-    public ContainerInspectionResult inspectContainer(final String containerId) {
-        String json = getServiceEndPoint()
-                .path(containerId)
-                .path("json")
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .get(String.class);
-
-        return toObject(json, ContainerInspectionResult.class);
-    }
-
-    public String getLogs(final String containerId) {
-        byte[] bytes = getServiceEndPoint()
-                .path(containerId)
-                .path("logs")
-                .queryParam("stdout", 1)
-                .queryParam("stderr", 1)
-                .request("application/vnd.docker.raw-stream")
-                .get(byte[].class);
-
-        // To see how docker returns the logs and why it's parsed like this:
-        // http://docs.docker.com/v1.2/reference/api/docker_remote_api_v1.14/#attach-to-a-container
-        StringBuilder logs = new StringBuilder();
-        ByteBuffer bb = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
-
-        while (bb.hasRemaining()) {
-            bb.position(bb.position() + 4);
-            int frameLength = bb.getInt();
-            byte[] frame = new byte[frameLength];
-            bb.get(frame);
-            logs.append(new String(frame, Charset.forName("UTF-8")));
-        }
-
-        return logs.toString();
     }
 }
