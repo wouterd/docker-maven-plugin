@@ -86,7 +86,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     @Override
     public void stopContainer(final String containerId) {
-        getContainersService().killContainer(containerId);
+        getContainersService().stopContainer(containerId);
     }
 
     @Override

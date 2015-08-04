@@ -17,22 +17,21 @@
 
 package net.wouterdanes.docker.remoteapi;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import net.wouterdanes.docker.remoteapi.exception.ContainerNotFoundException;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateResponse;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 /**
  * This class is responsible for talking to the Docker Remote API "containers" endpoint.<br> See <a
@@ -60,8 +59,21 @@ public class ContainersService extends BaseService {
         return createResponse.getId();
     }
 
+    public void killContainer(String id) {
+        Response response = getServiceEndPoint()
+                .path(id)
+                .path("/kill")
+                .request()
+                .method(HttpMethod.POST);
+
+        Response.StatusType statusInfo = response.getStatusInfo();
+        response.close();
+
+        checkContainerTargetingResponse(id, statusInfo);
+    }
+
     public void startContainer(String id, ContainerStartRequest configuration) {
-          Response response = getServiceEndPoint()
+        Response response = getServiceEndPoint()
                 .path(id)
                 .path("/start")
                 .request()
@@ -73,10 +85,11 @@ public class ContainersService extends BaseService {
         checkContainerTargetingResponse(id, statusInfo);
     }
 
-    public void killContainer(String id) {
+    public void stopContainer(String id) {
         Response response = getServiceEndPoint()
                 .path(id)
-                .path("/kill")
+                .path("/stop")
+                .queryParam("t", 10)
                 .request()
                 .method(HttpMethod.POST);
 
