@@ -1,3 +1,7 @@
+# version 4.0.0
+- Now needs Java8 to run, Java7 has been deprecated for a while
+- The plugin now uses the "stop" instead of "kill" command to stop containers in the post-integration-test phase.
+
 # version 3.1.0
 - Now outputs the daemon responses while building an image. 
 
