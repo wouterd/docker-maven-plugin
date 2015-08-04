@@ -71,6 +71,13 @@
         <role>Developer</role>
       </roles>
     </contributor>
+    <contributor>
+      <name>Chris Emery</name>
+      <url>https://github.com/emeryc</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
   </contributors>
 
   <properties>
