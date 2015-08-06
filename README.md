@@ -42,105 +42,99 @@ Current release version: `3.1.0`
 Current snapshot version: `4.0.0-SNAPSHOT`
 
 ## Example
+The following is a snippet from the pom for one of the integration test projects in this project. You can find the full
+pom.xml here: [pom.xml](https://github.com/wouterd/docker-maven-plugin/blob/master/src/it/sample-api-mongo-it/pom.xml)
 
-      <plugin>
-        <groupId>net.wouterdanes.docker</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>3.0.1</version>
-        <configuration>
-          <userName>goonwarrior</userName>
-          <password>g0onwarr!or</password>
-          <email>goonwarrior89@hotmail.com</email>
-        </configuration>
-        <executions>
-          <execution>
-            <id>build</id>
-            <goals>
-              <goal>build-images</goal>
-            </goals>
-            <configuration>
-              <images>
-                <image>
-                  <id>nginx</id>
-                  <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
-                  <keep>true</keep>
-                  <nameAndTag>goonwarrior/my-nginx:1.0-SNAPSHOT</nameAndTag>
-                </image>
-              </images>
-            </configuration>
-          </execution>
-          <execution>
-            <id>start</id>
-            <configuration>
-              <containers>
-                <container>
-                  <id>Debian</id>
-                  <image>debian:wheezy</image>
-                </container>
-                <container>
-                  <id>BusyBox</id>
-                  <image>busybox</image>
-                  <hostname>busyhost</hostname>
-                </container>
-                <container>
-                  <id>cache</id>
-                  <image>nginx</image>
-                </container>
-              </containers>
-            </configuration>
-            <goals>
-              <goal>start-containers</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>stop</id>
-            <goals>
-              <goal>stop-containers</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>tag</id>
-            <goals>
-              <goal>tag-images</goal>
-            </goals>
-            <configuration>
-              <images>
-                <image>
-                  <id>nginx</id>
-                  <tags>
-                  	<tag>goonwarrior/my-nginx:1.0</tag>
-                  	<tag>goonwarrior/my-nginx:latest</tag>
-                  </tags>
-                  <push>true</push>
-                </image>
-              </images>
-            </configuration>
-          </execution>
-          <execution>
-            <id>push</id>
-            <goals>
-              <goal>push-images</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+    <plugin>
+      <groupId>net.wouterdanes.docker</groupId>
+      <artifactId>docker-maven-plugin</artifactId>
+      <version>3.1.0</version>
+      <executions>
+        <execution>
+          <id>package</id>
+          <goals>
+            <goal>build-images</goal>
+          </goals>
+          <configuration>
+            <images>
+              <image>
+                <id>app</id>
+                <dockerFile>${project.basedir}/src/main/docker/Dockerfile</dockerFile>
+                <artifacts>
+                  <artifact>
+                    <file>${project.build.directory}/discuss-jar-with-dependencies.jar</file>
+                  </artifact>
+                </artifacts>
+              </image>
+            </images>
+          </configuration>
+        </execution>
+        <execution>
+          <id>start</id>
+          <goals>
+            <goal>start-containers</goal>
+          </goals>
+          <configuration>
+            <containers>
+              <container>
+                <id>mongo</id>
+                <image>mongo:2.6</image>
+                <waitForStartup>waiting for connections on port 27017</waitForStartup>
+              </container>
+              <container>
+                <id>app</id>
+                <image>app</image>
+                <links>
+                  <link>
+                    <containerId>mongo</containerId>
+                    <containerAlias>mongo</containerAlias>
+                  </link>
+                </links>
+                <env>
+                  <APP_MESSAGE>Hello, world!</APP_MESSAGE>
+                </env>
+                <waitForStartup>Ratpack started for</waitForStartup>
+              </container>
+              <container>
+                <id>app2</id>
+                <image>app</image>
+                <links>
+                  <link>
+                    <containerId>mongo</containerId>
+                    <containerAlias>mongo</containerAlias>
+                  </link>
+                </links>
+                <env>
+                  <APP_MESSAGE>I am, so I message</APP_MESSAGE>
+                </env>
+                <waitForStartup>Ratpack started for</waitForStartup>
+              </container>
+            </containers>
+          </configuration>
+        </execution>
+        <execution>
+          <id>stop</id>
+          <goals>
+            <goal>stop-containers</goal>
+          </goals>
+        </execution>
+        <execution>
+          <id>verify</id>
+          <goals>
+            <goal>verify</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
 
-The above pom.xml element includes the plugin and starts builds an image from the project. Then it starts some containers
+The above pom.xml element includes the plugin and starts building an image from the project. Then it starts some containers
 in the pre-integration-test phase, including the built container and stops those in the post-integration-test phase.
 Under `<configuration>` add some containers. By giving them an `id`, you can reference them later and the ID is also
 used in the port mapping properties. The `<image>` tag specifies the docker image to start.
-Then, in the install phase it assign new release tags to the image we built, , "goonwarrior/my-nginx:1.0" and "goonwarrior/my-nginx:latest".
-Finally, during the deploy phase we push this image to public (default) registry  https://registry.hub.docker.com/.
 
 By default, all exposed ports are published on the host. The following two properties are set per exposed port:
-- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.cache.ports.80/tcp.host')
-- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.cache.ports.80/tcp.port')
+- docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.app.ports.80/tcp.host')
+- docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.app.ports.80/tcp.port')
 
 You can pass those project properties over to your integration test and use them to connect to your application.
 
@@ -336,9 +330,9 @@ The releases of this plugin are deployed to maven central, the SNAPSHOT versions
       </pluginRepository>
 
 ## Enabling the Remote Api on the Docker Daemon
-Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST 
-API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon 
-startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 2375 (default) 
+Normally, docker accepts commands via unix sockets, by default this is /var/run/docker.sock. This plugin uses the REST
+API that is also packaged with docker, but needs to be enabled. You can enable this by adding a -H option to the daemon
+startup command, see http://docs.docker.io/reference/commandline/cli/#daemon. To bind the REST API to port 2375 (default)
 that only listens to the local interface, add this to your daemon startup: `-H tcp://127.0.0.1:2375`
 
 ## Skipping execution of the plugin or phases
@@ -383,7 +377,7 @@ line, the plugin should pick up the right environment variables. The environment
 
 * `DOCKER_HOST` specifies where docker lives, for example: `tcp://192.168.59.103:2376`.
 * `DOCKER_TLS_VERIFY` specifies whether SSL encryption is on, the value `1` denotes that SSL encryption is enabled.
-* `DOCKER_CERT_PATH` points to the folder containing the needed `ca.pem`, `cert.pem` and `key.pem`. If not specified, 
+* `DOCKER_CERT_PATH` points to the folder containing the needed `ca.pem`, `cert.pem` and `key.pem`. If not specified,
     this defaults to `~/.docker`.
 
 # Dependencies:
