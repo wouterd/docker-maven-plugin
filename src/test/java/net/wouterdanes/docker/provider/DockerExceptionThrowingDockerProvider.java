@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 
+import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
@@ -55,6 +56,12 @@ public class DockerExceptionThrowingDockerProvider implements DockerProvider {
 
     @Override
     public String buildImage(final ImageBuildConfiguration image) {
+        throwBadException();
+        return null;
+    }
+
+    @Override
+    public String commitContainer(ContainerCommitConfiguration configuration) {
         throwBadException();
         return null;
     }
