@@ -1,11 +1,8 @@
 package net.wouterdanes.docker.maven;
 
-import com.google.common.base.Optional;
 import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
-import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-import org.apache.maven.plugin.MojoFailureException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,9 +16,6 @@ import java.util.UUID;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
-/**
- * Created by eli on 30/06/15.
- */
 public class CommitContainerMojoTest {
 
     private final String fakeProviderKey = UUID.randomUUID().toString();
@@ -52,7 +46,7 @@ public class CommitContainerMojoTest {
         mojo.execute();
         Mockito.verify(FakeDockerProvider.instance, Mockito.never()).commitContainer(any(ContainerCommitConfiguration.class));
 
-        mojo.setConfiguration(new ArrayList<ContainerCommitConfiguration>());
+        mojo.setConfiguration(new ArrayList<>());
         mojo.execute();
         Mockito.verify(FakeDockerProvider.instance, Mockito.never()).commitContainer(any(ContainerCommitConfiguration.class));
     }

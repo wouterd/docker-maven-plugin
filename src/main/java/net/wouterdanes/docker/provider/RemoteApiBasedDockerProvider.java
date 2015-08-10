@@ -103,10 +103,10 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     public String commitContainer(final ContainerCommitConfiguration configuration) {
         return miscService.commitContainer(
                 configuration.getId(),
-                Optional.fromNullable(configuration.getRepo()),
-                Optional.fromNullable(configuration.getTag()),
-                Optional.fromNullable(configuration.getComment()),
-                Optional.fromNullable(configuration.getAuthor())
+                Optional.ofNullable(configuration.getRepo()),
+                Optional.ofNullable(configuration.getTag()),
+                Optional.ofNullable(configuration.getComment()),
+                Optional.ofNullable(configuration.getAuthor())
         );
     }
 

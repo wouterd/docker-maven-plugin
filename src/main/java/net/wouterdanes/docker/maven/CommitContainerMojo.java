@@ -1,8 +1,9 @@
 package net.wouterdanes.docker.maven;
 
 
-import java.util.List;
-
+import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
+import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
@@ -10,11 +11,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import com.google.common.base.Optional;
-
-import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
-import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import java.util.List;
+import java.util.Optional;
 
 @Mojo(name = "commit-container", defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST, threadSafe = true,
         instantiationStrategy = InstantiationStrategy.PER_LOOKUP)

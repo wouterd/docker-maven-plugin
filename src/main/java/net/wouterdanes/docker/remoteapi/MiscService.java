@@ -17,27 +17,16 @@
 
 package net.wouterdanes.docker.remoteapi;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonStreamParser;
-
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCommitResponse;
 import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
@@ -94,10 +83,10 @@ public class MiscService extends BaseService {
         WebTarget request = getServiceEndPoint()
                 .path("/commit")
                 .queryParam("container", container)
-                .queryParam("repo", repo.orNull())
-                .queryParam("tag", tag.orNull())
-                .queryParam("comment", comment.orNull())
-                .queryParam("author", author.orNull());
+                .queryParam("repo", repo.orElse(null))
+                .queryParam("tag", tag.orElse(null))
+                .queryParam("comment", comment.orElse(null))
+                .queryParam("author", author.orElse(null));
 
         String json = request
                 .request(MediaType.APPLICATION_JSON_TYPE)
