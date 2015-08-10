@@ -25,6 +25,7 @@ The README of the master branch will cover the current development version and n
       - Available in a repository
 - Wait for a container to initialize by checking for a phrase in the stderr/stdout of the container
 - Link containers (same as docker run --link)
+- Commit the state of a running container to a new image
 - Shut down containers in the post-integration-test phase that were started in the pre-integration-test phase
 - Supply information to the project during the integration-test phase about:
       - Images that were built
@@ -113,6 +114,22 @@ pom.xml here: [pom.xml](https://github.com/wouterd/docker-maven-plugin/blob/mast
           </configuration>
         </execution>
         <execution>
+          <id>commit</id>
+          <configuration>
+            <containers>
+              <container>
+                <id>app2</id>
+                <repo>me/app</repo>
+                <tag>1.0</tag>
+                <push>true</push>
+              </container>
+            </containers>
+          </configuration>
+          <goals>
+            <goal>commit-container</goal>
+          </goals>
+        </execution>
+        <execution>
           <id>stop</id>
           <goals>
             <goal>stop-containers</goal>
@@ -127,7 +144,7 @@ pom.xml here: [pom.xml](https://github.com/wouterd/docker-maven-plugin/blob/mast
       </executions>
     </plugin>
 
-The above pom.xml element includes the plugin and starts building an image from the project. Then it starts some containers
+The above pom.xml element includes the plugin and starts builds an image from the project. Then it starts some containers
 in the pre-integration-test phase, including the built container and stops those in the post-integration-test phase.
 Under `<configuration>` add some containers. By giving them an `id`, you can reference them later and the ID is also
 used in the port mapping properties. The `<image>` tag specifies the docker image to start.
