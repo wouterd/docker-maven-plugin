@@ -20,6 +20,7 @@ package net.wouterdanes.docker.remoteapi;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonStreamParser;
+
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
 
