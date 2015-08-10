@@ -33,6 +33,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.util.*;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
+
 /**
  * Base class for all Mojos with shared functionality
  */
@@ -92,7 +95,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected Optional<StartedContainerInfo> getInfoForContainerStartId(String startId) {
         Map<String, StartedContainerInfo> map = obtainMapFromPluginContext(STARTED_CONTAINERS_KEY);
-        return Optional.ofNullable(map.get(startId));
+        return ofNullable(map.get(startId));
     }
 
     protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig) throws MojoFailureException {
@@ -130,7 +133,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     protected Optional<BuiltImageInfo> getBuiltImageForStartId(final String imageId) {
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
-        return Optional.ofNullable(builtImages.get(imageId));
+        return ofNullable(builtImages.get(imageId));
     }
 
     protected void registerPluginError(DockerPluginError error) {
@@ -144,9 +147,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig) throws MojoFailureException {
-        enqueueForPushing(imageId,
-                Optional.ofNullable(imageConfig.getNameAndTag()),
-                Optional.ofNullable(imageConfig.getRegistry()));
+        enqueueForPushing(imageId, ofNullable(imageConfig.getNameAndTag()), ofNullable(imageConfig.getRegistry()));
     }
 
     protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag, final Optional<String> registry) throws MojoFailureException {
@@ -159,7 +160,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected void enqueueForPushingToRegistry(final String imageId, final Optional<String> nameAndTag, final String registry) throws MojoFailureException {
-        Objects.requireNonNull(nameAndTag.orElse(null), "When pushing to an explicit registry, name-and-tag must be set.");
+        requireNonNull(nameAndTag.orElse(null), "When pushing to an explicit registry, name-and-tag must be set.");
 
         // build extended tag by prepending registry to name and tag
         String newNameAndTag = registry + "/" + nameAndTag.get();
@@ -168,7 +169,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         attachTag(imageId, newNameAndTag);
 
         // now enqueue for pushing
-        enqueueForPushing(imageId, Optional.ofNullable(newNameAndTag));
+        enqueueForPushing(imageId, ofNullable(newNameAndTag));
     }
 
     protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag) {
