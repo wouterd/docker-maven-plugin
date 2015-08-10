@@ -1,6 +1,5 @@
 package net.wouterdanes.docker.maven;
 
-
 import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
@@ -60,7 +59,9 @@ public class CommitContainerMojo extends AbstractPreVerifyDockerMojo {
                 handleDockerException(errorMessage, e);
             }
         } else {
-            getLog().warn(String.format("No container found for id '%s'", containerId));
+            String message = String.format("No container found for id '%s'", containerId);
+            registerPluginError(new DockerPluginError("commit-container", message));
+            getLog().warn(message);
         }
     }
 
