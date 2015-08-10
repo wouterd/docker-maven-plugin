@@ -26,6 +26,8 @@ import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
+import java.util.Iterator;
+
 /**
  * This class is responsible for pushing docking images in the deploy phase of the maven build. The goal
  * is called "push-images"
@@ -51,11 +53,15 @@ public class PushImageMojo extends AbstractDockerMojo {
     }
 
     private void ensureThatAllPushableImagesHaveAName() throws MojoFailureException {
-        for (PushableImage image : getImagesToPush()) {
-            if (!image.getNameAndTag().isPresent()) {
-                throw new MojoFailureException(String.format("Image '%s' needs to be pushed but doesn't have a name.",
-                        image.getImageId()));
-            }
+        Iterator<PushableImage> imagesWithoutNameAndTag = getImagesToPush().parallelStream()
+                .filter(image -> !image.getNameAndTag().isPresent()).iterator();
+
+        if (imagesWithoutNameAndTag.hasNext()) {
+            imagesWithoutNameAndTag.forEachRemaining(image -> {
+                String message = String.format("Image '%s' needs to be pushed but doesn't have a name.", image.getImageId());
+                getLog().error(message);
+            });
+            throw new MojoFailureException("There are images that need to be pushed without a name.");
         }
     }
 
