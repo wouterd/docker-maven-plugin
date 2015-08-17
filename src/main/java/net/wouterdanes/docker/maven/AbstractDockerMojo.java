@@ -114,6 +114,29 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return Collections.unmodifiableCollection(builtImagesMap.values());
     }
 
+    protected void cleanUpStartedContainers() {
+        List<String> stoppedContainerIds = new ArrayList<>();
+        for (Iterator<StartedContainerInfo> it = getStartedContainers().iterator(); it.hasNext();) {
+            String containerId = it.next().getContainerInfo().getId();
+            getLog().info(String.format("Stopping container '%s'..", containerId));
+            try {
+                getDockerProvider().stopContainer(containerId);
+                it.remove();
+                stoppedContainerIds.add(containerId);
+            } catch (DockerException e) {
+                getLog().error("Failed to stop container (this means it also won't be deleted)", e);
+            }
+        }
+        for (String containerId : stoppedContainerIds) {
+            getLog().info(String.format("Deleting container '%s'..", containerId));
+            try {
+                getDockerProvider().deleteContainer(containerId);
+            } catch (DockerException e) {
+                getLog().error("Failed to delete container", e);
+            }
+        }
+    }
+
     protected DockerProvider getDockerProvider() {
         DockerProvider provider = new DockerProviderSupplier(providerName).get();
         provider.setCredentials(getCredentials());
