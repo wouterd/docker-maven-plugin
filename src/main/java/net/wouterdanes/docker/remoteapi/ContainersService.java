@@ -46,11 +46,6 @@ public class ContainersService extends BaseService {
 
     public String createContainer(ContainerCreateRequest request) {
         String createResponseStr;
-        System.out.println(request);
-		System.out.println(getServiceEndPoint());
-		System.out.println(getServiceEndPoint().path("/create"));
-		System.out.println(getServiceEndPoint().path("/create").request(MediaType.APPLICATION_JSON_TYPE));
-		System.out.println(Entity.entity(toJson(request), MediaType.APPLICATION_JSON_TYPE));
         try {
             createResponseStr = getServiceEndPoint()
                     .path("/create")
@@ -59,7 +54,6 @@ public class ContainersService extends BaseService {
         } catch (WebApplicationException e) {
             throw makeImageTargetingException(request.getImage(), e);
         }
-        System.out.println(createResponseStr);
         ContainerCreateResponse createResponse = toObject(createResponseStr, ContainerCreateResponse.class);
         return createResponse.getId();
     }
