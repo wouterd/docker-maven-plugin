@@ -69,7 +69,7 @@ public class MiscService extends BaseService {
      * @param repo repository
      * @param tag tag
      * @param comment commit message
-     * @param author author (e.g., "John Hannibal Smith <hannibal@a-team.com>")
+     * @param author author (e.g., "John Hannibal Smith &lt;hannibal@a-team.com&gt;")
      *
      * @return the ID of the created image
      */
