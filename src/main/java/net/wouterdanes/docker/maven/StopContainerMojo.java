@@ -34,24 +34,8 @@ public class StopContainerMojo extends AbstractPreVerifyDockerMojo {
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
-        for (StartedContainerInfo container : getStartedContainers()) {
-            String containerId = container.getContainerInfo().getId();
-            getLog().info(String.format("Stopping container '%s'..", containerId));
-            try {
-                getDockerProvider().stopContainer(containerId);
-            } catch (DockerException e) {
-                getLog().error("Failed to stop container", e);
-            }
-        }
-        for (StartedContainerInfo container : getStartedContainers()) {
-            String containerId = container.getContainerInfo().getId();
-            getLog().info(String.format("Deleting container '%s'..", containerId));
-            try {
-                getDockerProvider().deleteContainer(containerId);
-            } catch (DockerException e) {
-                getLog().error("Failed to delete container", e);
-            }
-        }
+        cleanUpStartedContainers();
+
         for (BuiltImageInfo image : getBuiltImages()) {
             if (image.shouldKeepAfterStopping()) {
                 getLog().info(String.format("Keeping image %s", image.getImageId()));

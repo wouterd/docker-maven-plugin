@@ -48,6 +48,9 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
     @Parameter(required = true)
     private List<ContainerStartConfiguration> containers;
 
+    @Parameter
+    private boolean forceCleanup;
+
     @Inject
     public StartContainerMojo(List<ContainerStartConfiguration> containers) {
         this.containers = containers;
@@ -90,6 +93,23 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
         }
         getLog().debug("Properties after exposing ports: " + project.getProperties());
         waitForContainersToFinishStartup();
+        if (forceCleanup) {
+            addShutdownHookToCleanUpContainers();
+        }
+    }
+
+    /** Avoid dangling containers if the build is interrupted (e.g. via Ctrl+C) before the StopContainer mojo runs. */
+    private void addShutdownHookToCleanUpContainers()
+    {
+        getLog().info("Started containers will be forcibly cleaned up when the build finishes");
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                cleanUpStartedContainers();
+            }
+        }));
     }
 
     private ContainerStartConfiguration getContainerStartConfiguration(String id) {

@@ -76,6 +76,10 @@ pom.xml here: [pom.xml](https://github.com/wouterd/docker-maven-plugin/blob/mast
             <goal>start-containers</goal>
           </goals>
           <configuration>
+            <!-- You can set forceCleanup to true to stop and remove started containers
+                 at the end of the build even if the stop-containers goal is not executed
+                 (useful for preventing Ctrl+C causing dangling containers) -->
+            <forceCleanup>false</forceCleanup>
             <containers>
               <container>
                 <id>mongo</id>
