@@ -273,6 +273,37 @@ The configuration works as follows:
     the image will be retained after the container is stopped.
 - `<registry>` captures the host name and port of a private Docker registry, to which the image should be pushed, optional.
 
+## `commit-containers` goal
+The `commit-containers` goals allows you to persist the state of a container to an image. Below is an example snippet.
+
+          <execution>
+            <id>commit</id>
+            <goals>
+              <goal>commit-containers</goal>
+            </goals>
+            <configuration>
+              <containers>
+                <container>
+                  <id>app2</id>
+                  <repo>me/app</repo>
+                  <tag>${maven.build.timestamp}</tag>
+                  <comment>Daily build</comment>
+                  <author>Jenkins</author>
+                  <push>true</push>
+                </container>
+               </containers>
+            </configuration>
+          </execution>
+
+The configuration works as follows:
+- `<containers>` contains a list of containers to build as `<container>` elements
+- `<id>` specifies the ID of a previously started container.
+- `<repo>` specifies the repository to push the resulting image to.
+- `<tag>` specifies the tag for the image, especially useful when pushing the built image to a repository.
+- `<comment>` commit message
+- `<author>` author (e.g., “John Hannibal Smith <hannibal@a-team.com>“)
+- `<push>` (defaults to false) specifies whether or not the plugin should push the tagged image to a Docker image registry.
+
 ## `tag-images` goal
 The `tag-images` goal allows you to assign additional tags to images and optionally flag those tags to be pushed to a Docker image registry in a subsequent
 `push-images` execution.

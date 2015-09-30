@@ -13,7 +13,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import java.util.List;
 import java.util.Optional;
 
-@Mojo(name = "commit-container", defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST, threadSafe = true,
+@Mojo(name = "commit-containers", defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST, threadSafe = true,
         instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
 public class CommitContainerMojo extends AbstractPreVerifyDockerMojo {
     @Parameter(required = true)
@@ -60,14 +60,14 @@ public class CommitContainerMojo extends AbstractPreVerifyDockerMojo {
             }
         } else {
             String message = String.format("No container found for id '%s'", containerId);
-            registerPluginError(new DockerPluginError("commit-container", message));
+            registerPluginError(new DockerPluginError("commit-containers", message));
             getLog().warn(message);
         }
     }
 
     @Override
     protected String getMojoGoalName() {
-        return "commit-container";
+        return "commit-containers";
     }
 
 }
