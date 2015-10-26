@@ -17,24 +17,26 @@
 
 package net.wouterdanes.docker.remoteapi;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonStreamParser;
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.model.ContainerCommitResponse;
-import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonStreamParser;
+
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.ContainerCommitResponse;
+import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
 
 /**
  * The class act as an interface to the "root" Remote Docker API with some "misc" service end points.
@@ -111,6 +113,7 @@ public class MiscService extends BaseService {
                 .queryParam("t", name.orElse(null))
                 .queryParam("forcerm")
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
                 .post(Entity.entity(tarArchive, "application/tar"));
 
         InputStream inputStream = (InputStream) response.getEntity();
