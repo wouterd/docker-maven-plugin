@@ -1,3 +1,6 @@
+# version 4.1.0
+- Now passes authentication header to build image task to allow pulling images from a private repository.
+
 # version 4.0.0
 - Now needs Java8 to run, Java7 has been deprecated for a while
 - The plugin now uses the "stop" instead of "kill" command to stop containers in the `post-integration-test` phase.
