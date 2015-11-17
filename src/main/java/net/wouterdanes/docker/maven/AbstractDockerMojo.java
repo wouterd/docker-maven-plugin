@@ -30,7 +30,10 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static java.util.Objects.requireNonNull;
@@ -60,6 +63,13 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "", property = "docker.password", required = false)
     private String password;
+
+    /**
+     * Write docker logs output to this directory, using a filename of ${container-name}.log (from the
+     * plugin configuration's container name field).
+     */
+    @Parameter( defaultValue = "", property = "docker.logs", required = false )
+    private String logs;
 
     public void setProviderName(final String providerName) {
         this.providerName = providerName;
@@ -115,11 +125,48 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected void cleanUpStartedContainers() {
+        File logsDir = null;
+        if ( logs != null && logs.trim().length() > 0 )
+        {
+            logsDir = new File( logs );
+            logsDir.mkdirs();
+            getLog().info( "Writing docker container logs to directory: " + logsDir );
+        }
+        else
+        {
+            getLog().info( "NOT writing docker container logs." );
+        }
+
         List<String> stoppedContainerIds = new ArrayList<>();
         for (Iterator<StartedContainerInfo> it = getStartedContainers().iterator(); it.hasNext();) {
-            String containerId = it.next().getContainerInfo().getId();
+            StartedContainerInfo startedContainerInfo = it.next();
+            String containerId = startedContainerInfo.getContainerInfo().getId();
+            String containerName = startedContainerInfo.getContainerId();
             getLog().info(String.format("Stopping container '%s'..", containerId));
             try {
+                if ( logsDir != null )
+                {
+                    File logFile = new File( logsDir, containerName + ".log" );
+
+                    getLog().info( "Writing logs to: " + logFile );
+                    String logs = getDockerProvider().getLogs( containerId );
+                    try
+                    {
+                        FileUtils.fileWrite( logFile, logs );
+                    }
+                    catch ( IOException e )
+                    {
+                        if ( getLog().isDebugEnabled() )
+                        {
+                            getLog().error( "Failed to write docker logs to: " + logFile, e );
+                        }
+                        else
+                        {
+                            getLog().error( "Failed to write docker logs to: " + logFile );
+                        }
+                    }
+                }
+
                 getDockerProvider().stopContainer(containerId);
                 it.remove();
                 stoppedContainerIds.add(containerId);
