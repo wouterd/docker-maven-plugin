@@ -1,5 +1,6 @@
 # version 4.1.0
 - Now passes authentication header to build image task to allow pulling images from a private repository.
+- Now allows you to persist the logs for all containers to a certain folder.
 
 # version 4.0.0
 - Now needs Java8 to run, Java7 has been deprecated for a while

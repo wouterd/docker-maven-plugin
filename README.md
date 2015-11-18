@@ -273,6 +273,11 @@ The configuration works as follows:
     the image will be retained after the container is stopped.
 - `<registry>` captures the host name and port of a private Docker registry, to which the image should be pushed, optional.
 
+## `stop-containers` goal
+The `stop-containers` goal allows you to stop and clean up any containers that were created with the plugin. The `logs`
+parameter allows you to specify a folder where the logs of the containres need to go. They will be saved as
+`[container name].log`. If you don't specify a folder, no logs will be saved.
+
 ## `commit-containers` goal
 The `commit-containers` goals allows you to persist the state of a container to an image. Below is an example snippet.
 
