@@ -38,9 +38,9 @@ The README of the master branch will cover the current development version and n
 
 # Usage
 
-Current release version: `4.0.1`
+Current release version: `4.1.1`
 
-Current snapshot version: `4.0.2-SNAPSHOT`
+Current snapshot version: `4.1.2-SNAPSHOT`
 
 ## Example
 The following is a snippet from the pom for one of the integration test projects in this project. You can find the full
