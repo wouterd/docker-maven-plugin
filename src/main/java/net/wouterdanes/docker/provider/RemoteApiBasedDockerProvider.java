@@ -38,14 +38,14 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -234,8 +234,9 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         } else {
             ArchiveEntry entry = tar.createArchiveEntry(file, fileNameAndPath);
             tar.putArchiveEntry(entry);
-            byte[] contents = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-            tar.write(contents);
+            try (FileInputStream fis = new FileInputStream(file)) {
+                IOUtils.copy(fis, tar);
+            }
             tar.closeArchiveEntry();
         }
     }

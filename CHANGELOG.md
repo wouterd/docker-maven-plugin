@@ -1,3 +1,6 @@
+# version 4.1.1
+- Files added to the tar-ball sent to the docker daemon are no longer fully loaded into memory. The plugin should no longer need hundreds of MegaBytes of memory to work with big files. :-) Sorry! And thanks to [Cedric Thiebault](https://github.com/cthiebault) for fixing!
+
 # version 4.1.0
 - Now passes authentication header to build image task to allow pulling images from a private repository.
 - Now allows you to persist the logs for all containers to a certain folder.
@@ -8,7 +11,7 @@
 - Added the ability to commit containers after running them in the `post-integration-test` phase.
 
 # version 3.1.0
-- Now outputs the daemon responses while building an image. 
+- Now outputs the daemon responses while building an image.
 
 # version 3.0.1
 - Development: Fixed the VerifyHostnameSetIT which generated a NPE because of a non-existent logger.
@@ -18,7 +21,7 @@
 # version 3.0
 - Docker images are now constructed somewhat differently. You have you specify the Dockerfile as a special entry. Files
     in the Dockerfile are now called artifacts and you can specify where in the tar they will be placed. It's now possible to
-    point to whole folders and have those added to the tar ball in the build phase. Just put the path to the folder in 
+    point to whole folders and have those added to the tar ball in the build phase. Just put the path to the folder in
     `<file>` tags.
 - Added the ability to set the hostname of a container
 
