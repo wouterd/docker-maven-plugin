@@ -207,6 +207,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected Credentials getCredentials() {
+        // priority to credentials from plugin configuration over the ones from settings
         return Stream.of(getCredentialsFromParameters(), getCredentialsFromSettings())
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -219,7 +220,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
             getLog().debug("No user name provided. Will try <servers> from settings.xml");
             return empty();
         }
-        getLog().debug("Using credentials: " + userName);
+        getLog().debug("Using credentials from plugin config: " + userName);
         return of(new Credentials(userName, password, email, null));
     }
 
@@ -230,10 +231,10 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         }
         Server server = settings.getServer(serverId);
         if(server == null) {
-            getLog().debug("Cannot find server " + serverId + " in settings.xml");
+            getLog().debug("Cannot find server " + serverId + " in Maven settings");
             return empty();
         }
-        getLog().debug("Using credentials: " + server.getUsername());
+        getLog().debug("Using credentials from Maven settings: " + server.getUsername());
         return of(new Credentials(server.getUsername(), server.getPassword(), getEmail(server), null));
     }
 
