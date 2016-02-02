@@ -25,11 +25,14 @@ import net.wouterdanes.docker.provider.model.PushableImage;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,11 +40,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.stripToNull;
 
 /**
@@ -68,6 +72,15 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "", property = "docker.password", required = false)
     private String password;
+
+    @Parameter(property = "serverId")
+    private String serverId;
+
+    /**
+     * Maven settings from ~/.m2/settings.xml
+     */
+    @Component
+    private Settings settings;
 
     /**
      * Write docker logs output to this directory, using a filename of ${container-name}.log (from the
@@ -194,13 +207,58 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     protected Credentials getCredentials() {
-        if (StringUtils.isBlank(userName)) {
-            getLog().debug("No user name provided");
-            return null;
-        }
+        return Stream.of(getCredentialsFromParameters(), getCredentialsFromSettings())
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst()
+            .orElse(null);
+    }
 
+    private Optional<Credentials> getCredentialsFromParameters() {
+        if (isBlank(userName)) {
+            getLog().debug("No user name provided. Will try <servers> from settings.xml");
+            return empty();
+        }
         getLog().debug("Using credentials: " + userName);
-        return new Credentials(userName, password, email, null);
+        return of(new Credentials(userName, password, email, null));
+    }
+
+    private Optional<Credentials> getCredentialsFromSettings() {
+        if(settings == null) {
+            getLog().debug("No settings.xml");
+            return empty();
+        }
+        Server server = settings.getServer(serverId);
+        if(server == null) {
+            getLog().debug("Cannot find server " + serverId + " in settings.xml");
+            return empty();
+        }
+        getLog().debug("Using credentials: " + server.getUsername());
+        return of(new Credentials(server.getUsername(), server.getPassword(), getEmail(server), null));
+    }
+
+    /**
+     * <pre>
+     * <servers>
+     *   <server>
+     *     <id>docker-private-registry</id>
+     *     [...]
+     *     <configuration>
+     *       <email>foo@bar.com</email>
+     *     </configuration>
+     *   </server>
+     * </servers>
+     * </pre>
+     */
+    private String getEmail(Server server) {
+        Xpp3Dom configuration = (Xpp3Dom) server.getConfiguration();
+        if (configuration != null) {
+            Xpp3Dom emailNode = configuration.getChild("email");
+            if (emailNode != null) {
+                return emailNode.getValue();
+            }
+        }
+        return null;
     }
 
     protected Optional<BuiltImageInfo> getBuiltImageForStartId(final String imageId) {
