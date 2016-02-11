@@ -12,6 +12,9 @@ As the documentation evolves with different plugin versions, be sure that before
 
 The README of the master branch will cover the current development version and not cover the current released version.
 
+# Donations
+If you love this plugin and use it a lot and want to donate something for my time spent maintaining this project, use the following link: [Pay pal](https://www.paypal.me/WouterDanes). Donations are much appreciated!
+
 # Minimum versions required
 
 - Minimum required maven version: 3.1.1
