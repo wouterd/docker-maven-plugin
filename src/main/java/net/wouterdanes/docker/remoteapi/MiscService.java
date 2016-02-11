@@ -109,7 +109,6 @@ public class MiscService extends BaseService {
     public String buildImage(byte[] tarArchive, Optional<String> name) {
         Response response = getServiceEndPoint()
                 .path("/build")
-                .queryParam("q", true)
                 .queryParam("t", name.orElse(null))
                 .queryParam("forcerm")
                 .request(MediaType.APPLICATION_JSON_TYPE)
