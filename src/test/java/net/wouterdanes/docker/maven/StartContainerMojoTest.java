@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +43,9 @@ import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -379,6 +383,21 @@ public class StartContainerMojoTest {
         @Override
         protected AbstractFakeDockerProvider getInstance() {
             return instance;
+        }
+
+        @Override
+        public void setRepositorySystem(RepositorySystem repositorySystem) {
+            // NOOP
+        }
+
+        @Override
+        public void setRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
+            // NOOP
+        }
+
+        @Override
+        public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
+            // NOOP
         }
     }
 }

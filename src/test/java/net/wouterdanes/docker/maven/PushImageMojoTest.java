@@ -21,12 +21,16 @@ import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import org.apache.maven.plugin.MojoFailureException;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -81,6 +85,21 @@ public class PushImageMojoTest {
         @Override
         protected AbstractFakeDockerProvider getInstance() {
             return instance;
+        }
+
+        @Override
+        public void setRepositorySystem(RepositorySystem repositorySystem) {
+            // NOOP
+        }
+
+        @Override
+        public void setRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
+            // NOOP
+        }
+
+        @Override
+        public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
+            // NOOP
         }
     }
 }

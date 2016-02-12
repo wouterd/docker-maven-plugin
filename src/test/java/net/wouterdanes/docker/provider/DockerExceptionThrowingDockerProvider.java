@@ -11,6 +11,9 @@ import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * A Mock {@link net.wouterdanes.docker.provider.DockerProvider} that only throws
@@ -89,6 +92,21 @@ public class DockerExceptionThrowingDockerProvider implements DockerProvider {
 
     @Override
     public void setLogger(final Log logger) {
+        // NOOP
+    }
+
+    @Override
+    public void setRepositorySystem(RepositorySystem repositorySystem) {
+        // NOOP
+    }
+
+    @Override
+    public void setRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
+        // NOOP
+    }
+
+    @Override
+    public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
         // NOOP
     }
 

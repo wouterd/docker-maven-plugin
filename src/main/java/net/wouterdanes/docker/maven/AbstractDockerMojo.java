@@ -29,7 +29,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,6 +57,15 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     private static final String BUILT_IMAGES_KEY = "builtImages";
     private static final String PUSHABLE_IMAGES_KEY = "pushableImages";
     private static final String ERRORS_KEY = "errors";
+
+    @Component
+    private RepositorySystem repositorySystem;
+
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+    private RepositorySystemSession repositorySystemSession;
+
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}")
+    private List<RemoteRepository> remoteRepositories;
 
     @Parameter(defaultValue = "remote", property = "docker.provider", required = true)
     private String providerName;
@@ -190,6 +203,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         DockerProvider provider = new DockerProviderSupplier(providerName).get();
         provider.setCredentials(getCredentials());
         provider.setLogger(getLog());
+        provider.setRepositorySystem(repositorySystem);
+        provider.setRepositorySystemSession(repositorySystemSession);
+        provider.setRemoteRepositories(remoteRepositories);
         return provider;
     }
 

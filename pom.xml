@@ -19,8 +19,8 @@
   <name>Docker Maven Plugin</name>
 
   <description>
-    A plugin designed to wrap the docker API to prepare docker images for integration testing. Tested containers can
-    then be pushed to a central docker repository and deployed into production.
+    A plugin designed to wrap the docker API to prepare docker images for integration testing.
+    Tested containers can then be pushed to a central docker remoteRepositories and deployed into production.
   </description>
 
   <url>https://github.com/wouterd/docker-maven-plugin</url>
@@ -82,6 +82,7 @@
 
   <properties>
     <maven.required.version>3.1.1</maven.required.version>
+    <aether-api.version>1.1.0</aether-api.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -152,6 +153,17 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
       <version>1.8</version>
+    </dependency>
+    <!-- Required to add maven dependencies to an image -->
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>${aether-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>${aether-api.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

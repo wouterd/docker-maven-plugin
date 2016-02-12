@@ -17,14 +17,12 @@
 
 package net.wouterdanes.docker.provider;
 
-import net.wouterdanes.docker.provider.model.Artifact;
-import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
-import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
-import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.provider.model.*;
 import net.wouterdanes.docker.remoteapi.BaseService;
 import net.wouterdanes.docker.remoteapi.ContainersService;
 import net.wouterdanes.docker.remoteapi.ImagesService;
 import net.wouterdanes.docker.remoteapi.MiscService;
+import net.wouterdanes.docker.remoteapi.exception.MavenArtifactNotFoundException;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
@@ -40,16 +38,16 @@ import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.maven.plugin.logging.Log;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
@@ -62,6 +60,9 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
     private final Set<BaseService> services;
 
+    private RepositorySystem repositorySystem;
+    private RepositorySystemSession repositorySystemSession;
+    private List<RemoteRepository> remoteRepositories;
     private Log log;
 
     private static final int DEFAULT_DOCKER_PORT = 2375;
@@ -143,6 +144,21 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         this.log = logger;
     }
 
+    @Override
+    public void setRepositorySystem(RepositorySystem repositorySystem) {
+        this.repositorySystem = repositorySystem;
+    }
+
+    @Override
+    public void setRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
+        this.repositorySystemSession = repositorySystemSession;
+    }
+
+    @Override
+    public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
+        this.remoteRepositories = remoteRepositories;
+    }
+
     protected RemoteApiBasedDockerProvider(final String host, final int port) {
         this.host = host;
         this.port = port;
@@ -196,7 +212,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         return port;
     }
 
-    private static byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
+    private byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (
                 ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", baos)
@@ -206,8 +222,31 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
             if (image.getArtifacts() != null) {
                 for (Artifact artifact : image.getArtifacts()) {
                     File file = artifact.getFile();
-                    String pathinTar = artifact.getDest().orElse(file.getName());
-                    addToTar(tar, file, pathinTar);
+                    String pathInTar = artifact.getDest().orElse(file.getName());
+                    addToTar(tar, file, pathInTar);
+                }
+            }
+
+            if (image.getMavenArtifacts() != null) {
+                for (MavenArtifact mavenArtifact : image.getMavenArtifacts()) {
+                    ArtifactRequest request = new ArtifactRequest();
+                    request.setArtifact(new DefaultArtifact(mavenArtifact.getDependency()));
+                    request.setRepositories(remoteRepositories);
+
+                    log.debug("Resolving artifact " + mavenArtifact.getDependency() + " from " + remoteRepositories);
+
+                    ArtifactResult result;
+
+                    try {
+                        result = repositorySystem.resolveArtifact(repositorySystemSession, request);
+                    } catch (ArtifactResolutionException e) {
+                        throw new MavenArtifactNotFoundException(e.getMessage(), e);
+                    }
+
+                    log.debug("Resolved artifact " + mavenArtifact.getDependency() + " to " + result.getArtifact().getFile() + " from " + result.getRepository());
+
+                    String pathInTar = mavenArtifact.getDest().orElse(result.getArtifact().getFile().getName());
+                    addToTar(tar, result.getArtifact().getFile(), pathInTar);
                 }
             }
 
@@ -244,14 +283,14 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     private static Integer getDockerPortFromEnvironment() {
         return DockerPortFromPropertySupplier.INSTANCE.get()
                 .orElse(DockerPortFromEnvironmentSupplier.INSTANCE.get()
-                                .orElse(DEFAULT_DOCKER_PORT)
+                        .orElse(DEFAULT_DOCKER_PORT)
                 );
     }
 
     private static String getDockerHostFromEnvironment() {
         return DockerHostFromPropertySupplier.INSTANCE.get()
                 .orElse(DockerHostFromEnvironmentSupplier.INSTANCE.get()
-                                .orElse(DEFAULT_DOCKER_HOST)
+                        .orElse(DEFAULT_DOCKER_HOST)
                 );
     }
 }
