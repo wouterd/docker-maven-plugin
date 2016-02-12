@@ -17,24 +17,6 @@
 
 package net.wouterdanes.docker.maven;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
 import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
@@ -43,18 +25,22 @@ import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class StartContainerMojoTest {
 
@@ -383,21 +369,6 @@ public class StartContainerMojoTest {
         @Override
         protected AbstractFakeDockerProvider getInstance() {
             return instance;
-        }
-
-        @Override
-        public void setRepositorySystem(RepositorySystem repositorySystem) {
-            // NOOP
-        }
-
-        @Override
-        public void setRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
-            // NOOP
-        }
-
-        @Override
-        public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
-            // NOOP
         }
     }
 }

@@ -1,15 +1,17 @@
 package net.wouterdanes.docker.provider;
 
-import java.util.List;
-
-import org.apache.maven.plugin.logging.Log;
-
 import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.Credentials;
+import org.apache.maven.plugin.logging.Log;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
+
+import java.util.List;
 
 /**
  * Utility class to create mock docker providers, extend this and implement the getInstance() method, then create
@@ -83,5 +85,20 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     @Override
     public void setLogger(final Log logger) {
         proxy.setLogger(logger);
+    }
+
+    @Override
+    public void setRepositorySystem(RepositorySystem repositorySystem) {
+        // NOOP
+    }
+
+    @Override
+    public void setRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
+        // NOOP
+    }
+
+    @Override
+    public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
+        // NOOP
     }
 }

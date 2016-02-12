@@ -3,13 +3,10 @@ package net.wouterdanes.docker.maven;
 import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,21 +70,6 @@ public class CommitContainerMojoTest {
         @Override
         protected AbstractFakeDockerProvider getInstance() {
             return instance;
-        }
-
-        @Override
-        public void setRepositorySystem(RepositorySystem repositorySystem) {
-            // NOOP
-        }
-
-        @Override
-        public void setRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
-            // NOOP
-        }
-
-        @Override
-        public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
-            // NOOP
         }
     }
 }
