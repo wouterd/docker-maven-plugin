@@ -1,4 +1,5 @@
-# version 4.1.2
+# version 4.2.0
+- You can now add maven dependencies to your docker images. Thanks to [Mark Collin](https://github.com/Ardesco) for making the pull request!
 - Fixed building an image under Docker 1.10, the output of a quiet build had significantly changed, so the plugin got all confused and basically gave up. Poor plugin. :( The plugin should now be able to decrypt the fairly cryptic statement "sha256:{insert random uuid}"
 
 # version 4.1.1

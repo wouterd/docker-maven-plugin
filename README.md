@@ -15,8 +15,9 @@ The README of the master branch will cover the current development version and n
 # Donations
 If you love this plugin and use it a lot and want to donate something for my time spent maintaining this project, use the following link: [Pay pal](https://www.paypal.me/WouterDanes). Donations are much appreciated!
 
-# Minimum versions required
+# Minimum versions required for the plugin to work
 
+- Minimum required java version: 8
 - Minimum required maven version: 3.1.1
 - Minimum required docker daemon version: 1.0 (Remote API v1.12)
 
@@ -41,9 +42,9 @@ If you love this plugin and use it a lot and want to donate something for my tim
 
 # Usage
 
-Current release version: `4.1.1`
+Current release version: `4.2.0`
 
-Current snapshot version: `4.1.2-SNAPSHOT`
+Current snapshot version: `4.2.1-SNAPSHOT`
 
 ## Example
 The following is a snippet from the pom for one of the integration test projects in this project. You can find the full
