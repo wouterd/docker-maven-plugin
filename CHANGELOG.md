@@ -1,3 +1,6 @@
+# version 4.1.2
+- Fixed building an image under Docker 1.10, the output of a quiet build had significantly changed, so the plugin got all confused and basically gave up. Poor plugin. :( The plugin should now be able to decrypt the fairly cryptic statement "sha256:{insert random uuid}"
+
 # version 4.1.1
 - Files added to the tar-ball sent to the docker daemon are no longer fully loaded into memory. The plugin should no longer need hundreds of MegaBytes of memory to work with big files. :-) Sorry! And thanks to [Cedric Thiebault](https://github.com/cthiebault) for fixing!
 
