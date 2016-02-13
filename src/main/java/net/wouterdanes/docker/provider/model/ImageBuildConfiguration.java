@@ -18,6 +18,7 @@
 package net.wouterdanes.docker.provider.model;
 
 import org.apache.maven.plugins.annotations.Parameter;
+import org.eclipse.aether.repository.RemoteRepository;
 
 import java.io.File;
 import java.util.List;
@@ -46,8 +47,11 @@ public class ImageBuildConfiguration {
     @Parameter
     private String registry;
 
-	@Parameter
-	private List<Artifact> artifacts;
+    @Parameter
+    private List<Artifact> artifacts;
+
+    @Parameter
+    private List<MavenArtifact> mavenArtifacts;
 
     public String getId() {
         return id;
@@ -89,19 +93,27 @@ public class ImageBuildConfiguration {
         this.registry = registry;
     }
 
-	public List<Artifact> getArtifacts() {
-		return artifacts;
-	}
+    public List<Artifact> getArtifacts() {
+        return artifacts;
+    }
 
-	public void setArtifacts(List<Artifact> artifacts) {
-		this.artifacts = artifacts;
-	}
+    public void setArtifacts(List<Artifact> artifacts) {
+        this.artifacts = artifacts;
+    }
 
-	public File getDockerFile() {
-		return dockerFile;
-	}
+    public List<MavenArtifact> getMavenArtifacts() {
+        return mavenArtifacts;
+    }
 
-	public void setDockerFile(File dockerFile) {
-		this.dockerFile = dockerFile;
-	}
+    public void setMavenArtifacts(List<MavenArtifact> mavenArtifacts) {
+        this.mavenArtifacts = mavenArtifacts;
+    }
+
+    public File getDockerFile() {
+        return dockerFile;
+    }
+
+    public void setDockerFile(File dockerFile) {
+        this.dockerFile = dockerFile;
+    }
 }

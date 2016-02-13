@@ -249,6 +249,12 @@ Below is an example snippet.
                       <dest>etc/nginx/sites-available/</dest>
                     </artifact>
                   </artifacts>
+                  <mavenArtifacts>
+                    <mavenArtifact>
+                      <dependency>biz.hochguertel.javaeetutorial.jaxrs:hello:war:1.4</dependency>
+                      <dest>test/rest.war</dest>
+                    </mavenArtifact>
+                  </mavenArtifacts>
                   <keep>true</keep>
                   <push>true</push>
                   <registry>mydocker-registry.corp.com:5000</registry>
@@ -267,6 +273,10 @@ The configuration works as follows:
     you can specify:
     - `file`: pointing to the file to add to the tar ball sent to the docker daemon
     - `dest`: path in the tar ball where you want the file, you can refer to it using the same path in an ADD statement.
+- `<mavenArtifacts>` contains a list of Maven dependencies to add to the container as `<mavenArtifact>` elements. For each `<mavenArtifact>` element
+    you can specify:
+    - `dependency`: A maven dependency in the format <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>
+    - `dest`: path in the tar ball where you want the maven dependency put, you can refer to it using the same path in an ADD statement.    
 - `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing
     the maven build. If false, the image will be deleted as part of the `stop-containers` goal.
 - `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It can be in one of the
