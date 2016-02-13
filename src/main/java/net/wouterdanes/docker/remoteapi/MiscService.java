@@ -44,7 +44,7 @@ import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
 public class MiscService extends BaseService {
 
     private static final Pattern BUILD_IMAGE_ID_EXTRACTION_PATTERN =
-            Pattern.compile(".*Successfully built ([0-9a-f]+).*", Pattern.DOTALL);
+            Pattern.compile(".*sha256:([0-9a-f]+).*", Pattern.DOTALL);
 
     public MiscService(final String dockerApiRoot) {
         super(dockerApiRoot, "/");
