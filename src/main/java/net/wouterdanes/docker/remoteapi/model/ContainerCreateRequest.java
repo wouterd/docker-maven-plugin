@@ -44,6 +44,8 @@ public class ContainerCreateRequest {
     private String image;
     @JsonProperty("Env")
     private List<String> env;
+    @JsonProperty("MacAddress")
+    private String macAddress;
     
     public String getHostname() {
         return hostname;
@@ -67,6 +69,10 @@ public class ContainerCreateRequest {
 
     public List<String> getEnv() {
         return env != null ? Collections.unmodifiableList(env) : Collections.<String>emptyList();
+    }
+
+    public String getMacAddress() {
+        return macAddress;
     }
 
     public ContainerCreateRequest withEnv(Map<String, String> env) {
@@ -101,6 +107,11 @@ public class ContainerCreateRequest {
 
     public ContainerCreateRequest withCommands(List<String> commands) {
         this.cmd = new ArrayList<>(commands);
+        return this;
+    }
+
+    public ContainerCreateRequest withMacAddress(String macAddress) {
+        this.macAddress = macAddress;
         return this;
     }
 

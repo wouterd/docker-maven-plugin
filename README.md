@@ -187,8 +187,18 @@ The hostname can be set by adding a <hostname> element to a container configurat
 
             <container>
                 <id>app</id>
-                <iamge>app</image>
+                <image>app</image>
                 <hostname>appserver1</hostname>
+            </container>
+
+## Setting the hostname
+
+The macAddress can be set by adding a <macAddress> element to a container configuration.
+
+            <container>
+                <id>app</id>
+                <image>app</image>
+                <macAddress>12:34:56:78:9a:bc</macAddress>
             </container>
 
 ## Linking containers

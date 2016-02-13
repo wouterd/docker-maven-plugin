@@ -44,15 +44,15 @@ public class ContainersService extends BaseService {
         super(dockerApiRoot, "/containers");
     }
 
-    public String createContainer(ContainerCreateRequest request) {
+    public String createContainer(ContainerCreateRequest containerCreateRequest) {
         String createResponseStr;
         try {
             createResponseStr = getServiceEndPoint()
                     .path("/create")
                     .request(MediaType.APPLICATION_JSON_TYPE)
-                    .post(Entity.entity(toJson(request), MediaType.APPLICATION_JSON_TYPE), String.class);
+                    .post(Entity.entity(toJson(containerCreateRequest), MediaType.APPLICATION_JSON_TYPE), String.class);
         } catch (WebApplicationException e) {
-            throw makeImageTargetingException(request.getImage(), e);
+            throw makeImageTargetingException(containerCreateRequest.getImage(), e);
         }
         ContainerCreateResponse createResponse = toObject(createResponseStr, ContainerCreateResponse.class);
         return createResponse.getId();
