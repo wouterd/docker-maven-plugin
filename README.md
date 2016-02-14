@@ -19,7 +19,7 @@ If you love this plugin and use it a lot and want to donate something for my tim
 
 - Minimum required java version: 8
 - Minimum required maven version: 3.1.1
-- Minimum required docker daemon version: 1.0 (Remote API v1.12)
+- Minimum required docker daemon version: 1.9 (Remote API v1.21)
 
 # Current Functionality:
 - Build a docker image from a bunch of source files in package and pre-integration-test phases
