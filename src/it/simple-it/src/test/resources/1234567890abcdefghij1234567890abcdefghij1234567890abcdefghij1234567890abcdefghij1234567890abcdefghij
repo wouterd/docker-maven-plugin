@@ -1,0 +1,2 @@
+Annoyingly long text file, so annoying that the commons-compress library said "screw this, I'm not adding you!".
+So this file is here to make sure the build falls over instead of the plugin when this happens again. :-)
