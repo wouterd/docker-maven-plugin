@@ -1,6 +1,8 @@
 # version 5.0.0
+- **NOTE**: You now need at least Docker 1.9 to use this plugin, due to the support for buildargs. Some CVE's also got fixed, so you probably want to upgrade that Docker Engine regardless. :-)
 - You can now maintain your docker registry credentials in maven's settings.xml. Thanks to [Cedric Thiebault](https://github.com/cthiebault) for the pull request!
 - Added the ability to set a Mac address for a started container. Thanks to [Mark Collin](https://github.com/Ardesco) for making the pull request!
+- Added the ability to pass build args to the Dockerfile when building an image. This should help with parametrizing your Dockerfiles while still having them be useful outside of Maven. Thanks to [Mark Collin](https://github.com/Ardesco) for making the pull request!
 
 # version 4.2.1
 - Fixed backwards compatibility with docker daemons older than 1.10, the daemon should now be able to figure out the built image IDs again. Sorry!
