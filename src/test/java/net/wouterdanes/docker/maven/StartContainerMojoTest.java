@@ -345,6 +345,22 @@ public class StartContainerMojoTest {
         assertEquals("test-hostname", passedValue.getHostname());
     }
 
+    @Test
+    public void testThatConfiguredMacAddressGetsPassedToDocker() throws Exception {
+        ContainerStartConfiguration configuration = new ContainerStartConfiguration().withMacAddress("12:34:56:78:9a:bc");
+        StartContainerMojo mojo = createMojo(configuration);
+
+        mojo.execute();
+
+        ArgumentCaptor<ContainerStartConfiguration> captor = ArgumentCaptor.forClass(ContainerStartConfiguration.class);
+        verify(FakeDockerProvider.instance).startContainer(captor.capture());
+
+        assert mojo.getPluginErrors().isEmpty();
+
+        ContainerStartConfiguration passedValue = captor.getValue();
+        assertEquals("12:34:56:78:9a:bc", passedValue.getMacAddress());
+    }
+
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {
         return createMojo(startConfiguration, FAKE_PROVIDER_KEY);
     }
