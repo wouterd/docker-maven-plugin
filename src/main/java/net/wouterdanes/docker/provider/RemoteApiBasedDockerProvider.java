@@ -22,8 +22,8 @@ import net.wouterdanes.docker.remoteapi.BaseService;
 import net.wouterdanes.docker.remoteapi.ContainersService;
 import net.wouterdanes.docker.remoteapi.ImagesService;
 import net.wouterdanes.docker.remoteapi.MiscService;
-import net.wouterdanes.docker.remoteapi.exception.MavenArtifactNotFoundException;
 import net.wouterdanes.docker.remoteapi.exception.ImageNotFoundException;
+import net.wouterdanes.docker.remoteapi.exception.MavenArtifactNotFoundException;
 import net.wouterdanes.docker.remoteapi.model.ContainerCreateRequest;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
@@ -97,7 +97,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     @Override
     public String buildImage(final ImageBuildConfiguration image) {
         byte[] bytes = getTgzArchiveForFiles(image);
-        return miscService.buildImage(bytes, Optional.ofNullable(image.getNameAndTag()));
+        return miscService.buildImage(bytes, Optional.ofNullable(image.getNameAndTag()), Optional.ofNullable(image.getBuildArguments()));
     }
 
     @Override

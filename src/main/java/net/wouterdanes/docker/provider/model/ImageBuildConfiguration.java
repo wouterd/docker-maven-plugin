@@ -17,11 +17,13 @@
 
 package net.wouterdanes.docker.provider.model;
 
+import com.google.gson.Gson;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.eclipse.aether.repository.RemoteRepository;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is responsible for holding the configuration of a single docker image to be built by the
@@ -52,6 +54,9 @@ public class ImageBuildConfiguration {
 
     @Parameter
     private List<MavenArtifact> mavenArtifacts;
+
+    @Parameter
+    protected Map<String, String> buildArguments = new HashMap<String, String>();
 
     public String getId() {
         return id;
@@ -107,6 +112,15 @@ public class ImageBuildConfiguration {
 
     public void setMavenArtifacts(List<MavenArtifact> mavenArtifacts) {
         this.mavenArtifacts = mavenArtifacts;
+    }
+
+    public String getBuildArguments() {
+        Gson gson = new Gson();
+        return gson.toJson(buildArguments);
+    }
+
+    public void setBuildArguments(Map<String, String> buildArguments) {
+        this.buildArguments = buildArguments;
     }
 
     public File getDockerFile() {
