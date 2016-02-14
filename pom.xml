@@ -305,7 +305,7 @@
           <plugin>
             <groupId>net.wouterdanes.docker</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>2.3</version>
+            <version>4.2.0</version>
             <executions>
               <execution>
                 <id>start-containers</id>
