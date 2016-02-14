@@ -51,7 +51,7 @@ public abstract class BaseService {
     // required for "push" even if no credentials required
     private static final String REGISTRY_AUTH_NULL_VALUE = "null";
 
-    private static final String TARGET_DOCKER_API_VERSION = "v1.12";
+    private static final String TARGET_DOCKER_API_VERSION = "v1.21";
     private static final String ENV_DOCKER_TLS_VERIFY = "DOCKER_TLS_VERIFY";
 
     private final ObjectMapper objectMapper;
