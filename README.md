@@ -53,7 +53,7 @@ pom.xml here: [pom.xml](https://github.com/wouterd/docker-maven-plugin/blob/mast
     <plugin>
       <groupId>net.wouterdanes.docker</groupId>
       <artifactId>docker-maven-plugin</artifactId>
-      <version>3.1.0</version>
+      <version>4.1.1</version>
       <executions>
         <execution>
           <id>package</id>
@@ -384,12 +384,45 @@ If the registry is omitted, then https://registry.hub.docker.com/ is assumed.
 ## Credentials
 Some registries (including https://registry.hub.docker.com/) will require user credentials to perform
 specific operations. The plugin provides a means to specify these credentials however, at this time
-they are only used when pushing images. These credentials can be specified within the plugin
-configuration or populated indirectly by Maven properties.
+they are only used when pushing images. These credentials can be specified in multiple ways.
+
+### Credentials within plugin configuration or populated indirectly by Maven properties
 
 - `<userName>`, Docker registry user name, defaults to the value of `docker.userName`.
 - `<password>`, Docker registry user password (in plain text), defaults to the value of `docker.password`.
 - `<email>`, Docker registry user email address, defaults to the value of `docker.email`.
+
+### Credentials in Maven's global `settings.xml`
+
+Define a new server in `~/.m2/settings.xml`
+
+        <servers>
+            <server>
+                <id>docker.mycompany.com</id>
+                <username>...</username>
+                <password>...</password>
+                <configuration>
+                    <email>...</email>
+                </configuration>
+              </server>
+        </servers>
+
+Refer to this server in the plugin configuration
+
+        <plugin>
+            <groupId>net.wouterdanes.docker</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>4.1.1</version>
+            <configuration>
+                <serverId>docker.mycompany.com</serverId>
+            </configuration>
+            <executions>
+                ...
+            </executions>
+        </plugin>
+
+Priority is given to credentials defined in plugin configuration over the ones from `settings.xml`.
+
 
 ## Using a SNAPSHOT version
 The releases of this plugin are deployed to maven central, the SNAPSHOT versions are automatically deployed to the Sonatype OSS repository. To be able to use the SNAPSHOT versions of this plugin, add the following repository to your project POM or settings.xml:
