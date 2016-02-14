@@ -65,6 +65,13 @@
 
   <contributors>
     <contributor>
+      <name>Hilbert Schraal</name>
+      <url>https://github.com/schraal</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
       <name>Lachlan Coote</name>
       <url>https://github.com/lcoote</url>
       <roles>
@@ -74,6 +81,55 @@
     <contributor>
       <name>Chris Emery</name>
       <url>https://github.com/emeryc</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Mark Collin</name>
+      <url>https://github.com/Ardesco</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Erno Tukia</name>
+      <url>https://github.com/creex</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Scott Stevelinck</name>
+      <url>https://github.com/ssteveli</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>svefors</name>
+      <url>https://github.com/svefors</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Quinten Krijger</name>
+      <url>https://github.com/Krijger</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>John Casey</name>
+      <url>https://github.com/jdcasey</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>vjestin</name>
+      <url>https://github.com/vjestin</url>
       <roles>
         <role>Developer</role>
       </roles>
