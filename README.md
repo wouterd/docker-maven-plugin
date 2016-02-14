@@ -256,6 +256,9 @@ Below is an example snippet.
                       <dest>test/rest.war</dest>
                     </mavenArtifact>
                   </mavenArtifacts>
+                  <buildArguments>
+                    <foo>bar</foo>
+                  </buildArguments>
                   <keep>true</keep>
                   <push>true</push>
                   <registry>mydocker-registry.corp.com:5000</registry>
@@ -274,10 +277,14 @@ The configuration works as follows:
     you can specify:
     - `file`: pointing to the file to add to the tar ball sent to the docker daemon
     - `dest`: path in the tar ball where you want the file, you can refer to it using the same path in an ADD statement.
+- `<buildArguments>` contains a list of build arguments that can be used in your Dockerfile
+    you can specify:
+    - `tag_name`: The name of the tag will be used as the name of the build argument e.g. <foo> will create a build argument called `foo` that can be used in your dockerfile as `$foo`.
+    - `tag_value`: The value of the tag will be used as the value of the build argument e.g. <foo>bar</foo> will create a build argument called `foo` with the value `bar` that can be used in your dockerfile as `$foo`.
 - `<mavenArtifacts>` contains a list of Maven dependencies to add to the container as `<mavenArtifact>` elements. For each `<mavenArtifact>` element
     you can specify:
     - `dependency`: A maven dependency in the format <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>
-    - `dest`: path in the tar ball where you want the maven dependency put, you can refer to it using the same path in an ADD statement.    
+    - `dest`: path in the tar ball where you want the maven dependency put, you can refer to it using the same path in an ADD statement.        
 - `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing
     the maven build. If false, the image will be deleted as part of the `stop-containers` goal.
 - `<nameAndTag>` specifies the name and tag for this image, especially useful when keeping the built images. It can be in one of the
