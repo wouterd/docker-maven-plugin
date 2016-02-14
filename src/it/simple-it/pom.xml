@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>net.wouterdanes.docker.it</groupId>
@@ -45,7 +45,9 @@
             </goals>
             <configuration>
               <systemPropertyVariables>
-                <cache.base.url>http://${docker.containers.cache.ports.80/tcp.host}:${docker.containers.cache.ports.80/tcp.port}</cache.base.url>
+                <cache.base.url>
+                  http://${docker.containers.cache.ports.80/tcp.host}:${docker.containers.cache.ports.80/tcp.port}
+                </cache.base.url>
               </systemPropertyVariables>
             </configuration>
           </execution>
@@ -65,7 +67,12 @@
               <images>
                 <image>
                   <id>nginx</id>
-	              <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
+                  <dockerFile>${project.basedir}/src/test/resources/Dockerfile</dockerFile>
+                  <artifacts>
+                    <artifact>
+                      <file>${project.basedir}/src/test/resources/1234567890abcdefghij1234567890abcdefghij1234567890abcdefghij1234567890abcdefghij1234567890abcdefghij</file>
+                    </artifact>
+                  </artifacts>
                   <nameAndTag>nginx-name:tahahag</nameAndTag>
                   <keep>true</keep>
                 </image>

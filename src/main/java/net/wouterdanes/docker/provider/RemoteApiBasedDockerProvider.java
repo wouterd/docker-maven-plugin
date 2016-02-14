@@ -33,9 +33,8 @@ import net.wouterdanes.docker.remoteapi.util.DockerHostFromPropertySupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerPortFromEnvironmentSupplier;
 import net.wouterdanes.docker.remoteapi.util.DockerPortFromPropertySupplier;
 import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.aether.RepositorySystem;
@@ -216,8 +215,9 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
     private byte[] getTgzArchiveForFiles(final ImageBuildConfiguration image) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (
-                ArchiveOutputStream tar = new ArchiveStreamFactory().createArchiveOutputStream("tar", baos)
+            TarArchiveOutputStream tar = new TarArchiveOutputStream(baos)
         ) {
+            tar.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
             addToTar(tar, image.getDockerFile(), "Dockerfile");
 
             if (image.getArtifacts() != null) {
@@ -253,7 +253,7 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
 
             tar.flush();
             baos.flush();
-        } catch (ArchiveException | IOException e) {
+        } catch (IOException e) {
             throw new IllegalStateException("Unable to create output archive", e);
         }
         return baos.toByteArray();
