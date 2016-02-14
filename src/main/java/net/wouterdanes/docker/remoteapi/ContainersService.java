@@ -87,7 +87,7 @@ public class ContainersService extends BaseService {
 
         while (bb.hasRemaining()) {
             bb.position(bb.position() + 4);
-            int frameLength = bb.getInt();
+            int frameLength = Math.min(bb.getInt(), bb.remaining());
             byte[] frame = new byte[frameLength];
             bb.get(frame);
             logs.append(new String(frame, Charset.forName("UTF-8")));

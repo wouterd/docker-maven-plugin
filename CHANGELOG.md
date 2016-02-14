@@ -5,6 +5,7 @@
 - Added the ability to pass build args to the Dockerfile when building an image. This should help with parametrizing your Dockerfiles while still having them be useful outside of Maven. Thanks to [Mark Collin](https://github.com/Ardesco) for making the pull request!
 - **BUGFIX**: Plugin now properly removes created volumes when deleting a container. I apologize profoundly to any disks who were hurt in the last 4 versions.
 - **BUGFIX**: Sometimes file names are long, sometimes they are so long that certain maven plugins fall over.. The plugin should now be able to handle adding files with paths longer than 100 bytes. Especially useful when you're all about organizing your hard drive into many folders!
+- Plugin should be more resilient when docker logging drivers lie about the amount of characters to grab from the stream. (Don't ask...)
 
 # version 4.2.1
 - Fixed backwards compatibility with docker daemons older than 1.10, the daemon should now be able to figure out the built image IDs again. Sorry!
