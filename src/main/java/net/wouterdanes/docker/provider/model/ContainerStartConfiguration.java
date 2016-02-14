@@ -54,6 +54,11 @@ public class ContainerStartConfiguration {
     private String hostname;
 
     /**
+     * Supply an optional mac address for the container
+     */
+    private String macAddress;
+
+    /**
      * Set the image name or id to use and returns the object so you can chain from/with statements.
      *
      * @param image the image name or id
@@ -100,6 +105,11 @@ public class ContainerStartConfiguration {
         this.hostname = hostname;
         return this;
     }
+
+    public ContainerStartConfiguration withMacAddress(String macAddress) {
+        this.macAddress = macAddress;
+        return this;
+    }
     
     public String getImage() {
         return image;
@@ -119,6 +129,10 @@ public class ContainerStartConfiguration {
 
     public String getHostname() {
         return hostname;
+    }
+
+    public String getMacAddress() {
+        return macAddress;
     }
     
     public String getWaitForStartup() {

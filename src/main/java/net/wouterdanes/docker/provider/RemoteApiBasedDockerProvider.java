@@ -176,7 +176,8 @@ public abstract class RemoteApiBasedDockerProvider implements DockerProvider {
         ContainerCreateRequest createRequest = new ContainerCreateRequest()
                 .fromImage(imageId)
                 .withEnv(configuration.getEnv())
-                .withHostname(configuration.getHostname());
+                .withHostname(configuration.getHostname())
+                .withMacAddress(configuration.getMacAddress());
 
         String containerId;
         try {
