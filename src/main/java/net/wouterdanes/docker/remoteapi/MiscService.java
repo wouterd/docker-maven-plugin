@@ -17,6 +17,18 @@
 
 package net.wouterdanes.docker.remoteapi;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonStreamParser;
+import net.wouterdanes.docker.remoteapi.exception.DockerException;
+import net.wouterdanes.docker.remoteapi.model.ContainerCommitResponse;
+import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,27 +36,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonStreamParser;
-
-import net.wouterdanes.docker.remoteapi.exception.DockerException;
-import net.wouterdanes.docker.remoteapi.model.ContainerCommitResponse;
-import net.wouterdanes.docker.remoteapi.model.DockerVersionInfo;
-
 /**
  * The class act as an interface to the "root" Remote Docker API with some "misc" service end points.
  */
 public class MiscService extends BaseService {
 
     private static final Pattern BUILD_IMAGE_ID_EXTRACTION_PATTERN =
-            Pattern.compile(".*sha256:([0-9a-f]+).*", Pattern.DOTALL);
+        Pattern.compile(".*(Successfully built |sha256:)([0-9a-f]+).*", Pattern.DOTALL);
 
     public MiscService(final String dockerApiRoot) {
         super(dockerApiRoot, "/");
@@ -143,7 +141,7 @@ public class MiscService extends BaseService {
                 System.out.print(text);
                 Matcher matcher = BUILD_IMAGE_ID_EXTRACTION_PATTERN.matcher(text);
                 if (matcher.matches()) {
-                    imageId = matcher.group(1);
+                    imageId = matcher.group(2);
                 }
             }
             if (object.has("status")) {

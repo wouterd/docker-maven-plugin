@@ -42,9 +42,9 @@ If you love this plugin and use it a lot and want to donate something for my tim
 
 # Usage
 
-Current release version: `4.2.0`
+Current release version: `4.2.1`
 
-Current snapshot version: `4.2.1-SNAPSHOT`
+Current snapshot version: `5.0.0-SNAPSHOT`
 
 ## Example
 The following is a snippet from the pom for one of the integration test projects in this project. You can find the full
