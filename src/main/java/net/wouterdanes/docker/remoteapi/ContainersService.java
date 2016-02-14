@@ -61,6 +61,7 @@ public class ContainersService extends BaseService {
     public void deleteContainer(String id) {
         Response response = getServiceEndPoint()
                 .path(id)
+                .queryParam("v", 1)
                 .request()
                 .delete();
 
