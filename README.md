@@ -276,7 +276,7 @@ The configuration works as follows:
     - `dest`: path in the tar ball where you want the file, you can refer to it using the same path in an ADD statement.
 - `<mavenArtifacts>` contains a list of Maven dependencies to add to the container as `<mavenArtifact>` elements. For each `<mavenArtifact>` element
     you can specify:
-    - `dependency`: A maven dependency in the format <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>
+    - `dependency`: A maven dependency in the format \<groupId\>:\<artifactId\>[:\<extension\>[:\<classifier\>]]:\<version\>
     - `dest`: path in the tar ball where you want the maven dependency put, you can refer to it using the same path in an ADD statement.    
 - `<keep>` (defaults to false) specifies whether or not the plugin should keep this image or delete it after executing
     the maven build. If false, the image will be deleted as part of the `stop-containers` goal.
