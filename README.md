@@ -1,6 +1,8 @@
 docker-maven-plugin
 ===================
 
+[![Join the chat at https://gitter.im/wouterd/docker-maven-plugin](https://badges.gitter.im/wouterd/docker-maven-plugin.svg)](https://gitter.im/wouterd/docker-maven-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/wouterd/docker-maven-plugin.svg?branch=master)](https://travis-ci.org/wouterd/docker-maven-plugin)
 
 A maven plugin to create, test and publish docker containers and images for maven projects. Can also be used to integration test your application using docker containers.
