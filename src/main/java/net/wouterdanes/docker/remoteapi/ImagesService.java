@@ -17,12 +17,18 @@
 
 package net.wouterdanes.docker.remoteapi;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonStreamParser;
 import net.wouterdanes.docker.remoteapi.model.ImageDescriptor;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Optional;
 
 /**
@@ -59,10 +65,35 @@ public class ImagesService extends BaseService {
             target = target.queryParam("tag", descriptor.getTag().get());
         }
 
-        return target.request()
+        Response response = target.request()
                 .header(REGISTRY_AUTH_HEADER, getRegistryAuthHeaderValue())
                 .accept(MediaType.APPLICATION_JSON_TYPE)
-                .post(null, String.class);
+                .post(null);
+
+        InputStream inputStream = (InputStream) response.getEntity();
+
+        parseSteamToDisplayImageDownloadStatus(inputStream);
+
+        return response.readEntity(String.class);
+    }
+
+    private static void parseSteamToDisplayImageDownloadStatus(final InputStream inputStream) {
+        InputStreamReader isr = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(isr);
+
+        JsonStreamParser parser = new JsonStreamParser(reader);
+
+        while (parser.hasNext()) {
+            JsonElement element = parser.next();
+            JsonObject object = element.getAsJsonObject();
+            if (object.has("status")) {
+                System.out.print(".");
+            }
+            if (object.has("error")) {
+                System.err.println("ERROR: " + object.get("error").getAsString());
+            }
+        }
+        System.out.println("");
     }
 
     public String pushImage(String nameAndTag) {
