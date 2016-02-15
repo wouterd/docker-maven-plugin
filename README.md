@@ -291,8 +291,8 @@ The configuration works as follows:
     - `dest`: path in the tar ball where you want the file, you can refer to it using the same path in an ADD statement.
 - `<buildArguments>` contains a list of build arguments that can be used in your Dockerfile
     you can specify:
-    - `tag_name`: The name of the tag will be used as the name of the build argument e.g. <foo> will create a build argument called `foo` that can be used in your dockerfile as `$foo`.
-    - `tag_value`: The value of the tag will be used as the value of the build argument e.g. <foo>bar</foo> will create a build argument called `foo` with the value `bar` that can be used in your dockerfile as `$foo`.
+    - `tag_name`: The name of the tag will be used as the name of the build argument e.g. `<foo>` will create a build argument called `foo` that can be used in your dockerfile as `$foo`.
+    - `tag_value`: The value of the tag will be used as the value of the build argument e.g. `<foo>bar</foo>` will create a build argument called `foo` with the value `bar` that can be used in your dockerfile as `$foo`.
 - `<mavenArtifacts>` contains a list of Maven dependencies to add to the container as `<mavenArtifact>` elements. For each `<mavenArtifact>` element
     you can specify:
     - `dependency`: A maven dependency in the format \<groupId\>:\<artifactId\>[:\<extension\>[:\<classifier\>]]:\<version\>
