@@ -24,6 +24,7 @@ import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.provider.model.PushableImage;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,18 +32,24 @@ import org.mockito.Mockito;
 
 import java.util.*;
 
+import static net.wouterdanes.docker.maven.AbstractDockerMojo.IMAGE_LIST_PROPERTY;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BuildImageMojoTest {
 
     private static final String FAKE_PROVIDER_KEY = UUID.randomUUID().toString();
     private static final String IMAGEID = UUID.randomUUID().toString();
     private static final String STARTID = UUID.randomUUID().toString();
+    private static final String STARTIDTWO = UUID.randomUUID().toString();
     private static final String NAMEANDTAG = UUID.randomUUID().toString();
+    private static final String NAMEANDTAGTWO = UUID.randomUUID().toString();
     private static final String REGISTRY = UUID.randomUUID().toString();
     private static final String REGISTRYANDNAMEANDTAG = REGISTRY + "/" + NAMEANDTAG;
 
+    private final MavenProject mavenProject = mock(MavenProject.class);
     private BuildImageMojo mojo = new BuildImageMojo();
 
     private ImageBuildConfiguration mockImage;
@@ -50,6 +57,9 @@ public class BuildImageMojoTest {
     @Before
     public void setUp() throws Exception {
         mojo.setPluginContext(new HashMap());
+
+        Properties mavenProjectProperties = new Properties();
+        when(mavenProject.getProperties()).thenReturn(mavenProjectProperties);
 
         FakeDockerProvider.instance = Mockito.mock(FakeDockerProvider.class);
         Mockito.when(FakeDockerProvider.instance.buildImage(any(ImageBuildConfiguration.class))).thenReturn(IMAGEID);
@@ -134,8 +144,74 @@ public class BuildImageMojoTest {
         assertImageEnqueuedForPush(null);
     }
 
+    @Test
+    public void imageListPropertyNotSetWhenImageIsPushAndIsKeep() throws Exception {
+        Mockito.when(mockImage.isPush()).thenReturn(true);
+        Mockito.when(mockImage.isKeep()).thenReturn(true);
+
+        executeMojo(FAKE_PROVIDER_KEY);
+
+        assertEquals(1, mojo.getImagesToPush().size());
+
+        PushableImage actual = mojo.getImagesToPush().get(0);
+
+        assertEquals(BuildImageMojoTest.IMAGEID, actual.getImageId());
+        assertEquals(null, mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+    }
+
+    @Test
+    public void imageListPropertyNotSetWhenImageIsNotPushAndIsNotKeep() throws Exception {
+        Mockito.when(mockImage.isPush()).thenReturn(false);
+        Mockito.when(mockImage.isKeep()).thenReturn(false);
+
+        executeMojo(FAKE_PROVIDER_KEY);
+
+        assertEquals(0, mojo.getImagesToPush().size());
+        assertEquals(null, mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+    }
+
+    @Test
+    public void imageListPropertySetWhenImageIsPushButNotIsKeep() throws Exception {
+        Mockito.when(mockImage.isPush()).thenReturn(true);
+        Mockito.when(mockImage.isKeep()).thenReturn(false);
+
+        executeMojo(FAKE_PROVIDER_KEY);
+
+        assertEquals(1, mojo.getImagesToPush().size());
+
+        assertEquals(mojo.getImagesToPush().get(0).getImageId(),
+                mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+    }
+
+    @Test
+    public void imageListPropertySetWhenMultipleImagesSetToIsPushButNotIsKeep() throws Exception {
+        Mockito.when(mockImage.isPush()).thenReturn(true);
+        Mockito.when(mockImage.isKeep()).thenReturn(false);
+
+        ImageBuildConfiguration mockImageTwo = Mockito.mock(ImageBuildConfiguration.class);
+        Mockito.when(mockImageTwo.getId()).thenReturn(STARTIDTWO);
+        Mockito.when(mockImageTwo.getNameAndTag()).thenReturn(NAMEANDTAGTWO);
+        Mockito.when(mockImageTwo.isPush()).thenReturn(true);
+        Mockito.when(mockImageTwo.isKeep()).thenReturn(false);
+
+        List<ImageBuildConfiguration> images = new ArrayList<>();
+        images.add(mockImage);
+        images.add(mockImageTwo);
+        mojo.setImages(images);
+
+        executeMojo(FAKE_PROVIDER_KEY);
+
+        assertEquals(2, mojo.getImagesToPush().size());
+
+        String expectedImageListPropertyValue = mojo.getImagesToPush().get(0).getImageId() + "," + mojo.getImagesToPush().get(1).getImageId();
+
+        assertEquals(expectedImageListPropertyValue,
+                mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+    }
+
     private void executeMojo(String provider) throws MojoExecutionException, MojoFailureException {
         mojo.setProviderName(provider);
+        mojo.setProject(mavenProject);
         mojo.execute();
     }
 
