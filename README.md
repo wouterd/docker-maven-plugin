@@ -53,7 +53,7 @@ pom.xml here: [pom.xml](https://github.com/wouterd/docker-maven-plugin/blob/mast
     <plugin>
       <groupId>net.wouterdanes.docker</groupId>
       <artifactId>docker-maven-plugin</artifactId>
-      <version>4.1.1</version>
+      <version>5.0.0</version>
       <executions>
         <execution>
           <id>package</id>
@@ -503,7 +503,6 @@ line, the plugin should pick up the right environment variables. The environment
 
 # Dependencies:
 
-* [Google Guava](https://code.google.com/p/guava-libraries/) for Optional and Supplier, because it's too early for Java8
 * [Jersey Client](https://jersey.java.net/) for a light weight API to do rest calls.
 * [Jackson](http://jackson.codehaus.org/) for parsing / creating JSON
 * [Apache Commons Compress](http://commons.apache.org/proper/commons-compress/) for creating the tar.gz archive needed to build a docker image
