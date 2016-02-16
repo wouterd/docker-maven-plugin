@@ -24,7 +24,6 @@ import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.provider.model.PushableImage;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +31,9 @@ import org.mockito.Mockito;
 
 import java.util.*;
 
-import static net.wouterdanes.docker.maven.AbstractDockerMojo.IMAGE_LIST_PROPERTY;
+import static net.wouterdanes.docker.maven.AbstractDockerMojo.imagesToDeleteAfterPush;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class BuildImageMojoTest {
 
@@ -49,17 +46,14 @@ public class BuildImageMojoTest {
     private static final String REGISTRY = UUID.randomUUID().toString();
     private static final String REGISTRYANDNAMEANDTAG = REGISTRY + "/" + NAMEANDTAG;
 
-    private final MavenProject mavenProject = mock(MavenProject.class);
     private BuildImageMojo mojo = new BuildImageMojo();
 
     private ImageBuildConfiguration mockImage;
 
     @Before
     public void setUp() throws Exception {
+        imagesToDeleteAfterPush = new ArrayList<>();
         mojo.setPluginContext(new HashMap());
-
-        Properties mavenProjectProperties = new Properties();
-        when(mavenProject.getProperties()).thenReturn(mavenProjectProperties);
 
         FakeDockerProvider.instance = Mockito.mock(FakeDockerProvider.class);
         Mockito.when(FakeDockerProvider.instance.buildImage(any(ImageBuildConfiguration.class))).thenReturn(IMAGEID);
@@ -80,6 +74,7 @@ public class BuildImageMojoTest {
     @After
     public void tearDown() throws Exception {
         DockerProviderSupplier.removeProvider(FAKE_PROVIDER_KEY);
+        imagesToDeleteAfterPush = new ArrayList<>();
     }
 
     @Test
@@ -156,7 +151,7 @@ public class BuildImageMojoTest {
         PushableImage actual = mojo.getImagesToPush().get(0);
 
         assertEquals(BuildImageMojoTest.IMAGEID, actual.getImageId());
-        assertEquals(null, mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+        assertEquals(0, imagesToDeleteAfterPush.size());
     }
 
     @Test
@@ -167,11 +162,13 @@ public class BuildImageMojoTest {
         executeMojo(FAKE_PROVIDER_KEY);
 
         assertEquals(0, mojo.getImagesToPush().size());
-        assertEquals(null, mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+        assertEquals(0, imagesToDeleteAfterPush.size());
     }
 
     @Test
     public void imageListPropertySetWhenImageIsPushButNotIsKeep() throws Exception {
+        ArrayList<String> expectedImagesToBeDeletedAfterPush = new ArrayList<>();
+
         Mockito.when(mockImage.isPush()).thenReturn(true);
         Mockito.when(mockImage.isKeep()).thenReturn(false);
 
@@ -179,12 +176,15 @@ public class BuildImageMojoTest {
 
         assertEquals(1, mojo.getImagesToPush().size());
 
-        assertEquals(mojo.getImagesToPush().get(0).getImageId(),
-                mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+        expectedImagesToBeDeletedAfterPush.add(mojo.getImagesToPush().get(0).getImageId());
+
+        assertEquals(imagesToDeleteAfterPush, expectedImagesToBeDeletedAfterPush);
     }
 
     @Test
     public void imageListPropertySetWhenMultipleImagesSetToIsPushButNotIsKeep() throws Exception {
+        ArrayList<String> expectedImagesToBeDeletedAfterPush = new ArrayList<>();
+
         Mockito.when(mockImage.isPush()).thenReturn(true);
         Mockito.when(mockImage.isKeep()).thenReturn(false);
 
@@ -203,15 +203,14 @@ public class BuildImageMojoTest {
 
         assertEquals(2, mojo.getImagesToPush().size());
 
-        String expectedImageListPropertyValue = mojo.getImagesToPush().get(0).getImageId() + "," + mojo.getImagesToPush().get(1).getImageId();
+        expectedImagesToBeDeletedAfterPush.add(mojo.getImagesToPush().get(0).getImageId());
+        expectedImagesToBeDeletedAfterPush.add(mojo.getImagesToPush().get(1).getImageId());
 
-        assertEquals(expectedImageListPropertyValue,
-                mavenProject.getProperties().getProperty(IMAGE_LIST_PROPERTY));
+        assertEquals(imagesToDeleteAfterPush, expectedImagesToBeDeletedAfterPush);
     }
 
     private void executeMojo(String provider) throws MojoExecutionException, MojoFailureException {
         mojo.setProviderName(provider);
-        mojo.setProject(mavenProject);
         mojo.execute();
     }
 

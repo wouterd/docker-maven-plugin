@@ -25,9 +25,7 @@ import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,9 +41,6 @@ public class BuildImageMojo extends AbstractPreVerifyDockerMojo {
     @Parameter(required = true)
     private List<ImageBuildConfiguration> images;
 
-    @Parameter(defaultValue = "${project}", readonly = true)
-    private MavenProject project;
-
     public void setImages(final List<ImageBuildConfiguration> images) {
         this.images = images;
     }
@@ -58,8 +53,6 @@ public class BuildImageMojo extends AbstractPreVerifyDockerMojo {
         }
 
         validateAllImages();
-
-        ArrayList<String> imagesToDeleteAfterPush = new ArrayList<>();
 
         for (ImageBuildConfiguration image : images) {
             try {
@@ -74,12 +67,6 @@ public class BuildImageMojo extends AbstractPreVerifyDockerMojo {
                 String errorMessage = String.format("Cannot build image '%s'", image.getId());
                 handleDockerException(errorMessage, e);
             }
-        }
-
-        if (imagesToDeleteAfterPush.size() > 0) {
-            String listOfImagesToDeleteAfterPush = String.join(",", imagesToDeleteAfterPush);
-            getLog().debug(String.format("Storing list of containers that need to be removed after a push: %s", listOfImagesToDeleteAfterPush));
-            project.getProperties().setProperty(IMAGE_LIST_PROPERTY, listOfImagesToDeleteAfterPush);
         }
     }
 
@@ -101,10 +88,6 @@ public class BuildImageMojo extends AbstractPreVerifyDockerMojo {
             }
             ids.add(image.getId());
         }
-    }
-
-    public void setProject(MavenProject project) {
-        this.project = project;
     }
 
     @Override

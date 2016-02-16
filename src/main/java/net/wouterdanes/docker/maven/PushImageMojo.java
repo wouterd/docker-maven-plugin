@@ -25,12 +25,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.InstantiationStrategy;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * This class is responsible for pushing docking images in the deploy phase of the maven build. The goal
@@ -39,9 +35,6 @@ import java.util.List;
 @Mojo(defaultPhase = LifecyclePhase.DEPLOY, name = "push-images", threadSafe = true,
         instantiationStrategy = InstantiationStrategy.PER_LOOKUP)
 public class PushImageMojo extends AbstractDockerMojo {
-
-    @Parameter(defaultValue = "${project}", readonly = true)
-    private MavenProject project;
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
@@ -58,15 +51,11 @@ public class PushImageMojo extends AbstractDockerMojo {
             }
         }
 
-        String listOfImagesToDeleteAfterPush = project.getProperties().getProperty(IMAGE_LIST_PROPERTY);
-        if (listOfImagesToDeleteAfterPush != null) {
-            List<String> imageIDs = Arrays.asList(listOfImagesToDeleteAfterPush.split(","));
-            for (String imageID : imageIDs) {
-                try {
-                    getDockerProvider().removeImage(imageID);
-                } catch (DockerException e) {
-                    getLog().error("Failed to remove image", e);
-                }
+        for (String imageID : imagesToDeleteAfterPush) {
+            try {
+                getDockerProvider().removeImage(imageID);
+            } catch (DockerException e) {
+                getLog().error("Failed to remove image", e);
             }
         }
     }
@@ -82,9 +71,5 @@ public class PushImageMojo extends AbstractDockerMojo {
             });
             throw new MojoFailureException("There are images that need to be pushed without a name.");
         }
-    }
-
-    public void setProject(MavenProject project) {
-        this.project = project;
     }
 }

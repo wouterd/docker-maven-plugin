@@ -21,7 +21,6 @@ import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,18 +28,16 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
 
-import static net.wouterdanes.docker.maven.AbstractDockerMojo.IMAGE_LIST_PROPERTY;
 import static org.mockito.Mockito.*;
 
 public class PushImageMojoTest {
 
     private final String fakeProviderKey = UUID.randomUUID().toString();
-    private final MavenProject mavenProject = mock(MavenProject.class);
     private PushImageMojo mojo;
     private ImageBuildConfiguration mockImage;
 
@@ -48,8 +45,7 @@ public class PushImageMojoTest {
 
     @Before
     public void setUp() throws Exception {
-        Properties mavenProjectProperties = new Properties();
-        when(mavenProject.getProperties()).thenReturn(mavenProjectProperties);
+        AbstractDockerMojo.imagesToDeleteAfterPush = new ArrayList<>();
 
         mockImage = Mockito.mock(ImageBuildConfiguration.class);
         Mockito.when(mockImage.getNameAndTag()).thenReturn(NAME_AND_TAG);
@@ -60,15 +56,13 @@ public class PushImageMojoTest {
 
         mojo = new PushImageMojo();
         mojo.setPluginContext(new HashMap());
-        mojo.setProject(mavenProject);
         mojo.setProviderName(fakeProviderKey);
     }
 
     @After
     public void tearDown() throws Exception {
-
         DockerProviderSupplier.removeProvider(fakeProviderKey);
-
+        AbstractDockerMojo.imagesToDeleteAfterPush = new ArrayList<>();
     }
 
     @Test(expected = MojoFailureException.class)
@@ -101,8 +95,7 @@ public class PushImageMojoTest {
 
     @Test
     public void willRemoveImagesIfImageListPropertyContainsASingleID() throws Exception {
-
-        mavenProject.getProperties().setProperty(IMAGE_LIST_PROPERTY, "some-image-id");
+        AbstractDockerMojo.imagesToDeleteAfterPush.add("some-image-id");
 
         mojo.enqueueForPushing("some-image-id", mockImage);
         mojo.enqueueForPushing("another-image-id", mockImage);
@@ -113,8 +106,8 @@ public class PushImageMojoTest {
 
     @Test
     public void willRemoveImagesIfImageListPropertyContainsMultipleIDs() throws Exception {
-
-        mavenProject.getProperties().setProperty(IMAGE_LIST_PROPERTY, "some-image-id,another-image-id");
+        AbstractDockerMojo.imagesToDeleteAfterPush.add("some-image-id");
+        AbstractDockerMojo.imagesToDeleteAfterPush.add("some-image-id,another-image-id");
 
         mojo.enqueueForPushing("some-image-id", mockImage);
         mojo.enqueueForPushing("another-image-id", mockImage);

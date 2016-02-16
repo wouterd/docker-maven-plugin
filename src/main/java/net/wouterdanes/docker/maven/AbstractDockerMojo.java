@@ -60,7 +60,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     private static final String BUILT_IMAGES_KEY = "builtImages";
     private static final String PUSHABLE_IMAGES_KEY = "pushableImages";
     private static final String ERRORS_KEY = "errors";
-    protected static final String IMAGE_LIST_PROPERTY = "docker.containers.to.remove.after.push";
+    protected static ArrayList<String> imagesToDeleteAfterPush = new ArrayList<>();
 
     @Component
     private RepositorySystem repositorySystem;
