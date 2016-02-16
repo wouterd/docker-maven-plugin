@@ -72,12 +72,12 @@ public class ImagesService extends BaseService {
 
         InputStream inputStream = (InputStream) response.getEntity();
 
-        parseSteamToDisplayImageDownloadStatus(inputStream);
+        parseStreamToDisplayImageDownloadStatus(inputStream);
 
         return response.readEntity(String.class);
     }
 
-    private static void parseSteamToDisplayImageDownloadStatus(final InputStream inputStream) {
+    private static void parseStreamToDisplayImageDownloadStatus(final InputStream inputStream) {
         InputStreamReader isr = new InputStreamReader(inputStream);
         BufferedReader reader = new BufferedReader(isr);
 
