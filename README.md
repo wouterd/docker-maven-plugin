@@ -86,6 +86,7 @@ pom.xml here: [pom.xml](https://github.com/wouterd/docker-maven-plugin/blob/mast
                  at the end of the build even if the stop-containers goal is not executed
                  (useful for preventing Ctrl+C causing dangling containers) -->
             <forceCleanup>false</forceCleanup>
+            <dockerMappingsFile/>
             <containers>
               <container>
                 <id>mongo</id>
@@ -162,6 +163,13 @@ used in the port mapping properties. The `<image>` tag specifies the docker imag
 By default, all exposed ports are published on the host. The following two properties are set per exposed port:
 - docker.containers.[id].ports.[portname].host (f.ex 'docker.containers.id.app.ports.80/tcp.host')
 - docker.containers.[id].ports.[portname].port (f.ex 'docker.containers.id.app.ports.80/tcp.port')
+
+All properties are also added to the file `${project.build.directory}/docker-plugin/docker-mappings.properties` so that you can easily load this properties file into your integration tests.
+You can change the name or location of this file by modifying `<dockerMappingsFile>` in the configuration block of the start-containers execution block.
+
+    <dockerMappingsFile>${project.build.directory}/docker-plugin/docker-mappings.properties</dockerMappingsFile>
+
+The location specified above is also exposed as a maven variable called `${docker.mappings.file}`
 
 You can pass those project properties over to your integration test and use them to connect to your application.
 
