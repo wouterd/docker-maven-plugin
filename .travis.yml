@@ -7,7 +7,7 @@ jdk:
 install:
   - uname -a
   - sudo apt-get -y update
-  - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine
+  - sudo apt-get -o Dpkg::Options::="--force-confold" install -y docker-engine
   - docker version
   - docker info
   - ps -ef | grep docker
