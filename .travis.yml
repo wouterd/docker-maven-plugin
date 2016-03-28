@@ -6,7 +6,8 @@ jdk:
   - oraclejdk8
 install:
   - uname -a
-  - env | grep -i docker
+  - sudo apt-get -y update
+  - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine
   - docker version
 script: env | grep -i docker && mvn clean verify -Prun-its
 after_success: ./deploy-to-sonatype.sh
