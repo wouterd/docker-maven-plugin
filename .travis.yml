@@ -7,7 +7,7 @@ jdk:
 install:
   - uname -a
   - env | grep -i docker
-script: mvn clean verify -Prun-its
+script: env | grep -i docker && mvn clean verify -Prun-its
 after_success: ./deploy-to-sonatype.sh
 env:
   global:
