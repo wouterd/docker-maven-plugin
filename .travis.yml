@@ -6,8 +6,7 @@ jdk:
   - oraclejdk8
 install:
   - uname -a
-  - ps -ef
-  - docker info
+  - env | grep -i docker
 script: mvn clean verify
 after_success: ./deploy-to-sonatype.sh
 env:
