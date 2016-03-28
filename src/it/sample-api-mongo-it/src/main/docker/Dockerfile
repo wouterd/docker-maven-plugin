@@ -1,4 +1,4 @@
-FROM wouterd/java8
+FROM jeanblanchard/java:8
 
 ADD discuss-jar-with-dependencies.jar /discuss.jar
 
