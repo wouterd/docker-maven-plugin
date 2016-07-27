@@ -21,6 +21,7 @@ import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
@@ -89,7 +90,8 @@ public class StartContainerMojoTest {
                 new ExposedPort("tcp/8080", 1337, "172.42.123.10"),
                 new ExposedPort("tcp/9000", 41329, "localhost")
         );
-        when(FakeDockerProvider.instance.getExposedPorts("someId")).thenReturn(exposedPorts);
+        when( FakeDockerProvider.instance.getExposedNetworkInfo( "someId" ) ).thenReturn(
+                new ExposedNetworkInfo().withExposedPorts( exposedPorts ) );
 
         ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()
                 .withId("ubuntu").fromImage("debian");

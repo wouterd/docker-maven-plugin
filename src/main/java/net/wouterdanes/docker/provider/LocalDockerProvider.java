@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
@@ -52,11 +53,12 @@ public class LocalDockerProvider extends RemoteApiBasedDockerProvider {
     }
 
     @Override
-    public List<ExposedPort> getExposedPorts(final String containerId) {
+    public ExposedNetworkInfo getExposedNetworkInfo( final String containerId) {
         ContainerInspectionResult containerInspectionResult = getContainersService().inspectContainer(containerId);
         if (containerInspectionResult.getNetworkSettings().getPorts().isEmpty()) {
-            return Collections.emptyList();
+            return new ExposedNetworkInfo();
         }
+
         Set<String> ports = containerInspectionResult.getConfig().getExposedPorts().keySet();
         String containerIp = containerInspectionResult.getNetworkSettings().getIpAddress();
         List<ExposedPort> exposedPorts = new ArrayList<>(ports.size());
@@ -67,6 +69,7 @@ public class LocalDockerProvider extends RemoteApiBasedDockerProvider {
                 exposedPorts.add(new ExposedPort(port, tcpPort, containerIp));
             }
         }
-        return exposedPorts;
+
+        return new ExposedNetworkInfo().withExposedPorts(exposedPorts);
     }
 }

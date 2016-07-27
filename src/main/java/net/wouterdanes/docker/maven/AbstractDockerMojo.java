@@ -36,6 +36,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
+import org.sonatype.plexus.components.cipher.PlexusCipherException;
+import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -63,6 +68,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
 
     @Component
     private RepositorySystem repositorySystem;
+
+    @Parameter(property = "docker.keepContainers")
+    protected boolean keepContainers;
 
     @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
     private RepositorySystemSession repositorySystemSession;
@@ -138,7 +146,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return ofNullable(map.get(startId));
     }
 
-    protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig) throws MojoFailureException {
+    protected void registerBuiltImage(String imageId, ImageBuildConfiguration imageConfig)
+            throws MojoFailureException, MojoExecutionException
+    {
         BuiltImageInfo info = new BuiltImageInfo(imageId, imageConfig);
 
         Map<String, BuiltImageInfo> builtImages = obtainMapFromPluginContext(BUILT_IMAGES_KEY);
@@ -154,7 +164,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return Collections.unmodifiableCollection(builtImagesMap.values());
     }
 
-    protected void cleanUpStartedContainers() {
+    protected void cleanUpStartedContainers()
+            throws MojoExecutionException
+    {
         Optional<Path> logsDir = Optional.ofNullable(stripToNull(logs)).map(this::getLogDirectory);
         if (logsDir.isPresent()) {
             getLog().info("Writing docker container logs to directory: " + logsDir.get());
@@ -192,12 +204,16 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
                 getLog().error("Failed to stop container (this means it also won't be deleted)", e);
             }
         }
-        for (String containerId : stoppedContainerIds) {
-            getLog().info(String.format("Deleting container '%s'..", containerId));
-            try {
-                getDockerProvider().deleteContainer(containerId);
-            } catch (DockerException e) {
-                getLog().error("Failed to delete container", e);
+
+        if ( !keepContainers )
+        {
+            for (String containerId : stoppedContainerIds) {
+                getLog().info(String.format("Deleting container '%s'..", containerId));
+                try {
+                    getDockerProvider().deleteContainer(containerId);
+                } catch (DockerException e) {
+                    getLog().error("Failed to delete container", e);
+                }
             }
         }
     }
@@ -211,7 +227,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         }
     }
 
-    protected DockerProvider getDockerProvider() {
+    protected DockerProvider getDockerProvider()
+            throws MojoExecutionException
+    {
         DockerProvider provider = new DockerProviderSupplier(providerName).get();
         provider.setCredentials(getCredentials());
         provider.setLogger(getLog());
@@ -221,7 +239,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return provider;
     }
 
-    protected Credentials getCredentials() {
+    protected Credentials getCredentials() throws MojoExecutionException {
         // priority to credentials from plugin configuration over the ones from settings
         return Stream.of(getCredentialsFromParameters(), getCredentialsFromSettings())
             .filter(Optional::isPresent)
@@ -230,16 +248,19 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
             .orElse(null);
     }
 
-    private Optional<Credentials> getCredentialsFromParameters() {
+    private Optional<Credentials> getCredentialsFromParameters()
+            throws MojoExecutionException
+    {
         if (isBlank(userName)) {
             getLog().debug("No user name provided. Will try <servers> from settings.xml");
             return empty();
         }
         getLog().debug("Using credentials from plugin config: " + userName);
-        return of(new Credentials(userName, password, email, null));
+
+        return of(new Credentials(userName, decryptPassword(password), email, null));
     }
 
-    private Optional<Credentials> getCredentialsFromSettings() {
+    private Optional<Credentials> getCredentialsFromSettings() throws MojoExecutionException {
         if(settings == null) {
             getLog().debug("No settings.xml");
             return empty();
@@ -250,7 +271,25 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
             return empty();
         }
         getLog().debug("Using credentials from Maven settings: " + server.getUsername());
-        return of(new Credentials(server.getUsername(), server.getPassword(), getEmail(server), null));
+
+        return of(new Credentials(server.getUsername(), decryptPassword(server.getPassword()), getEmail(server), null));
+    }
+
+    private String decryptPassword( String password )
+            throws MojoExecutionException
+    {
+        try {
+            SecDispatcher secDispatcher = new DefaultSecDispatcher() {{
+                _cipher = new DefaultPlexusCipher();
+            }};
+
+            return secDispatcher.decrypt(password);
+
+        } catch (SecDispatcherException e) {
+            throw new MojoExecutionException("Unable to decrypt password", e);
+        } catch (PlexusCipherException e) {
+            throw new MojoExecutionException("Unable to initialize password decryption", e);
+        }
     }
 
     /**
@@ -292,11 +331,15 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return Collections.unmodifiableList(list);
     }
 
-    protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig) throws MojoFailureException {
+    protected void enqueueForPushing(final String imageId, final ImageBuildConfiguration imageConfig)
+            throws MojoFailureException, MojoExecutionException
+    {
         enqueueForPushing(imageId, ofNullable(imageConfig.getNameAndTag()), ofNullable(imageConfig.getRegistry()));
     }
 
-    protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag, final Optional<String> registry) throws MojoFailureException {
+    protected void enqueueForPushing(final String imageId, final Optional<String> nameAndTag, final Optional<String> registry)
+            throws MojoFailureException, MojoExecutionException
+    {
         if (!registry.isPresent()) {
             enqueueForPushing(imageId, nameAndTag);
             return;
@@ -305,7 +348,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         enqueueForPushingToRegistry(imageId, nameAndTag, registry.get());
     }
 
-    protected void enqueueForPushingToRegistry(final String imageId, final Optional<String> nameAndTag, final String registry) throws MojoFailureException {
+    protected void enqueueForPushingToRegistry(final String imageId, final Optional<String> nameAndTag, final String registry)
+            throws MojoFailureException, MojoExecutionException
+    {
         requireNonNull(nameAndTag.orElse(null), "When pushing to an explicit registry, name-and-tag must be set.");
 
         // build extended tag by prepending registry to name and tag
@@ -333,7 +378,9 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
         return Collections.unmodifiableList(list);
     }
 
-    protected void attachTag(String imageId, String nameAndTag) throws MojoFailureException {
+    protected void attachTag(String imageId, String nameAndTag)
+            throws MojoFailureException, MojoExecutionException
+    {
         try {
             getLog().info(String.format("Tagging image '%s' with tag '%s'..", imageId, nameAndTag));
             getDockerProvider().tagImage(imageId, nameAndTag);

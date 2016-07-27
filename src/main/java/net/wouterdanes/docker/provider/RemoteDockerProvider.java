@@ -23,9 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedNetwork;
+import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
+import net.wouterdanes.docker.remoteapi.model.Network;
+import net.wouterdanes.docker.remoteapi.model.NetworkSettings;
 
 /**
  * This class is responsible for providing a docker interface with a remote (not running on localhost) docker host. It
@@ -51,20 +55,36 @@ public class RemoteDockerProvider extends RemoteApiBasedDockerProvider {
     }
 
     @Override
-    public List<ExposedPort> getExposedPorts(final String containerId) {
+    public ExposedNetworkInfo getExposedNetworkInfo( final String containerId) {
         ContainerInspectionResult containerInspectionResult = getContainersService().inspectContainer(containerId);
         if (containerInspectionResult.getNetworkSettings().getPorts().isEmpty()) {
-            return Collections.emptyList();
+            return new ExposedNetworkInfo();
         }
-        Map<String, List<ContainerInspectionResult.NetworkSettings.PortMappingInfo>> ports =
-                containerInspectionResult.getNetworkSettings().getPorts();
+        NetworkSettings networkSettings = containerInspectionResult.getNetworkSettings();
+        Map<String, List<NetworkSettings.PortMappingInfo>> ports =
+                networkSettings.getPorts();
+
         List<ExposedPort> exposedPorts = new ArrayList<>();
-        for (Map.Entry<String, List<ContainerInspectionResult.NetworkSettings.PortMappingInfo>> port : ports.entrySet()) {
+        for (Map.Entry<String, List<NetworkSettings.PortMappingInfo>> port : ports.entrySet()) {
             String exposedPort = port.getKey();
+            if ( port.getValue() == null || port.getValue().isEmpty() )
+            {
+                System.out.printf( "Exposed ports list is empty / missing for: '%s'\n", exposedPort );
+                continue;
+            }
+
             int hostPort = port.getValue().get(0).getHostPort();
             exposedPorts.add(new ExposedPort(exposedPort, hostPort, getHost()));
         }
-        return exposedPorts;
+
+        List<ExposedNetwork> nets = new ArrayList<>();
+        Map<String, Network> networks = networkSettings.getNetworks();
+        if ( networks != null )
+        {
+            networks.forEach( (name, net) -> nets.add( new ExposedNetwork( name, net.getIpAddress() )));
+        }
+
+        return new ExposedNetworkInfo().withExposedPorts( exposedPorts ).withExposedNetworks( nets );
     }
 
 }
