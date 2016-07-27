@@ -21,9 +21,11 @@ import net.wouterdanes.docker.provider.AbstractFakeDockerProvider;
 import net.wouterdanes.docker.provider.DockerExceptionThrowingDockerProvider;
 import net.wouterdanes.docker.provider.DockerProviderSupplier;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedNetwork;
 import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
+import net.wouterdanes.docker.remoteapi.model.ContainerHostConfig;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
 import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 import org.apache.maven.plugin.MojoExecution;
@@ -105,6 +107,26 @@ public class StartContainerMojoTest {
         assertEquals("1337", properties.getProperty("docker.containers.ubuntu.ports.tcp/8080.port"));
         assertEquals("localhost", properties.getProperty("docker.containers.ubuntu.ports.tcp/9000.host"));
         assertEquals("41329", properties.getProperty("docker.containers.ubuntu.ports.tcp/9000.port"));
+
+        assert mojo.getPluginErrors().isEmpty();
+    }
+
+    @Test
+    public void testThatMojoExposesContainerCustomNetworkAsProperty() throws Exception {
+        String customNet = "custom_net";
+        ExposedNetwork net = new ExposedNetwork( customNet, "172.18.0.6" );
+        when( FakeDockerProvider.instance.getExposedNetworkInfo( "someId" ) ).thenReturn(
+                new ExposedNetworkInfo().withExposedNetworks( Collections.singletonList( net ) ) );
+
+        ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()
+                .withId("ubuntu").fromImage("debian").withHostConfig( new ContainerHostConfig().withNetworkMode( customNet ) );
+
+        StartContainerMojo mojo = createMojo(startConfiguration);
+
+        mojo.execute();
+
+        Properties properties = mavenProject.getProperties();
+        assertEquals("172.18.0.6", properties.getProperty("docker.containers.ubuntu.nets.custom_net"));
 
         assert mojo.getPluginErrors().isEmpty();
     }
