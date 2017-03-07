@@ -1,6 +1,8 @@
 docker-maven-plugin
 ===================
 
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 [![Join the chat at https://gitter.im/wouterd/docker-maven-plugin](https://badges.gitter.im/wouterd/docker-maven-plugin.svg)](https://gitter.im/wouterd/docker-maven-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Build Status](https://travis-ci.org/wouterd/docker-maven-plugin.svg?branch=master)](https://travis-ci.org/wouterd/docker-maven-plugin)
@@ -13,9 +15,6 @@ As the documentation evolves with different plugin versions, be sure that before
 - Switch to the right tag to read the right documentation.
 
 The README of the master branch will cover the current development version and not cover the current released version.
-
-# Donations
-If you love this plugin and use it a lot and want to donate something for my time spent maintaining this project, use the following link: [Pay pal](https://www.paypal.me/WouterDanes). Donations are much appreciated!
 
 # Minimum versions required for the plugin to work
 
