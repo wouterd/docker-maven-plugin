@@ -50,6 +50,14 @@ public class PushImageMojo extends AbstractDockerMojo {
                 handleDockerException(message, e);
             }
         }
+
+        for (String imageID : imagesToDeleteAfterPush) {
+            try {
+                getDockerProvider().removeImage(imageID);
+            } catch (DockerException e) {
+                getLog().error("Failed to remove image", e);
+            }
+        }
     }
 
     private void ensureThatAllPushableImagesHaveAName() throws MojoFailureException {
@@ -64,5 +72,4 @@ public class PushImageMojo extends AbstractDockerMojo {
             throw new MojoFailureException("There are images that need to be pushed without a name.");
         }
     }
-
 }

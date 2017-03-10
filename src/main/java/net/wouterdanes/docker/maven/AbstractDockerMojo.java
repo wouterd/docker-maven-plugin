@@ -60,6 +60,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     private static final String BUILT_IMAGES_KEY = "builtImages";
     private static final String PUSHABLE_IMAGES_KEY = "pushableImages";
     private static final String ERRORS_KEY = "errors";
+    protected static ArrayList<String> imagesToDeleteAfterPush = new ArrayList<>();
 
     @Component
     private RepositorySystem repositorySystem;
@@ -224,10 +225,10 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     protected Credentials getCredentials() {
         // priority to credentials from plugin configuration over the ones from settings
         return Stream.of(getCredentialsFromParameters(), getCredentialsFromSettings())
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst()
-            .orElse(null);
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst()
+                .orElse(null);
     }
 
     private Optional<Credentials> getCredentialsFromParameters() {
@@ -240,12 +241,12 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     private Optional<Credentials> getCredentialsFromSettings() {
-        if(settings == null) {
+        if (settings == null) {
             getLog().debug("No settings.xml");
             return empty();
         }
         Server server = settings.getServer(serverId);
-        if(server == null) {
+        if (server == null) {
             getLog().debug("Cannot find server " + serverId + " in Maven settings");
             return empty();
         }

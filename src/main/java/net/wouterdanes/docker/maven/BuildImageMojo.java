@@ -60,6 +60,9 @@ public class BuildImageMojo extends AbstractPreVerifyDockerMojo {
                 String imageId = getDockerProvider().buildImage(image);
                 getLog().info(String.format("Image '%s' has Id '%s'", image.getId(), imageId));
                 registerBuiltImage(imageId, image);
+                if (image.isPush() && !image.isKeep()) {
+                    imagesToDeleteAfterPush.add(imageId);
+                }
             } catch (DockerException e) {
                 String errorMessage = String.format("Cannot build image '%s'", image.getId());
                 handleDockerException(errorMessage, e);

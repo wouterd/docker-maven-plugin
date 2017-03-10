@@ -25,7 +25,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,24 +39,30 @@ public class PushImageMojoTest {
 
     private final String fakeProviderKey = UUID.randomUUID().toString();
     private PushImageMojo mojo;
+    private ImageBuildConfiguration mockImage;
+
+    private static final String NAME_AND_TAG = UUID.randomUUID().toString();
 
     @Before
     public void setUp() throws Exception {
+        AbstractDockerMojo.imagesToDeleteAfterPush = new ArrayList<>();
+
+        mockImage = Mockito.mock(ImageBuildConfiguration.class);
+        Mockito.when(mockImage.getNameAndTag()).thenReturn(NAME_AND_TAG);
+        Mockito.when(mockImage.isPush()).thenReturn(true);
 
         FakeDockerProvider.instance = mock(FakeDockerProvider.class);
         DockerProviderSupplier.registerProvider(fakeProviderKey, FakeDockerProvider.class);
 
         mojo = new PushImageMojo();
         mojo.setPluginContext(new HashMap());
-
         mojo.setProviderName(fakeProviderKey);
     }
 
     @After
     public void tearDown() throws Exception {
-
         DockerProviderSupplier.removeProvider(fakeProviderKey);
-
+        AbstractDockerMojo.imagesToDeleteAfterPush = new ArrayList<>();
     }
 
     @Test(expected = MojoFailureException.class)
@@ -72,6 +81,39 @@ public class PushImageMojoTest {
 
         verify(FakeDockerProvider.instance, never()).pushImage(Matchers.<String>any());
 
+    }
+
+    @Test
+    public void willNotRemoveImagesIfImageListPropertyIsNotSet() throws Exception {
+
+        mojo.enqueueForPushing("some-image-id", mockImage);
+        mojo.enqueueForPushing("another-image-id", mockImage);
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance, never()).removeImage(Matchers.<String>any());
+    }
+
+    @Test
+    public void willRemoveImagesIfImageListPropertyContainsASingleID() throws Exception {
+        AbstractDockerMojo.imagesToDeleteAfterPush.add("some-image-id");
+
+        mojo.enqueueForPushing("some-image-id", mockImage);
+        mojo.enqueueForPushing("another-image-id", mockImage);
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance, VerificationModeFactory.times(1)).removeImage(Matchers.<String>any());
+    }
+
+    @Test
+    public void willRemoveImagesIfImageListPropertyContainsMultipleIDs() throws Exception {
+        AbstractDockerMojo.imagesToDeleteAfterPush.add("some-image-id");
+        AbstractDockerMojo.imagesToDeleteAfterPush.add("some-image-id,another-image-id");
+
+        mojo.enqueueForPushing("some-image-id", mockImage);
+        mojo.enqueueForPushing("another-image-id", mockImage);
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance, VerificationModeFactory.times(2)).removeImage(Matchers.<String>any());
     }
 
     public static class FakeDockerProvider extends AbstractFakeDockerProvider {
