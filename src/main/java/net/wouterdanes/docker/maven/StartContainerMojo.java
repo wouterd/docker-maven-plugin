@@ -34,8 +34,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import javax.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Pattern;
+
+import static java.nio.file.StandardOpenOption.APPEND;
 
 /**
  * This class is responsible for starting docking containers in the pre-integration phase of the maven build. The goal
@@ -62,11 +68,15 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
     @Parameter(defaultValue = "${mojoExecution}", readonly = true)
     private MojoExecution mojoExecution;
 
+    @Parameter(defaultValue = "${project.build.directory}/docker-plugin/docker-mappings.properties")
+    private File dockerMappingsFile;
+
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
         if (hasDuplicateIds() || hasInvalidLinks()) {
             return;
         }
+        generateMappingsFile();
         DockerProvider provider = getDockerProvider();
         for (ContainerStartConfiguration configuration : containers) {
             for (ContainerLink link : configuration.getLinks()) {
@@ -84,6 +94,7 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
                 String containerId = container.getId();
                 List<ExposedPort> exposedPorts = provider.getExposedPorts(containerId);
                 exposePortsToProject(configuration, exposedPorts);
+                writeListOfPortsToFile(configuration, exposedPorts);
                 getLog().info(String.format("Started container with id '%s'", containerId));
                 registerStartedContainer(configuration.getId(), container);
             } catch (DockerException e) {
@@ -98,15 +109,14 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
         }
     }
 
-    /** Avoid dangling containers if the build is interrupted (e.g. via Ctrl+C) before the StopContainer mojo runs. */
-    private void addShutdownHookToCleanUpContainers()
-    {
+    /**
+     * Avoid dangling containers if the build is interrupted (e.g. via Ctrl+C) before the StopContainer mojo runs.
+     */
+    private void addShutdownHookToCleanUpContainers() {
         getLog().info("Started containers will be forcibly cleaned up when the build finishes");
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
-        {
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 cleanUpStartedContainers();
             }
         }));
@@ -193,11 +203,37 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
 
     private void exposePortsToProject(ContainerStartConfiguration configuration, List<ExposedPort> exposedPorts) {
         exposedPorts.parallelStream().forEach(port -> {
-            String prefix = String.format("docker.containers.%s.ports.%s.",
-                    configuration.getId(), port.getContainerPort());
+            String prefix = String.format("docker.containers.%s.ports.%s.", configuration.getId(), port.getContainerPort());
             addPropertyToProject(prefix + "host", port.getHost());
             addPropertyToProject(prefix + "port", String.valueOf(port.getExternalPort()));
         });
+    }
+
+    private void generateMappingsFile() throws MojoExecutionException {
+        try {
+            if (dockerMappingsFile.getParentFile() != null) {
+                Files.createDirectories(dockerMappingsFile.getParentFile().toPath());
+            }
+            Files.createFile(dockerMappingsFile.toPath());
+            addPropertyToProject("docker.mappings.file", dockerMappingsFile.getAbsolutePath());
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error generating docker mapping file: ", e);
+        }
+    }
+
+    private void writeListOfPortsToFile(ContainerStartConfiguration configuration, List<ExposedPort> exposedPorts) throws MojoExecutionException {
+        try (BufferedWriter writer = Files.newBufferedWriter(dockerMappingsFile.toPath(), APPEND)) {
+            getLog().info(String.format("Writing properties for container '%s' to '%s'", configuration.getId(), dockerMappingsFile.getName()));
+            for (ExposedPort port : exposedPorts) {
+                String prefix = String.format("docker.containers.%s.ports.%s.", configuration.getId(), port.getContainerPort());
+                writer.write(prefix + "host=" + port.getHost());
+                writer.newLine();
+                writer.write(prefix + "port=" + String.valueOf(port.getExternalPort()));
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error writing to docker mapping file: ", e);
+        }
     }
 
     private void replaceImageWithBuiltImageIdIfInternalId(ContainerStartConfiguration configuration) {
@@ -225,6 +261,10 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
 
     public void setMojoExecution(final MojoExecution mojoExecution) {
         this.mojoExecution = mojoExecution;
+    }
+
+    public void setDockerMappingsFile(File dockerMappingsFile) {
+        this.dockerMappingsFile = dockerMappingsFile;
     }
 
     private void addPropertyToProject(String key, String value) {

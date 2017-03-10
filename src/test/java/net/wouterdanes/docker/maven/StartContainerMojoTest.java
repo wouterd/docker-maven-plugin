@@ -28,6 +28,7 @@ import net.wouterdanes.docker.remoteapi.model.ContainerLink;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,7 +36,12 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,6 +51,7 @@ import static org.mockito.Mockito.*;
 public class StartContainerMojoTest {
 
     private static final String FAKE_PROVIDER_KEY = UUID.randomUUID().toString();
+    private static final String DOCKER_MAPPINGS_FILE = System.getProperty("java.io.tmpdir") + File.separator + "docker-maven-plugin" + File.separator + "docker-mappings.properties";
 
     private final MavenProject mavenProject = mock(MavenProject.class);
     private final MojoExecution mojoExecution = new MojoExecution(null, "start-containers", "some-id");
@@ -69,6 +76,7 @@ public class StartContainerMojoTest {
     @After
     public void tearDown() throws Exception {
         DockerProviderSupplier.removeProvider(FAKE_PROVIDER_KEY);
+        Files.deleteIfExists(Paths.get(DOCKER_MAPPINGS_FILE));
     }
 
     @Test
@@ -285,8 +293,8 @@ public class StartContainerMojoTest {
         final ContainerStartConfiguration parent = new ContainerStartConfiguration()
                 .withId("parent")
                 .withLink(new ContainerLink()
-                                .toContainer("linked")
-                                .withAlias("database")
+                        .toContainer("linked")
+                        .withAlias("database")
                 );
 
         when(FakeDockerProvider.instance.getLogs("linked")).thenReturn("", "", "there");
@@ -311,15 +319,15 @@ public class StartContainerMojoTest {
 
     @Test
     public void testThatMojoStartsAContainerOnTheProviderWithEnvironmentVariables() throws Exception {
-    	Map<String, String> env = new HashMap<>();
-    	env.put("TEST_KEY", "test value");
-    	
+        Map<String, String> env = new HashMap<>();
+        env.put("TEST_KEY", "test value");
+
         ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration()
-        	.withEnv(env);
+                .withEnv(env);
         StartContainerMojo mojo = createMojo(startConfiguration);
 
         mojo.execute();
-        
+
         ArgumentCaptor<ContainerStartConfiguration> captor = ArgumentCaptor.forClass(ContainerStartConfiguration.class);
         verify(FakeDockerProvider.instance).startContainer(captor.capture());
 
@@ -361,6 +369,22 @@ public class StartContainerMojoTest {
         assertEquals("12:34:56:78:9a:bc", passedValue.getMacAddress());
     }
 
+    @Test
+    public void testThatDockerMappingsFileIsCreated() throws Exception {
+        ContainerStartConfiguration startConfiguration = new ContainerStartConfiguration();
+        StartContainerMojo mojo = createMojo(startConfiguration);
+
+        File dockerMappingsFile = new File(DOCKER_MAPPINGS_FILE);
+
+        assertEquals(dockerMappingsFile.exists(), false);
+
+        mojo.execute();
+
+        verify(FakeDockerProvider.instance).startContainer(startConfiguration);
+
+        assertEquals(dockerMappingsFile.exists(), true);
+    }
+
     private StartContainerMojo createMojo(final ContainerStartConfiguration startConfiguration) {
         return createMojo(startConfiguration, FAKE_PROVIDER_KEY);
     }
@@ -375,6 +399,7 @@ public class StartContainerMojoTest {
         mojo.setProviderName(provider);
         mojo.setPluginContext(new HashMap());
         mojo.setMojoExecution(mojoExecution);
+        mojo.setDockerMappingsFile(new File(DOCKER_MAPPINGS_FILE));
 
         return mojo;
     }
