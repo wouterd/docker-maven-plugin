@@ -55,7 +55,9 @@ public class TagImageMojo extends AbstractDockerMojo {
         }
     }
 
-    private void applyTagsToImage(ImageTagConfiguration config) throws MojoFailureException {
+    private void applyTagsToImage(ImageTagConfiguration config)
+            throws MojoFailureException, MojoExecutionException
+    {
         String imageId = config.getId();
         boolean push = config.isPush();
         Optional<String> registry = Optional.ofNullable(config.getRegistry());

@@ -44,10 +44,17 @@ public class StopContainerMojo extends AbstractPreVerifyDockerMojo {
 
             getLog().info(String.format("Removing image '%s' (%s) ...", image.getImageId(), image.getStartId()));
 
-            try {
-                getDockerProvider().removeImage(image.getImageId());
-            } catch (DockerException e) {
-                getLog().error("Failed to remove image", e);
+            if ( !keepContainers )
+            {
+                try {
+                    getDockerProvider().removeImage(image.getImageId());
+                } catch (DockerException e) {
+                    getLog().error("Failed to remove image", e);
+                }
+            }
+            else
+            {
+                System.out.println( "Keeping containers! Be sure to remove them manually!!" );
             }
         }
     }

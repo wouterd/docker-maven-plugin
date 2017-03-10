@@ -2,6 +2,7 @@ package net.wouterdanes.docker.provider;
 
 import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
@@ -43,8 +44,8 @@ public abstract class AbstractFakeDockerProvider implements DockerProvider {
     }
 
     @Override
-    public List<ExposedPort> getExposedPorts(final String containerId) {
-        return proxy.getExposedPorts(containerId);
+    public ExposedNetworkInfo getExposedNetworkInfo( final String containerId) {
+        return proxy.getExposedNetworkInfo(containerId);
     }
 
     @Override

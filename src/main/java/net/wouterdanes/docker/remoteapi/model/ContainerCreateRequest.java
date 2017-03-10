@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
@@ -46,7 +47,13 @@ public class ContainerCreateRequest {
     private List<String> env;
     @JsonProperty("MacAddress")
     private String macAddress;
-    
+
+    @JsonProperty("HostConfig")
+    private ContainerHostConfig hostConfig;
+
+    @JsonIgnore
+    private String containerName;
+
     public String getHostname() {
         return hostname;
     }
@@ -120,4 +127,25 @@ public class ContainerCreateRequest {
         return this;
     }
 
+    public ContainerCreateRequest withHostConfig( ContainerHostConfig hostConfig )
+    {
+        this.hostConfig = hostConfig;
+        return this;
+    }
+
+    public ContainerCreateRequest withContainerName( String containerName )
+    {
+        this.containerName = containerName;
+        return this;
+    }
+
+    public ContainerHostConfig getHostConfig()
+    {
+        return hostConfig;
+    }
+
+    public String getContainerName()
+    {
+        return containerName;
+    }
 }

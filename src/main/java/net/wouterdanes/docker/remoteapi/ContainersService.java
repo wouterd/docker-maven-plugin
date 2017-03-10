@@ -27,6 +27,8 @@ import net.wouterdanes.docker.remoteapi.model.ContainerStartRequest;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.nio.ByteBuffer;
@@ -47,10 +49,17 @@ public class ContainersService extends BaseService {
     public String createContainer(ContainerCreateRequest containerCreateRequest) {
         String createResponseStr;
         try {
-            createResponseStr = getServiceEndPoint()
-                    .path("/create")
-                    .request(MediaType.APPLICATION_JSON_TYPE)
-                    .post(Entity.entity(toJson(containerCreateRequest), MediaType.APPLICATION_JSON_TYPE), String.class);
+            WebTarget target = getServiceEndPoint().path( "/create" );
+
+            String name = containerCreateRequest.getContainerName();
+            if ( name != null )
+            {
+                target.queryParam( "name", name );
+            }
+
+            Invocation.Builder request = target.request( MediaType.APPLICATION_JSON_TYPE );
+            createResponseStr  = request.post(Entity.entity(toJson(containerCreateRequest), MediaType.APPLICATION_JSON_TYPE), String.class);
+
         } catch (WebApplicationException e) {
             throw makeImageTargetingException(containerCreateRequest.getImage(), e);
         }
@@ -119,12 +128,12 @@ public class ContainersService extends BaseService {
         checkContainerTargetingResponse(id, statusInfo);
     }
 
+    // TODO: It looks like ContainerStartRequest is not required anymore...should it be removed?
     public void startContainer(String id, ContainerStartRequest configuration) {
-        Response response = getServiceEndPoint()
-                .path(id)
-                .path("/start")
-                .request()
-                .post(Entity.entity(toJson(configuration), MediaType.APPLICATION_JSON_TYPE));
+        WebTarget target = getServiceEndPoint().path( id ).path( "/start" );
+
+        // Not necessary in v1.21+: .post( Entity.entity( toJson(configuration), MediaType.APPLICATION_JSON_TYPE ) );
+        Response response = target.request().method("POST");
 
         Response.StatusType statusInfo = response.getStatusInfo();
         response.close();

@@ -19,6 +19,7 @@ package net.wouterdanes.docker.provider;
 
 import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.provider.model.ImageBuildConfiguration;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
@@ -67,11 +68,12 @@ public interface DockerProvider {
     void deleteContainer(String containerId);
 
     /**
-     * Returns a list of ports exposed by the container, including information on how to reach them
+     * Returns a list of exposed ports and internal network configurations available for the container. Includes
+     * information on how to reach exposed ports.
      * @param containerId the Id of the container
      * @return {@link List} of {@link net.wouterdanes.docker.provider.model.ExposedPort}s
      */
-    List<ExposedPort> getExposedPorts(String containerId);
+    ExposedNetworkInfo getExposedNetworkInfo( String containerId);
 
     /**
      * Builds a new Docker Image based on the passed configuration and returns the id of the newly created image.

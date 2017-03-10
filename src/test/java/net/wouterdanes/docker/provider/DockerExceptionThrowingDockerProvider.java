@@ -2,6 +2,7 @@ package net.wouterdanes.docker.provider;
 
 import java.util.List;
 
+import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import org.apache.maven.plugin.logging.Log;
 
 import net.wouterdanes.docker.provider.model.ContainerCommitConfiguration;
@@ -52,7 +53,7 @@ public class DockerExceptionThrowingDockerProvider implements DockerProvider {
     }
 
     @Override
-    public List<ExposedPort> getExposedPorts(final String containerId) {
+    public ExposedNetworkInfo getExposedNetworkInfo( final String containerId) {
         throwBadException();
         return null;
     }

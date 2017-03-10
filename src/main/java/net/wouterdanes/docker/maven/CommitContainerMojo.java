@@ -34,7 +34,9 @@ public class CommitContainerMojo extends AbstractPreVerifyDockerMojo {
         }
     }
 
-    protected void commitContainer(ContainerCommitConfiguration container) throws MojoFailureException {
+    protected void commitContainer(ContainerCommitConfiguration container)
+            throws MojoFailureException, MojoExecutionException
+    {
         getLog().info(String.format("Creating image for configuration '%s'", container));
         String containerId = container.getId();
         Optional<StartedContainerInfo> containerInfo = getInfoForContainerStartId(containerId);

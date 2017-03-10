@@ -20,6 +20,8 @@ package net.wouterdanes.docker.maven;
 import net.wouterdanes.docker.provider.DockerProvider;
 import net.wouterdanes.docker.provider.model.BuiltImageInfo;
 import net.wouterdanes.docker.provider.model.ContainerStartConfiguration;
+import net.wouterdanes.docker.provider.model.ExposedNetwork;
+import net.wouterdanes.docker.provider.model.ExposedNetworkInfo;
 import net.wouterdanes.docker.provider.model.ExposedPort;
 import net.wouterdanes.docker.remoteapi.exception.DockerException;
 import net.wouterdanes.docker.remoteapi.model.ContainerInspectionResult;
@@ -82,8 +84,18 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
                 getLog().info(String.format("Starting container '%s'..", configuration.getId()));
                 ContainerInspectionResult container = provider.startContainer(configuration);
                 String containerId = container.getId();
-                List<ExposedPort> exposedPorts = provider.getExposedPorts(containerId);
-                exposePortsToProject(configuration, exposedPorts);
+
+                ExposedNetworkInfo networkInfo = provider.getExposedNetworkInfo( containerId );
+
+                if ( networkInfo != null )
+                {
+                    List<ExposedPort> exposedPorts = networkInfo.getExposedPorts();
+                    exposePortsToProject(configuration, exposedPorts);
+
+                    List<ExposedNetwork> exposedNetworks = networkInfo.getExposedNetworks();
+                    exposeNetworksToProject( configuration, exposedNetworks );
+                }
+
                 getLog().info(String.format("Started container with id '%s'", containerId));
                 registerStartedContainer(configuration.getId(), container);
             } catch (DockerException e) {
@@ -107,7 +119,18 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
             @Override
             public void run()
             {
-                cleanUpStartedContainers();
+                try
+                {
+                    cleanUpStartedContainers();
+                }
+                catch ( MojoExecutionException e )
+                {
+                    if ( getLog().isDebugEnabled() )
+                    {
+                        e.printStackTrace();
+                    }
+                    getLog().error( "Failed to cleanup started containers: " + e.getMessage());
+                }
             }
         }));
     }
@@ -136,7 +159,18 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
         long maxWait = System.currentTimeMillis() + 1000 * container.getStartupTimeout();
         boolean finished = false;
         while (System.currentTimeMillis() <= maxWait) {
-            String logs = getDockerProvider().getLogs(containerId);
+            String logs = null;
+            try
+            {
+                logs = getDockerProvider().getLogs( containerId);
+            }
+            catch ( MojoExecutionException e )
+            {
+                getLog().error("Failed to setup docker provider", e);
+                finished=false;
+                break;
+            }
+
             if (logs != null && pattern.matcher(logs).find()) {
                 getLog().info(String.format("Container '%s' has completed startup", container.getId()));
                 finished = true;
@@ -197,6 +231,14 @@ public class StartContainerMojo extends AbstractPreVerifyDockerMojo {
                     configuration.getId(), port.getContainerPort());
             addPropertyToProject(prefix + "host", port.getHost());
             addPropertyToProject(prefix + "port", String.valueOf(port.getExternalPort()));
+        });
+    }
+
+    private void exposeNetworksToProject(ContainerStartConfiguration configuration, List<ExposedNetwork> exposedNetworks) {
+        exposedNetworks.parallelStream().forEach(net -> {
+            String key = String.format("docker.containers.%s.nets.%s",
+                                          configuration.getId(), net.getName());
+            addPropertyToProject(key, net.getIpAddress());
         });
     }
 
