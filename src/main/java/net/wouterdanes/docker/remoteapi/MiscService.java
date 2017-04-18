@@ -121,7 +121,6 @@ public class MiscService extends BaseService {
     public String buildImage(byte[] tarArchive, Optional<String> name, Optional<String> buildArguments) {
         Response response = getServiceEndPoint()
                 .path("/build")
-                .queryParam("q", true)
                 .queryParam("t", name.orElse(null))
                 .queryParam("buildargs", UriComponent.encode(buildArguments.orElse(null), UriComponent.Type.QUERY_PARAM_SPACE_ENCODED))
                 .queryParam("forcerm")
